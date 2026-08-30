@@ -3,6 +3,15 @@ import { fbFirestore } from '../firebase/firestore'
 import * as LucideIcons from 'lucide-react'
 import { LMS_URL } from '../constants'
 
+const FA_TO_LUCIDE_MAP = {
+  'fa-solid fa-graduation-cap': 'GraduationCap',
+  'fa-solid fa-book-open': 'BookOpen',
+  'fa-solid fa-file-pen': 'PenTool',
+  'fa-solid fa-chart-line': 'LineChart',
+  'fa-regular fa-calendar-check': 'CalendarCheck',
+  'fa-solid fa-user-tie': 'UserCircle'
+}
+
 const DEFAULT_FEATURES = [
   { icon: 'GraduationCap', title: 'Structured Classes',  desc: 'Daily scheduled classes with expert faculty in Tamil & English medium.', imageUrl: '', visible: true },
   { icon: 'BookOpen',      title: 'Study Materials',     desc: 'Comprehensive study notes and question banks aligned to exam pattern.', imageUrl: '', visible: true },
@@ -41,7 +50,8 @@ export default function WhatYouGet() {
                   <img src={feat.imageUrl} alt={feat.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 ) : (
                   (() => {
-                    const IconComponent = LucideIcons[feat.icon] || LucideIcons.Star
+                    const iconName = FA_TO_LUCIDE_MAP[feat.icon] || feat.icon
+                    const IconComponent = LucideIcons[iconName] || LucideIcons.Star
                     return <IconComponent size={24} strokeWidth={2.5} color="var(--cream)" />
                   })()
                 )}
