@@ -42,7 +42,7 @@ export default function HowNermaiWorks() {
           {/* Vertical connector */}
           <div style={{ position: 'absolute', top: 0, bottom: 0, left: '23px', width: '2px', backgroundColor: 'var(--gray-200)', zIndex: 0 }} />
 
-          {steps.map((step, i) => {
+          {steps.filter(s => s.visible !== false).map((step, i) => {
             const style = STEP_STYLES[i % STEP_STYLES.length]
             return (
               <div

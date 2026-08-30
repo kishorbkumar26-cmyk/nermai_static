@@ -14,6 +14,50 @@ function Field({ label, value, onChange, type = 'text', placeholder = '' }) {
   )
 }
 
+function Toggle({ label, checked, onChange }) {
+  return (
+    <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>
+      <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)} style={{ cursor: 'pointer' }} />
+      {label}
+    </label>
+  )
+}
+
+/* ── Section Visibility Editor ───────────────────────────────────────────── */
+function VisibilityEditor({ visibility = {}, onChange }) {
+  const update = (key, val) => onChange({ ...visibility, [key]: val })
+  
+  const SECTIONS = [
+    { key: 'stats', label: 'Stats Banner (Orange Numbers)' },
+    { key: 'features', label: 'Features Grid (What You Get)' },
+    { key: 'courses', label: 'Courses Section' },
+    { key: 'about', label: 'About Nermai Section' },
+    { key: 'steps', label: 'How It Works (Steps)' },
+    { key: 'results', label: 'Results & Marquee' },
+    { key: 'gallery', label: 'Gallery Section' },
+    { key: 'testimonials', label: 'Testimonials' },
+    { key: 'faq', label: 'FAQ Section' }
+  ]
+
+  return (
+    <div>
+      <p style={{ fontSize: '0.82rem', color: 'var(--gray-400)', marginBottom: '1.25rem' }}>
+        Show or hide entire sections on the public homepage.
+      </p>
+      <div className="ap-card" style={{ padding: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
+        {SECTIONS.map(sec => (
+          <Toggle 
+            key={sec.key} 
+            label={sec.label} 
+            checked={visibility[sec.key] !== false} 
+            onChange={v => update(sec.key, v)} 
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 /* ── Stats Editor ─────────────────────────────────────────────────────────── */
 function StatsEditor({ stats, onChange }) {
   const update = (i, key, val) => {
@@ -31,16 +75,21 @@ function StatsEditor({ stats, onChange }) {
       {stats.map((stat, i) => (
         <div key={i} className="ap-card" style={{ marginBottom: '0.75rem', padding: '1rem', position: 'relative' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-            <div style={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--maroon)' }}>
-              Stat {i + 1}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--maroon)' }}>
+                Stat {i + 1}
+              </div>
+              <Toggle label="Visible" checked={stat.visible !== false} onChange={v => update(i, 'visible', v)} />
             </div>
             {stats.length > 1 && (
               <button 
                 onClick={() => remove(i)} 
                 title="Remove Stat"
-                style={{ background: 'transparent', border: 'none', color: '#e53e3e', cursor: 'pointer' }}
+                className="btn"
+                style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #f87171', padding: '0.25rem 0.75rem', fontSize: '0.75rem', borderRadius: '4px' }}
               >
-                <i className="fa-solid fa-trash" />
+                <i className="fa-solid fa-trash" style={{ marginRight: '6px' }} />
+                Delete
               </button>
             )}
           </div>
@@ -74,8 +123,18 @@ function FeaturesEditor({ features, onChange }) {
       </p>
       {features.map((feat, i) => (
         <div key={i} className="ap-card" style={{ marginBottom: '0.75rem', padding: '1rem' }}>
-          <div style={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--maroon)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <i className={feat.icon} style={{ fontSize: '1rem' }} /> Feature {i + 1}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--maroon)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <i className={feat.icon} style={{ fontSize: '1rem' }} /> Feature {i + 1}
+              </div>
+              <Toggle label="Visible" checked={feat.visible !== false} onChange={v => update(i, 'visible', v)} />
+            </div>
+            {features.length > 1 && (
+              <button onClick={() => remove(i)} className="btn" style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #f87171', padding: '0.25rem 0.75rem', fontSize: '0.75rem', borderRadius: '4px' }}>
+                <i className="fa-solid fa-trash" style={{ marginRight: '6px' }} /> Delete
+              </button>
+            )}
           </div>
           <div className="ap-form-row">
             <Field label="FA Icon Class" value={feat.icon}  onChange={v => update(i, 'icon', v)} placeholder="fa-solid fa-graduation-cap" />
@@ -98,8 +157,18 @@ function CoursesEditor({ courses, onChange }) {
       </p>
       {courses.map((course, i) => (
         <div key={i} className="ap-card" style={{ marginBottom: '0.75rem', padding: '1rem' }}>
-          <div style={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--maroon)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ fontSize: '1.2rem' }}>{course.icon}</span> Course {i + 1}: {course.name}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--maroon)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ fontSize: '1.2rem' }}>{course.icon}</span> Course {i + 1}: {course.name}
+              </div>
+              <Toggle label="Visible" checked={course.visible !== false} onChange={v => update(i, 'visible', v)} />
+            </div>
+            {courses.length > 1 && (
+              <button onClick={() => remove(i)} className="btn" style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #f87171', padding: '0.25rem 0.75rem', fontSize: '0.75rem', borderRadius: '4px' }}>
+                <i className="fa-solid fa-trash" style={{ marginRight: '6px' }} /> Delete
+              </button>
+            )}
           </div>
           <div className="ap-form-row">
             <Field label="Emoji Icon" value={course.icon}    onChange={v => update(i, 'icon', v)} placeholder="🏛️" />
@@ -174,8 +243,18 @@ function StepsEditor({ steps, onChange }) {
       </p>
       {steps.map((step, i) => (
         <div key={i} className="ap-card" style={{ marginBottom: '0.75rem', padding: '1rem' }}>
-          <div style={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--maroon)', marginBottom: '0.75rem' }}>
-            Step {step.num}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--maroon)' }}>
+                Step {i + 1}
+              </div>
+              <Toggle label="Visible" checked={step.visible !== false} onChange={v => update(i, 'visible', v)} />
+            </div>
+            {steps.length > 1 && (
+              <button onClick={() => remove(i)} className="btn" style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #f87171', padding: '0.25rem 0.75rem', fontSize: '0.75rem', borderRadius: '4px' }}>
+                <i className="fa-solid fa-trash" style={{ marginRight: '6px' }} /> Delete
+              </button>
+            )}
           </div>
           <div className="ap-form-row">
             <Field label="Step Number" value={step.num}   onChange={v => update(i, 'num', v)} placeholder="01" />
@@ -190,14 +269,16 @@ function StepsEditor({ steps, onChange }) {
 
 /* ── Main HomeContentSection ─────────────────────────────────────────────── */
 const TABS = [
-  { id: 'stats',    label: 'Stats Bar',  icon: 'fa-chart-bar' },
-  { id: 'features', label: 'Features',   icon: 'fa-grip' },
-  { id: 'courses',  label: 'Courses',    icon: 'fa-graduation-cap' },
-  { id: 'about',    label: 'About',      icon: 'fa-circle-info' },
-  { id: 'steps',    label: 'How It Works', icon: 'fa-route' },
+  { id: 'visibility', icon: 'fa-eye',           label: 'Visibility' },
+  { id: 'stats',      icon: 'fa-chart-simple',  label: 'Stats Bar' },
+  { id: 'features',   icon: 'fa-bolt',          label: 'Features' },
+  { id: 'courses',    icon: 'fa-book-bookmark', label: 'Courses' },
+  { id: 'about',      icon: 'fa-address-card',  label: 'About' },
+  { id: 'steps',      icon: 'fa-stairs',        label: 'How It Works' }
 ]
 
 const DEFAULTS = {
+  visibility: { stats: true, about: true, features: true, courses: true, steps: true, results: true, gallery: true, testimonials: true, faq: true },
   stats: [
     { num: '2400+', label: 'Students',  sublabel: 'பயிற்சி பெற்ற மாணவர்கள்' },
     { num: '14+',   label: 'Years',     sublabel: 'ஆண்டுகள் அனுபவம்' },
@@ -237,7 +318,7 @@ const DEFAULTS = {
 }
 
 export default function HomeContentSection({ toast }) {
-  const [activeTab, setActiveTab] = useState('stats')
+  const [activeTab, setActiveTab] = useState('visibility')
   const [content, setContent] = useState(DEFAULTS)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -246,6 +327,7 @@ export default function HomeContentSection({ toast }) {
     fbFirestore.getSettings().then(s => {
       if (s.homeContent) {
         setContent(prev => ({
+          visibility: s.homeContent.visibility || prev.visibility,
           stats:    s.homeContent.stats    || prev.stats,
           features: s.homeContent.features || prev.features,
           courses:  s.homeContent.courses  || prev.courses,
@@ -303,6 +385,7 @@ export default function HomeContentSection({ toast }) {
       </div>
 
       {/* Tab content */}
+      {activeTab === 'visibility' && <VisibilityEditor visibility={content.visibility} onChange={v => setContent(c => ({ ...c, visibility: v }))} />}
       {activeTab === 'stats'    && <StatsEditor    stats={content.stats}       onChange={v => setContent(c => ({ ...c, stats: v }))} />}
       {activeTab === 'features' && <FeaturesEditor features={content.features} onChange={v => setContent(c => ({ ...c, features: v }))} />}
       {activeTab === 'courses'  && <CoursesEditor  courses={content.courses}   onChange={v => setContent(c => ({ ...c, courses: v }))} />}

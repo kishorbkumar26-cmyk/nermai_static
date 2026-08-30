@@ -29,7 +29,7 @@ export default function WhatYouGet() {
         </div>
 
         <div className="wyg-grid">
-          {features.map((feat, i) => (
+          {features.filter(f => f.visible !== false).map((feat, i) => (
             <div
               key={i}
               className="wyg-card reveal"

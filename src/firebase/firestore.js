@@ -51,6 +51,17 @@ const DEFAULT_SETTINGS = {
     telegram: '#'
   },
   homeContent: {
+    visibility: {
+      stats: true,
+      about: true,
+      features: true,
+      courses: true,
+      steps: true,
+      results: true,
+      gallery: true,
+      testimonials: true,
+      faq: true
+    },
     stats: [
       { num: '2400+', label: 'Students',  sublabel: 'பயிற்சி பெற்ற மாணவர்கள்' },
       { num: '14+',   label: 'Years',     sublabel: 'ஆண்டுகள் அனுபவம்' },

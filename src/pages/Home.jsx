@@ -81,10 +81,15 @@ function initReveal() {
 
 export default function Home() {
   const [about, setAbout] = useState(DEFAULT_ABOUT)
+  const [visibility, setVisibility] = useState({
+    stats: true, about: true, features: true, courses: true, steps: true,
+    results: true, gallery: true, testimonials: true, faq: true
+  })
 
   useEffect(() => {
     fbFirestore.getSettings().then(s => {
       if (s.homeContent?.about) setAbout(ab => ({ ...DEFAULT_ABOUT, ...s.homeContent.about }))
+      if (s.homeContent?.visibility) setVisibility(v => ({ ...v, ...s.homeContent.visibility }))
     })
   }, [])
 
@@ -105,14 +110,15 @@ export default function Home() {
         <HeroCarousel />
 
         {/* ── EXAM MARQUEE STRIP ── */}
-        <ExamMarquee />
+        {visibility.results !== false && <ExamMarquee />}
 
         {/* ── STATS BAR ── */}
-        <StatsBar />
+        {visibility.stats !== false && <StatsBar />}
 
         {/* ── ABOUT + INTRO ── */}
-        <section className="section about-intro-section" id="about">
-          <div className="container">
+        {visibility.about !== false && (
+          <section className="section about-intro-section" id="about">
+            <div className="container">
             <div className="about-intro-grid">
               {/* Left: results image */}
               <div className="reveal about-intro-img-wrap">
@@ -160,32 +166,33 @@ export default function Home() {
                 </a>
               </div>
             </div>
-          </div>
-        </section>
+            </div>
+          </section>
+        )}
 
-        {/* ── WHAT YOU GET (features grid) ── */}
-        <WhatYouGet />
+        {/* ── WHAT YOU GET (Features) ── */}
+        {visibility.features !== false && <WhatYouGet />}
 
         {/* ── COURSES ── */}
-        <Courses />
+        {visibility.courses !== false && <Courses />}
 
         {/* ── WHY NERMAI ── */}
         <WhyNermai />
 
         {/* ── HOW IT WORKS ── */}
-        <HowNermaiWorks />
+        {visibility.steps !== false && <HowNermaiWorks />}
 
-        {/* ── RESULTS / TOPPERS ── */}
-        <Results />
+        {/* ── RESULTS ── */}
+        {visibility.results !== false && <Results />}
 
         {/* ── GALLERY ── */}
-        <Gallery />
+        {visibility.gallery !== false && <Gallery />}
 
         {/* ── TESTIMONIALS ── */}
-        <Testimonials />
+        {visibility.testimonials !== false && <Testimonials />}
 
         {/* ── FAQ ── */}
-        <FAQ />
+        {visibility.faq !== false && <FAQ />}
 
         {/* ── FINAL CTA ── */}
         <section className="cta-final-section" id="enroll">

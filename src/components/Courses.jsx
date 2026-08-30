@@ -34,7 +34,7 @@ export default function Courses() {
         </div>
 
         <div className="courses-grid">
-          {courses.map((course, i) => (
+          {courses.filter(c => c.visible !== false).map((course, i) => (
             <div key={i} className="course-card reveal" style={{ '--reveal-delay': `${i * 80}ms` }}>
               <div className="course-card-num">{String(i + 1).padStart(2, '0')}</div>
               <div className="course-card-icon">{course.icon}</div>

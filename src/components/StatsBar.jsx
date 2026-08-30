@@ -57,7 +57,7 @@ export default function StatsBar() {
     <div className="stats-bar">
       <div className="container">
         <div className="stats-bar-inner">
-          {stats.map((stat, i) => (
+          {stats.filter(s => s.visible !== false).map((stat, i) => (
             <div key={i} className="stat-item">
               <span className="stat-number mono" ref={el => refs.current[i] = el}>
                 {stat.num}
