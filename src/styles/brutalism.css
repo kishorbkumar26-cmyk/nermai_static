@@ -38,3 +38,18 @@
   font-size: 0.85rem;
   font-weight: 700;
 }
+
+/* Hero Carousel Aspect Ratio */
+.hero-banner-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-bottom: 4px solid var(--n-ink);
+  aspect-ratio: 16 / 5; /* Matches 1920x600 Desktop */
+}
+
+@media (max-width: 768px) {
+  .hero-banner-container {
+    aspect-ratio: 3 / 4; /* Matches 768x1024 Mobile */
+  }
+}

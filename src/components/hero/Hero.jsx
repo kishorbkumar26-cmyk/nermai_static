@@ -58,16 +58,7 @@ export default function Hero({ autoPlayInterval = 8000 }) {
   if (!banners || banners.length === 0) return null;
 
   return (
-    <section 
-      style={{ 
-        position: 'relative', 
-        width: '100%', 
-        height: 'calc(100vh - 80px)', // Full height
-        minHeight: '600px',
-        borderBottom: '4px solid var(--n-ink)',
-        overflow: 'hidden'
-      }}
-    >
+    <section className="hero-banner-container">
       <AnimatePresence mode="wait">
         <BannerSlide 
           key={banners[currentIndex].id} 
