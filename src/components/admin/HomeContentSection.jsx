@@ -115,18 +115,20 @@ function StatsEditor({ stats, onChange }) {
 /* ── Features Editor ─────────────────────────────────────────────────────── */
 function FeaturesEditor({ features, onChange }) {
   const update = (i, key, val) => onChange(features.map((f, idx) => idx === i ? { ...f, [key]: val } : f))
+  const add = () => onChange([...features, { icon: 'Star', title: '', desc: '', imageUrl: '', visible: true }])
+  const remove = (i) => onChange(features.filter((_, idx) => idx !== i))
+
   return (
     <div>
       <p style={{ fontSize: '0.82rem', color: 'var(--gray-400)', marginBottom: '1.25rem' }}>
-        Edit the 6 feature cards in the "Nermai Class Platform-ல் என்ன கிடைக்கும்?" section.
-        Use Font Awesome class names for icons (e.g. <code>fa-solid fa-graduation-cap</code>).
+        Edit the 6 feature cards. Provide either an Icon Name or an Image URL.
       </p>
       {features.map((feat, i) => (
         <div key={i} className="ap-card" style={{ marginBottom: '0.75rem', padding: '1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <div style={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--maroon)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <i className={feat.icon} style={{ fontSize: '1rem' }} /> Feature {i + 1}
+                Feature {i + 1}
               </div>
               <Toggle label="Visible" checked={feat.visible !== false} onChange={v => update(i, 'visible', v)} />
             </div>
@@ -137,12 +139,16 @@ function FeaturesEditor({ features, onChange }) {
             )}
           </div>
           <div className="ap-form-row">
-            <Field label="FA Icon Class" value={feat.icon}  onChange={v => update(i, 'icon', v)} placeholder="fa-solid fa-graduation-cap" />
-            <Field label="Title"         value={feat.title} onChange={v => update(i, 'title', v)} placeholder="Structured Classes" />
+            <Field label="Icon Name (e.g. GraduationCap)" value={feat.icon} onChange={v => update(i, 'icon', v)} placeholder="GraduationCap" />
+            <Field label="Image URL (Overrides Icon)" value={feat.imageUrl} onChange={v => update(i, 'imageUrl', v)} placeholder="https://..." />
           </div>
-          <Field label="Description" value={feat.desc} onChange={v => update(i, 'desc', v)} type="textarea" placeholder="Short description..." />
+          <Field label="Title" value={feat.title} onChange={v => update(i, 'title', v)} placeholder="Structured Classes" />
+          <Field label="Description" value={feat.desc} onChange={v => update(i, 'desc', v)} type="textarea" placeholder="Daily scheduled classes with expert faculty..." />
         </div>
       ))}
+      <button onClick={add} className="btn" style={{ marginTop: '0.5rem', width: '100%', justifyContent: 'center', background: 'var(--gray-100)', color: 'var(--gray-700)', border: '1px dashed var(--gray-300)' }}>
+        <i className="fa-solid fa-plus" style={{ marginRight: '8px' }} /> Add Feature
+      </button>
     </div>
   )
 }

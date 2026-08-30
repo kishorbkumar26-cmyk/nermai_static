@@ -76,12 +76,12 @@ const DEFAULT_SETTINGS = {
       { num: '98%',   label: 'Success',   sublabel: 'வெற்றி விகிதம்' }
     ],
     features: [
-      { icon: 'fa-solid fa-graduation-cap', title: 'Structured Classes',  desc: 'Daily scheduled classes with expert faculty in Tamil & English medium.' },
-      { icon: 'fa-solid fa-book-open',      title: 'Study Materials',     desc: 'Comprehensive study notes and question banks aligned to exam pattern.' },
-      { icon: 'fa-solid fa-file-pen',       title: 'Mock Tests',          desc: 'Weekly full-length tests and sectional tests with detailed analysis.' },
-      { icon: 'fa-solid fa-chart-line',     title: 'Progress Tracking',   desc: 'Personal performance dashboard to monitor strengths and weaknesses.' },
-      { icon: 'fa-regular fa-calendar-check', title: 'Class Schedule',    desc: 'Flexible batch timings for students, working professionals and rural aspirants.' },
-      { icon: 'fa-solid fa-user-tie',       title: 'Academic Guidance',   desc: 'One-on-one mentoring sessions with IAS/IPS selected alumni faculty.' }
+      { icon: 'GraduationCap', title: 'Structured Classes',  desc: 'Daily scheduled classes with expert faculty in Tamil & English medium.', imageUrl: '', visible: true },
+      { icon: 'BookOpen',      title: 'Study Materials',     desc: 'Comprehensive study notes and question banks aligned to exam pattern.', imageUrl: '', visible: true },
+      { icon: 'PenTool',       title: 'Mock Tests',          desc: 'Weekly full-length tests and sectional tests with detailed analysis.', imageUrl: '', visible: true },
+      { icon: 'LineChart',     title: 'Progress Tracking',   desc: 'Personal performance dashboard to monitor strengths and weaknesses.', imageUrl: '', visible: true },
+      { icon: 'CalendarCheck', title: 'Class Schedule',      desc: 'Flexible batch timings for students, working professionals and rural aspirants.', imageUrl: '', visible: true },
+      { icon: 'UserCircle',    title: 'Academic Guidance',   desc: 'One-on-one mentoring sessions with IAS/IPS selected alumni faculty.', imageUrl: '', visible: true }
     ],
     courses: [
       { icon: '🏛️', name: 'UPSC Civil Service',  subname: 'IAS / IPS / IFS',                      desc: "India's most prestigious exam. Comprehensive coaching for Prelims, Mains & Interview.", tags: ['CIVIL SERVICES','IAS','IPS','IFS'],                         slug: 'upsc' },
