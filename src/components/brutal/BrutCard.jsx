@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import '../styles/brutalism.css';
+import '../../styles/brutalism.css';
 
 export default function BrutCard({ children, className = '', style = {}, hoverLift = true }) {
   const baseClasses = 'brut-box' + (className ? ` ${className}` : '');

@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/brutalism.css';
+import '../../styles/brutalism.css';
 
 export default function BrutBadge({ label, icon, style = {} }) {
   return (

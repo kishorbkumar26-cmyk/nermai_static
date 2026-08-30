@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import '../styles/brutalism.css';
+import '../../styles/brutalism.css';
 
 export default function BrutButton({ children, onClick, className = '', type = 'button', variant = 'primary' }) {
   const isPrimary = variant === 'primary';
