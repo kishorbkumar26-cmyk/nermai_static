@@ -269,12 +269,17 @@ export default function CourseContentSection({ toast }) {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {content.faqs.map((faq, idx) => (
-                  <div key={idx} style={{ background: 'var(--gray-50)', padding: '1rem', border: '1px solid var(--gray-200)', position: 'relative' }}>
-                    <button style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', background: 'none', border: 'none', color: 'var(--maroon)', cursor: 'pointer' }} onClick={() => update('faqs', content.faqs.filter((_, i) => i !== idx))}>
-                      <i className="fa-solid fa-trash" />
-                    </button>
-                    <Field label={`Question ${idx + 1}`} value={faq.q} onChange={v => { const n = [...content.faqs]; n[idx].q = v; update('faqs', n) }} placeholder="Question?" />
-                    <Field label="Answer" value={faq.a} onChange={v => { const n = [...content.faqs]; n[idx].a = v; update('faqs', n) }} type="textarea" rows={2} placeholder="Answer text..." />
+                  <div key={idx} className="ap-card" style={{ padding: '1rem', border: '1px solid var(--gray-200)', background: 'var(--white)', boxShadow: 'none' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                      <div style={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--maroon)' }}>
+                        FAQ {idx + 1}
+                      </div>
+                      <button onClick={() => update('faqs', content.faqs.filter((_, i) => i !== idx))} className="btn" style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #f87171', padding: '0.25rem 0.75rem', fontSize: '0.75rem', borderRadius: '4px', textTransform: 'uppercase', fontWeight: 600 }}>
+                        <i className="fa-solid fa-trash" style={{ marginRight: '6px' }} /> Delete
+                      </button>
+                    </div>
+                    <Field label="Question" value={faq.q} onChange={v => { const n = [...content.faqs]; n[idx].q = v; update('faqs', n) }} placeholder="Question?" />
+                    <Field label="Answer" value={faq.a} onChange={v => { const n = [...content.faqs]; n[idx].a = v; update('faqs', n) }} type="textarea" rows={3} placeholder="Answer text..." />
                   </div>
                 ))}
               </div>
