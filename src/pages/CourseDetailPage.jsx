@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+import FAQ from '../components/FAQ'
 import { useReveal } from '../hooks/useReveal'
 import { fbFirestore } from '../firebase/firestore'
 import { LMS_URL } from '../constants'
@@ -138,10 +139,20 @@ export default function CourseDetailPage() {
       <Header />
       <main style={{ paddingTop: '80px' }}>
         {/* ── HERO ── */}
-        <section style={{ background: 'var(--maroon-deep)', color: 'var(--white)', padding: '4rem 0 3rem', borderBottom: '4px solid var(--saffron)', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', inset: 0, backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,0.03) 40px)', pointerEvents: 'none' }} />
-          <div className="container" style={{ position: 'relative' }}>
-            <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <section style={{ 
+          background: content.bannerUrl 
+            ? `linear-gradient(to bottom, rgba(74, 21, 33, 0.85), rgba(74, 21, 33, 0.95)), url(${content.bannerUrl}) center/cover no-repeat` 
+            : 'var(--maroon-deep)', 
+          color: 'var(--white)', 
+          padding: '6rem 0 5rem', 
+          borderBottom: '4px solid var(--saffron)', 
+          position: 'relative', 
+          overflow: 'hidden' 
+        }}>
+          {!content.bannerUrl && <div style={{ position: 'absolute', inset: 0, backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,0.03) 40px)', pointerEvents: 'none' }} />}
+          
+          <div className="container" style={{ position: 'relative', transform: content.bannerUrl ? 'translateZ(20px) scale(1.02)' : 'none', textShadow: content.bannerUrl ? '0 4px 15px rgba(0,0,0,0.5)' : 'none', transition: 'transform 0.3s ease-out' }}>
+            <div style={{ display: 'flex', gap: '2rem', alignItems: 'center', flexWrap: 'wrap', background: content.bannerUrl ? 'rgba(0,0,0,0.25)' : 'transparent', padding: content.bannerUrl ? '2rem' : '0', borderRadius: '12px', backdropFilter: content.bannerUrl ? 'blur(4px)' : 'none', border: content.bannerUrl ? '1px solid rgba(255,255,255,0.1)' : 'none', boxShadow: content.bannerUrl ? '0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2)' : 'none' }}>
               <div style={{ width: 80, height: 80, background: 'rgba(255,255,255,0.08)', border: '2px solid rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <CourseIcon course={content} />
               </div>
@@ -235,6 +246,11 @@ export default function CourseDetailPage() {
             </div>
           </div>
         </section>
+
+        {/* ── FAQS ── */}
+        {content.faqs && content.faqs.length > 0 && (
+          <FAQ faqs={content.faqs} eyebrow="Course FAQs" title={<>அடிக்கடி கேட்கப்படும்<br />கேள்விகள்</>} />
+        )}
 
         {/* ── CTA ── */}
         <section className="section cta-final" style={{ background: 'var(--maroon-deep)', color: 'var(--white)', textAlign: 'center' }}>

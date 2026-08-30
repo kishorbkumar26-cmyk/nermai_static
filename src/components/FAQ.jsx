@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const FAQS = [
+export const HOME_FAQS = [
   {
     q: 'Nermai எந்த தேர்வுகளுக்கான பயிற்சி வழங்குகிறது?',
     a: 'TNPSC (Group I, II, IV, VAO), UPSC Civil Services, TN Police (SI, PC), Banking (IBPS, SBI, RBI), Puducherry Government Exams மற்றும் SSC போன்ற போட்டித் தேர்வுகளுக்கான விரிவான பயிற்சி வழங்கப்படுகிறது.'
@@ -23,21 +23,23 @@ const FAQS = [
   },
 ]
 
-export default function FAQ() {
+export default function FAQ({ faqs = HOME_FAQS, eyebrow = 'FAQ', title = <>அடிக்கடி கேட்கப்படும்<br />கேள்விகள்</> }) {
   const [openIdx, setOpenIdx] = useState(0)
+
+  if (!faqs || faqs.length === 0) return null
 
   return (
     <section className="faq-section section" style={{ background: 'var(--cream)' }}>
       <div className="container-narrow">
         <div className="section-header" style={{ textAlign: 'left', marginBottom: 'var(--space-12)' }}>
-          <span className="eyebrow">FAQ</span>
+          {eyebrow && <span className="eyebrow">{eyebrow}</span>}
           <h2 className="section-title" style={{ marginTop: 'var(--space-3)' }}>
-            அடிக்கடி கேட்கப்படும்<br />கேள்விகள்
+            {title}
           </h2>
         </div>
 
         <div className="faq-list-v2">
-          {FAQS.map((faq, i) => (
+          {faqs.map((faq, i) => (
             <div
               key={i}
               className={`faq-item-v2${openIdx === i ? ' open' : ''}`}

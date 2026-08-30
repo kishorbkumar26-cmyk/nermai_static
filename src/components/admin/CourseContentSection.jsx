@@ -22,6 +22,8 @@ const EMPTY_CONTENT = {
   eligibility: '',
   batchInfo: '',
   feeInfo: '',
+  bannerUrl: '',
+  faqs: [],
   ctaText: 'Enroll Now',
   visibility: {
     overview: true,
@@ -212,6 +214,21 @@ export default function CourseContentSection({ toast }) {
             )}
           </div>
 
+          {/* Banner Section */}
+          <div className="ap-card" style={{ marginBottom: '1rem', padding: '1rem' }}>
+            <div style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.75rem', color: 'var(--maroon)' }}>
+              🖼️ Course Banner Image
+            </div>
+            <Field label="Banner Image URL (shown as hero background)" value={content.bannerUrl || ''} onChange={v => update('bannerUrl', v)} placeholder="https://example.com/banner.jpg" />
+            {content.bannerUrl && (
+              <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <img src={content.bannerUrl.includes('drive.google.com') ? content.bannerUrl.replace('/file/d/', '/thumbnail?id=').replace('/view?usp=sharing', '').replace('/view', '') : content.bannerUrl}
+                  alt="Banner Preview" style={{ width: '100%', maxHeight: 150, objectFit: 'cover', border: '1px solid var(--gray-200)', borderRadius: 0, background: '#f9f9f9' }}
+                  onError={e => e.target.style.display = 'none'} />
+              </div>
+            )}
+          </div>
+
           {/* Basic Info */}
           <div className="ap-card" style={{ marginBottom: '1rem', padding: '1rem' }}>
             <div style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.75rem', color: 'var(--maroon)' }}>📝 Basic Info</div>
@@ -237,6 +254,31 @@ export default function CourseContentSection({ toast }) {
             <Field label="Eligibility Criteria (Supports basic HTML like <ul>)" value={content.eligibility} onChange={v => update('eligibility', v)} type="textarea" placeholder="E.g. <ul><li>Age 21-32 years</li><li>Any degree</li></ul>" />
             <Field label="Batch Details" value={content.batchInfo} onChange={v => update('batchInfo', v)} type="textarea" placeholder="Morning / Evening / Weekend batches available..." />
             <Field label="Fee Structure & Offers" value={content.feeInfo} onChange={v => update('feeInfo', v)} type="textarea" placeholder="Total Fee: ₹45,000. Installments available..." />
+          </div>
+
+          {/* FAQs */}
+          <div className="ap-card" style={{ marginBottom: '1rem', padding: '1rem' }}>
+            <div style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.75rem', color: 'var(--maroon)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>❓ Course FAQs</span>
+              <button className="ap-btn ap-btn-outline" style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }} onClick={() => update('faqs', [...(content.faqs || []), { q: '', a: '' }])}>
+                <i className="fa-solid fa-plus" /> Add FAQ
+              </button>
+            </div>
+            {(!content.faqs || content.faqs.length === 0) ? (
+              <div style={{ fontSize: '0.85rem', color: 'var(--gray-400)', fontStyle: 'italic' }}>No FAQs added. Section will be hidden.</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {content.faqs.map((faq, idx) => (
+                  <div key={idx} style={{ background: 'var(--gray-50)', padding: '1rem', border: '1px solid var(--gray-200)', position: 'relative' }}>
+                    <button style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', background: 'none', border: 'none', color: 'var(--maroon)', cursor: 'pointer' }} onClick={() => update('faqs', content.faqs.filter((_, i) => i !== idx))}>
+                      <i className="fa-solid fa-trash" />
+                    </button>
+                    <Field label={`Question ${idx + 1}`} value={faq.q} onChange={v => { const n = [...content.faqs]; n[idx].q = v; update('faqs', n) }} placeholder="Question?" />
+                    <Field label="Answer" value={faq.a} onChange={v => { const n = [...content.faqs]; n[idx].a = v; update('faqs', n) }} type="textarea" rows={2} placeholder="Answer text..." />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
             </>
           )}
