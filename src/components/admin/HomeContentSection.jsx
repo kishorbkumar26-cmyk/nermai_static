@@ -298,6 +298,9 @@ function EventsEditor({ events = [], onChange }) {
 /* ── Steps Editor ────────────────────────────────────────────────────────── */
 function StepsEditor({ steps, onChange }) {
   const update = (i, key, val) => onChange(steps.map((s, idx) => idx === i ? { ...s, [key]: val } : s))
+  const add = () => onChange([...steps, { num: String(steps.length + 1).padStart(2, '0'), title: '', desc: '', visible: true }])
+  const remove = (i) => onChange(steps.filter((_, idx) => idx !== i))
+
   return (
     <div>
       <p style={{ fontSize: '0.82rem', color: 'var(--gray-400)', marginBottom: '1.25rem' }}>
@@ -325,6 +328,9 @@ function StepsEditor({ steps, onChange }) {
           <Field label="Description" value={step.desc} onChange={v => update(i, 'desc', v)} type="textarea" />
         </div>
       ))}
+      <button onClick={add} className="btn" style={{ marginTop: '0.5rem', width: '100%', justifyContent: 'center', background: 'var(--gray-100)', color: 'var(--gray-700)', border: '1px dashed var(--gray-300)' }}>
+        <i className="fa-solid fa-plus" style={{ marginRight: '8px' }} /> Add Step
+      </button>
     </div>
   )
 }
