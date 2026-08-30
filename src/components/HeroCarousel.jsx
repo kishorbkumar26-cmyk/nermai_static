@@ -15,6 +15,40 @@ const DEFAULT_SLIDES = [
   }
 ]
 
+/* Cinematic hero shown when admin has not yet uploaded any slide images */
+function HeroCinematicDefault({ cta }) {
+  return (
+    <div className="hero-cinematic-default">
+      <div className="hero-cinematic-grid" aria-hidden="true" />
+      <div className="hero-cinematic-radial" aria-hidden="true" />
+      <div className="hero-cinematic-content">
+        <div className="hero-cinematic-eyebrow">
+          <span className="hero-eyebrow-dot" />
+          NERMAI IAS ACADEMY · PUDUCHERRY
+        </div>
+        <h1 className="hero-cinematic-title">
+          Prepare with<br /><em>Purpose.</em>
+        </h1>
+        <p className="hero-cinematic-subtitle">
+          நேர்மையான கல்வி · வெற்றிக்கான உறுதியான பாதை
+        </p>
+        <p className="hero-cinematic-tagline">
+          Serve with Integrity.
+        </p>
+        <div className="hero-cinematic-actions">
+          <a href={cta?.link || '#'} className="btn btn-primary btn-lg" id="hero-enroll-btn">
+            {cta?.label || 'Enroll Now'} <i className="fa-solid fa-arrow-right" />
+          </a>
+          <a href="/why-nermai" className="btn btn-ghost btn-lg">Our Story</a>
+        </div>
+        <div className="hero-cinematic-meta">
+          UPSC · TNPSC · TN POLICE · BANKING · PUDUCHERRY EXAM
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function HeroCarousel() {
   const [slides, setSlides] = useState(DEFAULT_SLIDES)
   const [active, setActive] = useState(0)
@@ -86,32 +120,20 @@ export default function HeroCarousel() {
                   />
                 </picture>
               ) : (
-                /* Placeholder when no image uploaded yet */
-                <div className="hero-slide-placeholder">
-                  <div className="hero-slide-placeholder-inner">
-                    <i className="fa-solid fa-image" style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.4 }} />
-                    <div style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.5rem' }}>
-                      நேர்மை IAS Academy
-                    </div>
-                    <div style={{ fontSize: '0.85rem', opacity: 0.6, marginBottom: '1rem' }}>
-                      Admin panel மூலம் banner படங்கள் சேர்க்கவும்
-                    </div>
-                    <div style={{ fontSize: '0.75rem', opacity: 0.45, lineHeight: 1.6 }}>
-                      🖥️ PC: 1920 × 600 px &nbsp;·&nbsp; 📱 Mobile: 768 × 1024 px
-                    </div>
-                  </div>
-                </div>
+                /* Cinematic editorial default — admin hasn't uploaded images yet */
+                <HeroCinematicDefault cta={slide.cta ? { label: slide.cta, link: slide.ctaLink } : null} />
               )}
 
-              {/* Text overlay */}
-              {(slide.title || slide.subtitle || slide.cta) && (
-                <div className="hero-slide-overlay">
-                  <div className="hero-slide-content container-wide">
+              {/* Text overlay — only shown when there's an image + caption */}
+              {(desktopUrl || mobileUrl) && (slide.title || slide.subtitle) && (
+                <div className="hero-slide-text-overlay">
+                  <div className="container-wide">
+                    <div className="hero-slide-label">NERMAI IAS ACADEMY</div>
                     {slide.title && (
                       <h2 className="hero-slide-title">{slide.title}</h2>
                     )}
                     {slide.subtitle && (
-                      <p className="hero-slide-subtitle">{slide.subtitle}</p>
+                      <p className="hero-slide-sub">{slide.subtitle}</p>
                     )}
                     {slide.cta && (
                       <a
@@ -120,8 +142,7 @@ export default function HeroCarousel() {
                         target={slide.ctaLink && slide.ctaLink !== '#' ? '_blank' : undefined}
                         rel="noopener noreferrer"
                       >
-                        {slide.cta}
-                        <i className="fa-solid fa-arrow-right" style={{ marginLeft: '8px' }} />
+                        {slide.cta} <i className="fa-solid fa-arrow-right" style={{ marginLeft: '8px' }} />
                       </a>
                     )}
                   </div>

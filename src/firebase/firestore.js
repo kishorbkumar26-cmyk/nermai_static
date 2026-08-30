@@ -75,9 +75,9 @@ const DEFAULT_SETTINGS = {
     ],
     about: {
       eyebrow: 'About Nermai',
-      title: 'Introduction to Nermai IAS',
-      para1: 'The very basic purpose of starting this academy is that the civil services exam is considered to be the highest and most prestigious job of the country along with its 23 cadres including the Indian police service. They are meant to serve the people with a selfless attitude.',
-      para2: 'This exam has also proved to be the toughest exam out of all the competitive examinations. Keeping this fact in mind, a handful of youth from Puducherry started NERMAI IAS ACADEMY to change this stereotype and make quality coaching accessible to all.',
+      title: 'Built in Puducherry.\nDriven by purpose.',
+      para1: 'Quality coaching should not be a privilege. A handful of youth from Puducherry started NERMAI IAS ACADEMY to change this — making serious civil services preparation accessible to every aspirant, regardless of background.',
+      para2: 'The civil services examination is the most prestigious and most demanding exam in the country. Nermai exists to make the path clearer, the preparation more structured, and the journey less lonely.',
       imageUrl: 'https://nermaiiasacademy.in/wp-content/uploads/2024/11/WhatsApp-Image-2024-11-16-at-10.34.22-PM-2-1.jpeg',
       imageLabel: '187+ RESULTS · 2022–25',
       badges: [

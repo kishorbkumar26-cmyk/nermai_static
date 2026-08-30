@@ -3,13 +3,11 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { LMS_URL, CONTACT } from '../constants'
 
 const NAV_ITEMS = [
-  { label: 'Home',           href: '/',            type: 'route' },
-  { label: 'Why Nermai',     href: '/why-nermai',  type: 'route' },
-  { label: 'Courses',        href: '/courses',     type: 'route' },
-  { label: 'Online Course',  href: LMS_URL,        type: 'lms'   },
-  { label: 'Study Material', href: LMS_URL,        type: 'lms'   },
-  { label: 'Results',        href: '/#results',    type: 'hash'  },
-  { label: 'Contact Us',     href: '/contact',     type: 'route' },
+  { label: 'Home',       href: '/',          type: 'route' },
+  { label: 'Why Nermai', href: '/why-nermai', type: 'route' },
+  { label: 'Courses',    href: '/courses',    type: 'route' },
+  { label: 'Results',    href: '/#results',   type: 'hash'  },
+  { label: 'Contact Us', href: '/contact',    type: 'route' },
 ]
 
 export default function Header() {

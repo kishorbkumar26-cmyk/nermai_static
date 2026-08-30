@@ -16,9 +16,9 @@ import { fbFirestore } from '../firebase/firestore'
 
 const DEFAULT_ABOUT = {
   eyebrow: 'About Nermai',
-  title: 'Introduction to Nermai IAS',
-  para1: 'The very basic purpose of starting this academy is that the civil services exam is considered to be the highest and most prestigious job of the country along with its 23 cadres including the Indian police service. They are meant to serve the people with a selfless attitude.',
-  para2: 'This exam has also proved to be the toughest exam out of all the competitive examinations. Keeping this fact in mind, a handful of youth from Puducherry started NERMAI IAS ACADEMY to change this stereotype and make quality coaching accessible to all.',
+  title: 'Built in Puducherry.\nDriven by purpose.',
+  para1: 'Quality coaching should not be a privilege. A handful of youth from Puducherry started NERMAI IAS ACADEMY to change this — making serious civil services preparation accessible to every aspirant, regardless of background.',
+  para2: 'The civil services examination is the most prestigious and most demanding exam in the country. Nermai exists to make the path clearer, the preparation more structured, and the journey less lonely.',
   imageUrl: 'https://nermaiiasacademy.in/wp-content/uploads/2024/11/WhatsApp-Image-2024-11-16-at-10.34.22-PM-2-1.jpeg',
   imageLabel: '187+ RESULTS · 2022–25',
   badges: [
@@ -26,6 +26,44 @@ const DEFAULT_ABOUT = {
     { num: '14+',   label: 'Years' },
     { num: '2400+', label: 'Students' },
   ]
+}
+
+const MARQUEE_ITEMS = [
+  'UPSC CIVIL SERVICES', 'TNPSC GROUP I', 'TNPSC GROUP II', 'TNPSC GROUP IV',
+  'TN POLICE SI', 'TN POLICE PC', 'VAO', 'BANKING · IBPS · SBI',
+  'PUDUCHERRY UDC · LDC', 'DEPUTY TAHSILDAR', 'SSC CGL', 'RBI GRADE B',
+]
+
+function ExamMarquee() {
+  return (
+    <div className="exam-marquee-strip" aria-hidden="true">
+      <div className="exam-marquee-inner">
+        {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
+          <span key={i} className="exam-marquee-item">
+            <span className="exam-marquee-dot" />
+            {item}
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function ScrollProgress() {
+  const [progress, setProgress] = useState(0)
+  useEffect(() => {
+    const onScroll = () => {
+      const el = document.documentElement
+      const scrolled = el.scrollTop
+      const total = el.scrollHeight - el.clientHeight
+      setProgress(total > 0 ? (scrolled / total) * 100 : 0)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+  return (
+    <div className="scroll-progress-bar" style={{ width: `${progress}%` }} aria-hidden="true" />
+  )
 }
 
 function initReveal() {
@@ -46,7 +84,7 @@ export default function Home() {
 
   useEffect(() => {
     fbFirestore.getSettings().then(s => {
-      if (s.homeContent?.about) setAbout(ab => ({ ...ab, ...s.homeContent.about }))
+      if (s.homeContent?.about) setAbout(ab => ({ ...DEFAULT_ABOUT, ...s.homeContent.about }))
     })
   }, [])
 
@@ -57,11 +95,17 @@ export default function Home() {
 
   return (
     <>
+      {/* Scroll progress indicator */}
+      <ScrollProgress />
+
       <Header />
 
       <main>
         {/* ── HERO: Admin-managed sliding banners ── */}
         <HeroCarousel />
+
+        {/* ── EXAM MARQUEE STRIP ── */}
+        <ExamMarquee />
 
         {/* ── STATS BAR ── */}
         <StatsBar />
@@ -72,49 +116,54 @@ export default function Home() {
             <div className="about-intro-grid">
               {/* Left: results image */}
               <div className="reveal about-intro-img-wrap">
-                <div className="brut-frame">
+                <div className="about-img-frame">
                   {about.imageUrl && (
                     <img
                       src={about.imageUrl}
                       alt={about.imageLabel || 'Nermai IAS Academy Results'}
-                      style={{ width: '100%', display: 'block' }}
+                      style={{ width: '100%', display: 'block', objectFit: 'cover' }}
                       onError={e => { e.currentTarget.style.display = 'none' }}
                     />
                   )}
-                  <div className="brut-frame-label">{about.imageLabel}</div>
+                  <div className="about-img-label">{about.imageLabel}</div>
                 </div>
-              </div>
 
-              {/* Right: Introduction text */}
-              <div className="reveal about-intro-text">
-                <span className="eyebrow" style={{ color: 'var(--maroon)' }}>{about.eyebrow}</span>
-                <h2 className="section-title" style={{ marginTop: 'var(--space-2)' }}>
-                  {about.title}
-                </h2>
-                <p style={{ color: 'var(--gray-600)', lineHeight: 1.8, marginBottom: 'var(--space-4)' }}>
-                  {about.para1}
-                </p>
-                <p style={{ color: 'var(--gray-600)', lineHeight: 1.8, marginBottom: 'var(--space-6)' }}>
-                  {about.para2}
-                </p>
-                <div className="about-badges">
+                {/* Badges row */}
+                <div className="about-badges-row">
                   {(about.badges || []).map((b, i) => (
-                    <div key={i} className="about-badge">
+                    <div key={i} className="about-badge-v2">
                       <span className="about-badge-num">{b.num}</span>
                       <span className="about-badge-label">{b.label}</span>
                     </div>
                   ))}
                 </div>
-                <a href="/why-nermai" className="btn btn-outline" style={{ marginTop: 'var(--space-6)' }}>
-                  Continue Read <i className="fa-solid fa-arrow-right" style={{ marginLeft: '8px' }} />
+              </div>
+
+              {/* Right: Introduction text */}
+              <div className="reveal about-intro-text">
+                <span className="eyebrow">{about.eyebrow || 'About Nermai'}</span>
+                <h2 className="about-main-heading">
+                  {(about.title || DEFAULT_ABOUT.title).split('\n').map((line, i) => (
+                    <span key={i}>{line}{i === 0 && <br />}</span>
+                  ))}
+                </h2>
+                <div className="about-divider" />
+                <p className="about-para">{about.para1}</p>
+                <p className="about-para">{about.para2}</p>
+                <div className="about-stamp">
+                  <div className="stamp-text">NERMAI</div>
+                  <div className="stamp-sub">IAS ACADEMY</div>
+                  <div className="stamp-meta">PUDUCHERRY · INDIA · EST. 2011</div>
+                </div>
+                <a href="/why-nermai" className="btn btn-outline about-cta-btn">
+                  Our Story <i className="fa-solid fa-arrow-right" style={{ marginLeft: '8px' }} />
                 </a>
               </div>
             </div>
           </div>
         </section>
 
-
-        {/* ── WHAT YOU GET (8-feature grid) ── */}
+        {/* ── WHAT YOU GET (features grid) ── */}
         <WhatYouGet />
 
         {/* ── COURSES ── */}
@@ -139,27 +188,35 @@ export default function Home() {
         <FAQ />
 
         {/* ── FINAL CTA ── */}
-        <section className="section cta-final" style={{ backgroundColor: 'var(--maroon-deep)', color: 'var(--white)', textAlign: 'center' }}>
-          <div className="container-narrow reveal">
-            <span className="eyebrow" style={{ color: 'var(--saffron)', marginBottom: 'var(--space-4)', display: 'block' }}>
-              BEGIN YOUR JOURNEY
-            </span>
-            <h2 className="display-large" style={{ color: 'var(--white)', marginBottom: 'var(--space-4)' }}>
-              உங்கள் வெற்றிப் பயணம்<br />இன்றே தொடங்கட்டும்.
-            </h2>
-            <p style={{ fontSize: '1.15rem', color: 'rgba(255,255,255,0.75)', marginBottom: 'var(--space-8)', maxWidth: '500px', margin: '0 auto var(--space-8)' }}>
-              தேர்வை மட்டும் நோக்கமாகக் கொள்ளாதீர்கள். தயாரிப்பை முறையாகத் தொடங்குங்கள்.
-            </p>
-            <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <a href={LMS_URL} className="btn btn-primary btn-lg" id="home-enroll-btn">
-                Enroll Now <i className="fa-solid fa-arrow-right" style={{ marginLeft: '8px' }} />
-              </a>
-              <a href="/contact" className="btn btn-lg" style={{ backgroundColor: 'rgba(255,255,255,0.12)', color: 'var(--white)', border: '1px solid rgba(255,255,255,0.3)' }}>
-                Contact Us
-              </a>
-            </div>
-            <div style={{ marginTop: 'var(--space-8)', fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>
-              UPSC · TNPSC · TN POLICE · BANKING · PUDUCHERRY EXAM
+        <section className="cta-final-section" id="enroll">
+          <div className="cta-final-bg-grid" aria-hidden="true" />
+          <div className="container-narrow">
+            <div className="cta-final-inner reveal">
+              <div className="cta-final-stamp-wrap" aria-hidden="true">
+                <div className="cta-final-stamp">
+                  <span>ந</span>
+                </div>
+              </div>
+              <span className="eyebrow cta-eyebrow">BEGIN YOUR JOURNEY</span>
+              <h2 className="cta-final-heading">
+                உங்கள் வெற்றிப் பயணம்<br />
+                <em>இன்றே தொடங்கட்டும்.</em>
+              </h2>
+              <p className="cta-final-sub">
+                தேர்வை மட்டும் நோக்கமாகக் கொள்ளாதீர்கள்.<br />
+                தயாரிப்பை முறையாகத் தொடங்குங்கள்.
+              </p>
+              <div className="cta-final-actions">
+                <a href={LMS_URL} className="btn btn-primary btn-lg cta-enroll-btn" id="home-enroll-btn" target="_blank" rel="noopener noreferrer">
+                  Enroll Now <i className="fa-solid fa-arrow-right" />
+                </a>
+                <a href="/contact" className="btn btn-ghost btn-lg">
+                  Talk to Us
+                </a>
+              </div>
+              <div className="cta-exam-row">
+                UPSC · TNPSC · TN POLICE · BANKING · PUDUCHERRY EXAM · SSC
+              </div>
             </div>
           </div>
         </section>
