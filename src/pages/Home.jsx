@@ -120,39 +120,21 @@ export default function Home() {
         {visibility.about !== false && (
           <section className="section about-intro-section" id="about">
             <div className="container">
-              <div 
-                className="about-intro-grid" 
-                style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: visibility.events !== false && about.eventsData?.length !== 0 ? '1fr 1fr' : '1fr',
-                  gap: '5rem',
-                  alignItems: 'start'
-                }}
-              >
+              <div className={`about-intro-grid ${visibility.events !== false && about.eventsData?.length !== 0 ? 'has-events' : ''}`}>
                 
                 {/* Left: Introduction text + Image/Badges group */}
-                <div 
-                  className="reveal about-intro-text"
-                  style={{ 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    alignItems: visibility.events !== false ? 'flex-start' : 'center',
-                    textAlign: visibility.events !== false ? 'left' : 'center',
-                    maxWidth: visibility.events !== false ? 'none' : '800px',
-                    margin: visibility.events !== false ? '0' : '0 auto'
-                  }}
-                >
+                <div className={`reveal about-intro-text ${visibility.events !== false ? 'events-active' : 'events-inactive'}`}>
                   <span className="eyebrow">{about.eyebrow || 'About Nermai'}</span>
                   <h2 className="about-main-heading">
                     {(about.title || DEFAULT_ABOUT.title).split('\n').map((line, i) => (
                       <span key={i}>{line}{i === 0 && <br />}</span>
                     ))}
                   </h2>
-                  <div className="about-divider" style={{ margin: visibility.events !== false ? '1.5rem 0' : '1.5rem auto' }} />
+                  <div className="about-divider" />
                   <p className="about-para">{about.para1}</p>
                   <p className="about-para">{about.para2}</p>
                   
-                  <div className="about-stamp" style={{ margin: visibility.events !== false ? '2rem 0' : '2rem auto' }}>
+                  <div className="about-stamp">
                     <div className="stamp-text">NERMAI</div>
                     <div className="stamp-sub">IAS ACADEMY</div>
                     <div className="stamp-meta">PUDUCHERRY · INDIA · EST. 2011</div>

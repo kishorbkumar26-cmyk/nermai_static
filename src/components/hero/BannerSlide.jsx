@@ -53,7 +53,7 @@ export default function BannerSlide({ banner, isActive }) {
         animate={{ scale: 1 }}
         transition={{ duration: 6, ease: "easeOut" }}
       >
-        <picture>
+        <picture style={{ display: 'block', width: '100%', height: '100%' }}>
           {banner.bgImageMobile && banner.bgImageMobile !== banner.bgImage && (
             <source media="(max-width: 768px)" srcSet={banner.bgImageMobile} />
           )}

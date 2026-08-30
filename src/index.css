@@ -3941,3 +3941,58 @@ ul, ol { list-style: none; }
   margin: 0;
   line-height: 1.5;
 }
+
+/* ── RESPONSIVE ABOUT SECTION LAYOUT ── */
+.about-intro-grid {
+  display: grid;
+  gap: 5rem;
+  align-items: start;
+}
+
+.about-intro-grid.has-events {
+  grid-template-columns: 1fr 1fr;
+}
+
+.about-intro-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.about-intro-text.events-inactive {
+  align-items: center;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.about-intro-text.events-active {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.about-intro-text.events-active .about-divider,
+.about-intro-text.events-active .about-stamp {
+  margin: 1.5rem 0;
+}
+
+.about-intro-text.events-inactive .about-divider,
+.about-intro-text.events-inactive .about-stamp {
+  margin: 1.5rem auto;
+}
+
+@media (max-width: 992px) {
+  .about-intro-grid.has-events {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  
+  .about-intro-text.events-active {
+    align-items: center;
+    text-align: center;
+  }
+  
+  .about-intro-text.events-active .about-divider,
+  .about-intro-text.events-active .about-stamp {
+    margin: 1.5rem auto;
+  }
+}
