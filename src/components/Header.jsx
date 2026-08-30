@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { fbFirestore } from '../firebase/firestore'
 import { LMS_URL, CONTACT } from '../constants'
 
 const NAV_ITEMS = [
@@ -13,12 +14,18 @@ const NAV_ITEMS = [
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [pageVisibility, setPageVisibility] = useState(null)
   const navigate = useNavigate()
   const location = useLocation()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', onScroll, { passive: true })
+    
+    fbFirestore.getSettings().then(s => {
+      setPageVisibility(s.pageVisibility || { courses: true, results: true })
+    })
+
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
@@ -56,7 +63,11 @@ export default function Header() {
 
             {/* Desktop Nav */}
             <nav className="header-nav" aria-label="Primary navigation">
-              {NAV_ITEMS.map(item => {
+              {NAV_ITEMS.filter(item => {
+                if (item.href === '/courses' && pageVisibility?.courses === false) return false
+                if (item.href === '/#results' && pageVisibility?.results === false) return false
+                return true
+              }).map(item => {
                 if (item.type === 'route') {
                   return (
                     <Link
@@ -146,10 +157,13 @@ export default function Header() {
           >
             <i className="fa-solid fa-xmark" />
           </button>
-        </div>
-
-        <div className="mobile-nav-links">
-          {NAV_ITEMS.map(item => {
+          {/* Mobile Nav */}
+          <nav className="header-mobile-nav">
+            {NAV_ITEMS.filter(item => {
+              if (item.href === '/courses' && pageVisibility?.courses === false) return false
+              if (item.href === '/#results' && pageVisibility?.results === false) return false
+              return true
+            }).map(item => {
             if (item.type === 'route') {
               return (
                 <Link key={item.href} to={item.href} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>

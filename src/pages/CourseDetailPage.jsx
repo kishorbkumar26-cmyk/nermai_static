@@ -166,7 +166,7 @@ export default function CourseDetailPage() {
         </section>
 
         {/* ── OVERVIEW ── */}
-        {content.overview && (
+        {(content.overview && content.visibility?.overview !== false) && (
           <section className="section" style={{ background: 'var(--cream)' }}>
             <div className="container">
               <div className="about-intro-grid">
@@ -186,7 +186,7 @@ export default function CourseDetailPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
 
               {/* Syllabus */}
-              {syllabusItems.length > 0 && (
+              {(syllabusItems.length > 0 && content.visibility?.syllabus !== false) && (
                 <div className="reveal brut-frame" style={{ padding: '1.5rem' }}>
                   <div className="eyebrow" style={{ marginBottom: '1rem' }}>Syllabus</div>
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
@@ -201,7 +201,7 @@ export default function CourseDetailPage() {
               )}
 
               {/* Eligibility */}
-              {eligibilityItems.length > 0 && (
+              {(eligibilityItems.length > 0 && content.visibility?.eligibility !== false) && (
                 <div className="reveal brut-frame" style={{ padding: '1.5rem' }}>
                   <div className="eyebrow" style={{ marginBottom: '1rem' }}>Eligibility</div>
                   <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
@@ -216,15 +216,15 @@ export default function CourseDetailPage() {
               )}
 
               {/* Batch & Fee */}
-              {(content.batchInfo || content.feeInfo) && (
+              {((content.batchInfo && content.visibility?.batchInfo !== false) || (content.feeInfo && content.visibility?.feeInfo !== false)) && (
                 <div className="reveal brut-frame" style={{ padding: '1.5rem' }}>
-                  {content.batchInfo && (
+                  {(content.batchInfo && content.visibility?.batchInfo !== false) && (
                     <>
                       <div className="eyebrow" style={{ marginBottom: '0.75rem' }}>Batch Info</div>
-                      <p style={{ color: 'var(--gray-600)', fontSize: '0.88rem', lineHeight: 1.7, marginBottom: content.feeInfo ? '1.5rem' : 0, whiteSpace: 'pre-wrap' }}>{content.batchInfo}</p>
+                      <p style={{ color: 'var(--gray-600)', fontSize: '0.88rem', lineHeight: 1.7, marginBottom: (content.feeInfo && content.visibility?.feeInfo !== false) ? '1.5rem' : 0, whiteSpace: 'pre-wrap' }}>{content.batchInfo}</p>
                     </>
                   )}
-                  {content.feeInfo && (
+                  {(content.feeInfo && content.visibility?.feeInfo !== false) && (
                     <>
                       <div className="eyebrow" style={{ marginBottom: '0.75rem' }}>Fee Details</div>
                       <p style={{ color: 'var(--gray-600)', fontSize: '0.88rem', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{content.feeInfo}</p>

@@ -33,6 +33,14 @@ const settingsDoc    = () => doc(db, COLLECTIONS.SETTINGS, 'main')
 
 const DEFAULT_SETTINGS = {
   passcode: 'nermai2024',
+  pageVisibility: {
+    courses: true,
+    results: true,
+    notices: true,
+    gallery: true,
+    toppers: true,
+    testimonials: true
+  },
   driveConfig: {
     appsScriptUrl: '',
     folderId: '',

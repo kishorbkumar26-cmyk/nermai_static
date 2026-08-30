@@ -23,6 +23,13 @@ const EMPTY_CONTENT = {
   batchInfo: '',
   feeInfo: '',
   ctaText: 'Enroll Now',
+  visibility: {
+    overview: true,
+    syllabus: true,
+    eligibility: true,
+    batchInfo: true,
+    feeInfo: true
+  }
 }
 
 function Field({ label, value, onChange, type = 'text', placeholder = '', rows = 3 }) {
@@ -41,6 +48,7 @@ export default function CourseContentSection({ toast }) {
   const [selectedSlug, setSelectedSlug] = useState('upsc')
   const [courseList, setCourseList] = useState(DEFAULT_COURSES)
   const [content, setContent] = useState(EMPTY_CONTENT)
+  const [activeTab, setActiveTab] = useState('content')
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
 
@@ -62,10 +70,20 @@ export default function CourseContentSection({ toast }) {
   useEffect(() => {
     if (!selectedSlug) return
     setLoading(true)
-    fbFirestore.getCourseContent(selectedSlug).then(data => {
-      setContent(data ? { ...EMPTY_CONTENT, ...data } : { ...EMPTY_CONTENT })
-      setLoading(false)
-    })
+    const cObj = courseList.find(c => c.slug === selectedSlug)
+    fbFirestore.getCourseContent(selectedSlug).then(snap => {
+      if (snap.exists()) {
+        const data = snap.data()
+        // Ensure visibility object exists
+        setContent({ 
+          ...EMPTY_CONTENT, 
+          ...data,
+          visibility: { ...EMPTY_CONTENT.visibility, ...(data.visibility || {}) }
+        })
+      } else {
+        setContent({ ...EMPTY_CONTENT, ...cObj }) // fallback to basic list info
+      }
+    }).finally(() => setLoading(false))
   }, [selectedSlug])
 
   const update = (key, val) => setContent(c => ({ ...c, [key]: val }))
@@ -81,8 +99,6 @@ export default function CourseContentSection({ toast }) {
       setSaving(false)
     }
   }
-
-  const selectedCourse = courseList.find(c => c.slug === selectedSlug)
 
   return (
     <div>
@@ -127,6 +143,38 @@ export default function CourseContentSection({ toast }) {
         </div>
       ) : (
         <>
+          {/* Tabs */}
+          <div className="ap-tabs" style={{ marginBottom: '1.5rem', display: 'flex', gap: '0.5rem', borderBottom: '2px solid var(--gray-200)', paddingBottom: '0.5rem' }}>
+            <button className={`ap-tab${activeTab === 'content' ? ' active' : ''}`} onClick={() => setActiveTab('content')} style={{ background: 'none', border: 'none', fontWeight: 600, padding: '0.5rem 1rem', cursor: 'pointer', color: activeTab === 'content' ? 'var(--maroon)' : 'var(--gray-500)', borderBottom: activeTab === 'content' ? '3px solid var(--maroon)' : '3px solid transparent', marginBottom: '-0.65rem' }}>
+              <i className="fa-solid fa-pen-to-square" style={{ marginRight: '0.5rem' }} /> Content
+            </button>
+            <button className={`ap-tab${activeTab === 'visibility' ? ' active' : ''}`} onClick={() => setActiveTab('visibility')} style={{ background: 'none', border: 'none', fontWeight: 600, padding: '0.5rem 1rem', cursor: 'pointer', color: activeTab === 'visibility' ? 'var(--maroon)' : 'var(--gray-500)', borderBottom: activeTab === 'visibility' ? '3px solid var(--maroon)' : '3px solid transparent', marginBottom: '-0.65rem' }}>
+              <i className="fa-solid fa-eye" style={{ marginRight: '0.5rem' }} /> Visibility
+            </button>
+          </div>
+
+          {activeTab === 'visibility' ? (
+            <div className="ap-card" style={{ padding: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+              {[
+                { key: 'overview', label: 'Overview Section' },
+                { key: 'syllabus', label: 'Syllabus Section' },
+                { key: 'eligibility', label: 'Eligibility Criteria' },
+                { key: 'batchInfo', label: 'Batch Information' },
+                { key: 'feeInfo', label: 'Fee Structure' }
+              ].map(sec => (
+                <label key={sec.key} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>
+                  <input
+                    type="checkbox"
+                    checked={content.visibility?.[sec.key] !== false}
+                    onChange={e => update('visibility', { ...content.visibility, [sec.key]: e.target.checked })}
+                    style={{ cursor: 'pointer', accentColor: 'var(--maroon)' }}
+                  />
+                  {sec.label}
+                </label>
+              ))}
+            </div>
+          ) : (
+            <>
           {/* Icon Section */}
           <div className="ap-card" style={{ marginBottom: '1rem', padding: '1rem' }}>
             <div style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.75rem', color: 'var(--maroon)' }}>
@@ -186,23 +234,16 @@ export default function CourseContentSection({ toast }) {
             <div style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.75rem', color: 'var(--maroon)' }}>📄 Full Page Content</div>
             <Field label="Overview (shown at top of detail page)" value={content.overview} onChange={v => update('overview', v)} type="textarea" rows={4} placeholder="Full overview of the course, exam pattern, importance..." />
             <Field label="Syllabus (each topic on a new line)" value={content.syllabus} onChange={v => update('syllabus', v)} type="textarea" rows={5} placeholder="General Studies Paper 1&#10;General Studies Paper 2&#10;Optional Subject..." />
-            <Field label="Eligibility" value={content.eligibility} onChange={v => update('eligibility', v)} type="textarea" rows={3} placeholder="Age: 21-32 years, Educational Qualification: Any Degree..." />
-            <Field label="Batch Info" value={content.batchInfo} onChange={v => update('batchInfo', v)} type="textarea" rows={3} placeholder="Next batch starting: October 2025, Duration: 12 months..." />
-            <Field label="Fee Info" value={content.feeInfo} onChange={v => update('feeInfo', v)} type="textarea" rows={2} placeholder="Fee: Affordable rates, Scholarship available for rural students..." />
+            <Field label="Eligibility Criteria (Supports basic HTML like <ul>)" value={content.eligibility} onChange={v => update('eligibility', v)} type="textarea" placeholder="E.g. <ul><li>Age 21-32 years</li><li>Any degree</li></ul>" />
+            <Field label="Batch Details" value={content.batchInfo} onChange={v => update('batchInfo', v)} type="textarea" placeholder="Morning / Evening / Weekend batches available..." />
+            <Field label="Fee Structure & Offers" value={content.feeInfo} onChange={v => update('feeInfo', v)} type="textarea" placeholder="Total Fee: ₹45,000. Installments available..." />
           </div>
+            </>
+          )}
 
-          {/* Save */}
-          <div style={{ position: 'sticky', bottom: '1rem', zIndex: 10 }}>
-            <button
-              className="ap-btn ap-btn-primary"
-              onClick={handleSave}
-              disabled={saving}
-              style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
-            >
-              {saving
-                ? <><i className="fa-solid fa-spinner fa-spin" /> Saving...</>
-                : <><i className="fa-solid fa-floppy-disk" /> Save Course Content</>
-              }
+          <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem' }}>
+            <button className="ap-btn ap-btn-primary" onClick={handleSave} disabled={saving} style={{ flex: 1, justifyContent: 'center' }}>
+              {saving ? <><i className="fa-solid fa-spinner fa-spin" /> Saving...</> : <><i className="fa-solid fa-floppy-disk" /> Save Course Content</>}
             </button>
           </div>
         </>

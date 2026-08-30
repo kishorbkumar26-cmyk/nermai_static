@@ -27,6 +27,7 @@ const SECTIONS = [
   { id: 'toppers',      label: 'Toppers',        icon: 'fa-solid fa-trophy',                group: 'Updates' },
   { id: 'testimonials', label: 'Reviews',        icon: 'fa-solid fa-quote-right',           group: 'Updates' },
   { id: 'siteinfo',     label: 'Site Info',      icon: 'fa-solid fa-circle-info',           group: 'Settings' },
+  { id: 'siteVisibility',label:'Site Visibility', icon: 'fa-solid fa-eye',                 group: 'Settings' },
   { id: 'drive',        label: 'Drive Config',   icon: 'fa-brands fa-google-drive',         group: 'Settings' },
   { id: 'settings',     label: 'Passcode',       icon: 'fa-solid fa-lock',                  group: 'Settings' },
 ]
@@ -94,6 +95,73 @@ function SettingsSection({ toast }) {
           Admin session expires when you close the browser or click Logout. Keep the passcode safe — it is not displayed anywhere on the public site.
         </p>
       </div>
+    </div>
+  )
+}
+
+function SiteVisibilitySection({ toast }) {
+  const [visibility, setVisibility] = useState({})
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    fbFirestore.getSettings().then(s => {
+      setVisibility(s.pageVisibility || {
+        courses: true, results: true, notices: true, gallery: true, toppers: true, testimonials: true
+      })
+      setLoading(false)
+    })
+  }, [])
+
+  const update = (key, val) => setVisibility(prev => ({ ...prev, [key]: val }))
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      await fbFirestore.updateSettings({ pageVisibility: visibility })
+      toast.success('Site visibility updated! Refresh the page to see changes on the public site.')
+    } catch (e) {
+      toast.error(e.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const PAGES = [
+    { key: 'courses', label: 'Course Pages (/courses)' },
+    { key: 'results', label: 'Results Gallery (/results)' },
+    { key: 'notices', label: 'Notices (/notices)' },
+    { key: 'gallery', label: 'Photo Gallery (/gallery)' },
+    { key: 'toppers', label: 'Toppers (/toppers)' },
+    { key: 'testimonials', label: 'Reviews (/reviews)' }
+  ]
+
+  if (loading) return <div style={{ padding: '2rem', color: 'var(--gray-400)' }}><i className="fa-solid fa-spinner fa-spin" /> Loading...</div>
+
+  return (
+    <div>
+      <h2 className="ap-section-title"><i className="fa-solid fa-eye" /> Site Visibility</h2>
+      <p style={{ fontSize: '0.85rem', color: 'var(--gray-500)', marginBottom: '1.5rem' }}>
+        Toggle the overall visibility of entire pages on the public website. If hidden, links in the navigation bar will disappear and direct access will redirect to the homepage.
+      </p>
+      
+      <div className="ap-card" style={{ padding: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+        {PAGES.map(page => (
+          <label key={page.key} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>
+            <input 
+              type="checkbox" 
+              checked={visibility[page.key] !== false} 
+              onChange={e => update(page.key, e.target.checked)} 
+              style={{ cursor: 'pointer' }} 
+            />
+            {page.label}
+          </label>
+        ))}
+      </div>
+      
+      <button className="ap-btn ap-btn-primary" onClick={handleSave} disabled={saving}>
+        {saving ? <><i className="fa-solid fa-spinner fa-spin" /> Saving...</> : 'Save Changes'}
+      </button>
     </div>
   )
 }
@@ -215,10 +283,11 @@ export default function AdminDashboard() {
           {/* Custom sections */}
           {active === 'courses'  && <CourseContentSection toast={toast} />}
           {active === 'results'  && <ResultsGallerySection toast={toast} />}
+          {active === 'siteVisibility' && <SiteVisibilitySection toast={toast} />}
           {active === 'settings' && <SettingsSection toast={toast} />}
 
           {/* Reused from AdminPortal (via named export) */}
-          {!['courses', 'results', 'settings'].includes(active) && (
+          {!['courses', 'results', 'siteVisibility', 'settings'].includes(active) && (
             <AdminPanelContent activeSection={active} toast={toast} />
           )}
         </div>
