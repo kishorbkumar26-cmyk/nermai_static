@@ -3,41 +3,23 @@ import { AnimatePresence } from 'framer-motion';
 import BannerSlide from './BannerSlide';
 import BannerIndicators from './BannerIndicators';
 
-// Mock config. This could eventually come from Firestore.
-// Content is treated as part of the composition.
+// Banners are entirely image-driven promotional artworks.
+// All typography, messaging, and stats are baked into the artwork itself.
 const DEFAULT_BANNERS = [
   {
     id: 'results',
-    category: 'RESULTS 2026',
-    title: 'OUR ASPIRANTS.\nOUR PRIDE.',
-    stats: [
-      { label: 'AIR 12', name: 'Student Name' },
-      { label: 'AIR 47', name: 'Student Name' },
-      { label: 'AIR 103', name: 'Student Name' }
-    ],
     bgImage: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80',
-    scene: 'results', // 3D depth on result cards
-    layout: 'center' // Typography layout strategy
+    scene: 'results', // Optional 3D enhancement layer
   },
   {
     id: 'admissions',
-    category: 'UPSC CSE 2027',
-    title: 'ADMISSIONS OPEN',
-    subtitle: 'FOUNDATION PROGRAM\nPRELIMS • MAINS • INTERVIEW',
-    ctaLabel: 'Enroll Now',
-    ctaLink: '/courses',
     bgImage: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80',
     scene: 'admissions',
-    layout: 'bottom-left'
   },
   {
     id: 'platform',
-    category: 'NERMAI CLASS PLATFORM',
-    title: 'LEARN. PRACTICE. IMPROVE.',
-    subtitle: 'LIVE CLASSES • TESTS • MATERIALS • MENTORSHIP',
     bgImage: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80',
     scene: 'none',
-    layout: 'center'
   }
 ];
 
@@ -59,7 +41,7 @@ export default function Hero({ banners = DEFAULT_BANNERS, autoPlayInterval = 800
       style={{ 
         position: 'relative', 
         width: '100%', 
-        height: 'calc(100vh - 80px)', // Full height minus navbar roughly
+        height: 'calc(100vh - 80px)', // Full height
         minHeight: '600px',
         borderBottom: '4px solid var(--n-ink)',
         overflow: 'hidden'
