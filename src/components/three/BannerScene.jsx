@@ -35,18 +35,18 @@ export default function BannerScene({ type }) {
         
         <ParallaxGroup>
           {type === 'admissions' && (
-            <group position={[4, 0, -2]}>
-              <NermaiCube position={[0, 1, 0]} />
-              <FloatingPaper position={[-1, -1, 1]} rotation={[0, -Math.PI / 6, Math.PI / 12]} />
-              <FloatingPaper position={[1.5, -2, -1]} rotation={[Math.PI / 8, Math.PI / 4, 0]} />
+            <group position={[0, 0, -5]}>
+              {/* Subtle ambient floating geometries behind the text */}
+              <FloatingPaper position={[-6, -2, -3]} rotation={[0, -Math.PI / 6, Math.PI / 12]} />
+              <FloatingPaper position={[6, 2, -1]} rotation={[Math.PI / 8, Math.PI / 4, 0]} />
             </group>
           )}
 
           {type === 'results' && (
-            <group position={[4, 0, -2]}>
-              <FloatingPaper position={[0, 0, 0]} rotation={[0, 0, 0]} />
-              <FloatingPaper position={[1, 1, -1]} rotation={[0, -Math.PI / 12, 0]} />
-              <FloatingPaper position={[-1, -1, 1]} rotation={[0, Math.PI / 12, 0]} />
+            <group position={[0, 0, -2]}>
+              {/* Subtle floating result depth elements */}
+              <FloatingPaper position={[-5, 2, -2]} rotation={[0, 0, -Math.PI / 24]} />
+              <FloatingPaper position={[5, -1, -4]} rotation={[0, -Math.PI / 12, Math.PI / 24]} />
             </group>
           )}
         </ParallaxGroup>

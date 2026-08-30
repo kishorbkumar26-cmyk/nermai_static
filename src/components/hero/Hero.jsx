@@ -4,36 +4,40 @@ import BannerSlide from './BannerSlide';
 import BannerIndicators from './BannerIndicators';
 
 // Mock config. This could eventually come from Firestore.
+// Content is treated as part of the composition.
 const DEFAULT_BANNERS = [
   {
+    id: 'results',
+    category: 'RESULTS 2026',
+    title: 'OUR ASPIRANTS.\nOUR PRIDE.',
+    stats: [
+      { label: 'AIR 12', name: 'Student Name' },
+      { label: 'AIR 47', name: 'Student Name' },
+      { label: 'AIR 103', name: 'Student Name' }
+    ],
+    bgImage: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80',
+    scene: 'results', // 3D depth on result cards
+    layout: 'center' // Typography layout strategy
+  },
+  {
     id: 'admissions',
-    eyebrow: 'UPSC CSE 2027',
-    title: 'Admissions Open',
-    subtitle: 'Build your preparation with discipline, guidance and purpose. The structured approach to cracking civil services.',
+    category: 'UPSC CSE 2027',
+    title: 'ADMISSIONS OPEN',
+    subtitle: 'FOUNDATION PROGRAM\nPRELIMS • MAINS • INTERVIEW',
     ctaLabel: 'Enroll Now',
     ctaLink: '/courses',
     bgImage: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80',
-    scene: 'admissions'
-  },
-  {
-    id: 'results',
-    eyebrow: 'Results 2026',
-    title: 'Our Students. Our Pride.',
-    subtitle: 'Consistently producing top ranks with our intensive preparation system.',
-    ctaLabel: 'View Results',
-    ctaLink: '/results',
-    bgImage: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80',
-    scene: 'results'
+    scene: 'admissions',
+    layout: 'bottom-left'
   },
   {
     id: 'platform',
-    eyebrow: 'Nermai Class Platform',
-    title: 'Learn. Practice. Improve.',
-    subtitle: 'Experience our digital learning ecosystem designed for serious aspirants.',
-    ctaLabel: 'Explore Platform',
-    ctaLink: 'https://class.nermai.in',
+    category: 'NERMAI CLASS PLATFORM',
+    title: 'LEARN. PRACTICE. IMPROVE.',
+    subtitle: 'LIVE CLASSES • TESTS • MATERIALS • MENTORSHIP',
     bgImage: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80',
-    scene: 'none' // No 3D scene for this one
+    scene: 'none',
+    layout: 'center'
   }
 ];
 
@@ -55,9 +59,10 @@ export default function Hero({ banners = DEFAULT_BANNERS, autoPlayInterval = 800
       style={{ 
         position: 'relative', 
         width: '100%', 
-        height: '100vh',
+        height: 'calc(100vh - 80px)', // Full height minus navbar roughly
         minHeight: '600px',
-        borderBottom: '4px solid var(--n-ink)'
+        borderBottom: '4px solid var(--n-ink)',
+        overflow: 'hidden'
       }}
     >
       <AnimatePresence mode="wait">
