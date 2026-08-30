@@ -166,10 +166,10 @@ function HeroSection({ toast }) {
               </div>
             )}
             <div className="ap-form-group" style={{ marginTop: '0.75rem' }}>
-              <label>Or paste Drive URL (Desktop)</label>
+              <label>Or paste Drive / Online Image URL (Desktop)</label>
               <input
                 className="ap-input"
-                placeholder="https://drive.google.com/file/d/... (PC image)"
+                placeholder="https://... (Drive or any image URL)"
                 value={form.urlDesktop}
                 onChange={e => setForm(f => ({ ...f, urlDesktop: e.target.value }))}
               />
@@ -196,10 +196,10 @@ function HeroSection({ toast }) {
               </div>
             )}
             <div className="ap-form-group" style={{ marginTop: '0.75rem' }}>
-              <label>Or paste Drive URL (Mobile)</label>
+              <label>Or paste Drive / Online Image URL (Mobile)</label>
               <input
                 className="ap-input"
-                placeholder="https://drive.google.com/file/d/... (Mobile image)"
+                placeholder="https://... (Drive or any image URL)"
                 value={form.urlMobile}
                 onChange={e => setForm(f => ({ ...f, urlMobile: e.target.value }))}
               />
