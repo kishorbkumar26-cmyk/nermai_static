@@ -34,7 +34,11 @@ export default function EventsCalendar({ eventsData }) {
                 <span className="event-date-day">{ev.dateLine2}</span>
               </div>
               <div className="event-content">
-                <a href="#" className="event-title">{ev.title}</a>
+                {ev.url ? (
+                  <a href={ev.url} target="_blank" rel="noopener noreferrer" className="event-title link-title">{ev.title}</a>
+                ) : (
+                  <span className="event-title text-title">{ev.title}</span>
+                )}
                 <p className="event-subtitle">{ev.subtitle}</p>
               </div>
             </div>
