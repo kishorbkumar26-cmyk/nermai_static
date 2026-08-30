@@ -5,24 +5,7 @@ import BannerIndicators from './BannerIndicators';
 import { fbFirestore } from '../../firebase/firestore';
 import { driveStorage } from '../../services/driveStorage';
 
-// Fallback banners if admin has not uploaded any
-const DEFAULT_BANNERS = [
-  {
-    id: 'results',
-    bgImage: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80',
-    scene: 'results', // Optional 3D enhancement layer
-  },
-  {
-    id: 'admissions',
-    bgImage: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80',
-    scene: 'admissions',
-  },
-  {
-    id: 'platform',
-    bgImage: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80',
-    scene: 'none',
-  }
-];
+import HeroCinematicDefault from './HeroCinematicDefault';
 
 export default function Hero({ autoPlayInterval = 8000 }) {
   const [banners, setBanners] = useState([]);
@@ -42,7 +25,7 @@ export default function Hero({ autoPlayInterval = 8000 }) {
           ctaLink: item.ctaLink // For clicking the banner if we want to add that
         };
       });
-      setBanners(formattedBanners.length > 0 ? formattedBanners : DEFAULT_BANNERS);
+      setBanners(formattedBanners);
     });
     return () => unsub();
   }, []);
@@ -55,7 +38,9 @@ export default function Hero({ autoPlayInterval = 8000 }) {
     return () => clearInterval(timer);
   }, [banners.length, autoPlayInterval]);
 
-  if (!banners || banners.length === 0) return null;
+  if (!banners || banners.length === 0) {
+    return <HeroCinematicDefault />;
+  }
 
   return (
     <section className="hero-banner-container">

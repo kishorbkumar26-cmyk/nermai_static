@@ -119,6 +119,26 @@ function HeroSection({ toast }) {
     catch (e) { toast.error(e.message) }
   }
 
+  const handleMoveSlide = async (id, direction) => {
+    const currentIndex = slides.findIndex(s => s.id === id);
+    if (currentIndex < 0) return;
+    const targetIndex = currentIndex + direction;
+    if (targetIndex < 0 || targetIndex >= slides.length) return;
+
+    const currentSlide = slides[currentIndex];
+    const targetSlide = slides[targetIndex];
+
+    try {
+      await Promise.all([
+        fbFirestore.updateHeroSlide(currentSlide.id, { order: targetIndex }),
+        fbFirestore.updateHeroSlide(targetSlide.id, { order: currentIndex })
+      ]);
+      toast.success('Slide order updated');
+    } catch (e) {
+      toast.error('Failed to reorder: ' + e.message);
+    }
+  }
+
   return (
     <div>
       <h2 className="ap-section-title"><i className="fa-solid fa-images"></i> Hero Slides</h2>
@@ -239,7 +259,7 @@ function HeroSection({ toast }) {
           <div className="ap-empty"><i className="fa-solid fa-image"></i><p>Slides இல்லை — மேலே add செய்யவும்</p></div>
         ) : (
           <div className="ap-items-list">
-            {slides.map(slide => {
+            {slides.map((slide, i) => {
               const deskUrl = driveStorage.formatImageUrl(slide.urlDesktop || slide.url)
               const mobUrl  = driveStorage.formatImageUrl(slide.urlMobile)
               return (
@@ -265,7 +285,15 @@ function HeroSection({ toast }) {
                       {mobUrl  ? '📱 Mobile ✓'  : '📱 No mobile'}
                     </div>
                   </div>
-                  <div className="ap-item-actions">
+                  <div className="ap-item-actions" style={{ display: 'flex', gap: '0.25rem', flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', gap: '0.25rem' }}>
+                      <button className="ap-btn ap-btn-sm" onClick={() => handleMoveSlide(slide.id, -1)} disabled={i === 0} title="Move Up">
+                        <i className="fa-solid fa-arrow-up"></i>
+                      </button>
+                      <button className="ap-btn ap-btn-sm" onClick={() => handleMoveSlide(slide.id, 1)} disabled={i === slides.length - 1} title="Move Down">
+                        <i className="fa-solid fa-arrow-down"></i>
+                      </button>
+                    </div>
                     <button className="ap-btn ap-btn-danger ap-btn-sm" onClick={() => handleDelete(slide.id)}>
                       <i className="fa-solid fa-trash"></i>
                     </button>
