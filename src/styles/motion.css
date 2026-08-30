@@ -1,0 +1,40 @@
+/* src/styles/motion.css */
+:root {
+  --n-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --n-transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --n-transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Spring-like transitions for brutalist snaps */
+  --n-transition-spring: 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Hardware acceleration hints */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+/* Base reveal classes (if not using Framer Motion everywhere) */
+.reveal-hidden {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity var(--n-transition-slow), transform var(--n-transition-slow);
+}
+
+/* Respect user preferences */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

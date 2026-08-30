@@ -1,0 +1,40 @@
+/* src/styles/brutalism.css */
+.brut-box {
+  background-color: var(--n-cream);
+  border: 2px solid var(--n-ink);
+  box-shadow: 6px 6px 0px var(--n-maroon);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.brut-box:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0px var(--n-maroon);
+}
+
+.brut-box-pressed:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px var(--n-maroon);
+}
+
+.brut-panel {
+  background-color: var(--n-white);
+  border: 3px solid var(--n-ink);
+  box-shadow: 8px 8px 0px var(--n-saffron);
+}
+
+/* Typography styles */
+.brut-title {
+  font-family: var(--n-font-display);
+  text-transform: uppercase;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  color: var(--n-ink);
+}
+
+.brut-label {
+  font-family: var(--n-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.85rem;
+  font-weight: 700;
+}

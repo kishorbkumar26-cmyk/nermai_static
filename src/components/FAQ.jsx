@@ -31,7 +31,7 @@ export default function FAQ({ faqs = HOME_FAQS, eyebrow = 'FAQ', title = <>à®…à®
   return (
     <section className="faq-section section" style={{ background: 'var(--cream)' }}>
       <div className="container-narrow">
-        <div className="section-header" style={{ textAlign: 'left', marginBottom: 'var(--space-12)' }}>
+        <div className="section-header" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
           {eyebrow && <span className="eyebrow">{eyebrow}</span>}
           <h2 className="section-title" style={{ marginTop: 'var(--space-3)' }}>
             {title}
