@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import BannerSlide from './BannerSlide';
 import BannerIndicators from './BannerIndicators';
+import { fbFirestore } from '../../firebase/firestore';
+import { driveStorage } from '../../services/driveStorage';
 
-// Banners are entirely image-driven promotional artworks.
-// All typography, messaging, and stats are baked into the artwork itself.
+// Fallback banners if admin has not uploaded any
 const DEFAULT_BANNERS = [
   {
     id: 'results',
@@ -23,8 +24,28 @@ const DEFAULT_BANNERS = [
   }
 ];
 
-export default function Hero({ banners = DEFAULT_BANNERS, autoPlayInterval = 8000 }) {
+export default function Hero({ autoPlayInterval = 8000 }) {
+  const [banners, setBanners] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const unsub = fbFirestore.onHeroSlidesChanged(items => {
+      // Map the admin slides into the format our BannerSlide expects
+      const formattedBanners = items.map(item => {
+        const desktopUrl = driveStorage.formatImageUrl(item.urlDesktop || item.url);
+        const mobileUrl = driveStorage.formatImageUrl(item.urlMobile || item.urlDesktop || item.url);
+        return {
+          id: item.id,
+          bgImage: desktopUrl || mobileUrl,
+          bgImageMobile: mobileUrl || desktopUrl,
+          scene: item.scene || 'none', // Default to none if not configured in admin yet
+          ctaLink: item.ctaLink // For clicking the banner if we want to add that
+        };
+      });
+      setBanners(formattedBanners.length > 0 ? formattedBanners : DEFAULT_BANNERS);
+    });
+    return () => unsub();
+  }, []);
 
   useEffect(() => {
     if (banners.length <= 1) return;

@@ -51,7 +51,7 @@ function HeroSection({ toast }) {
   const [slides, setSlides] = useState([])
   const [form, setForm] = useState({
     urlDesktop: '', urlMobile: '',
-    title: '', subtitle: '', cta: '', ctaLink: '#'
+    ctaLink: '#', scene: 'none'
   })
   const [uploadingDesk, setUploadingDesk] = useState(false)
   const [progressDesk, setProgressDesk] = useState(0)
@@ -108,7 +108,7 @@ function HeroSection({ toast }) {
     }
     try {
       await fbFirestore.addHeroSlide(form)
-      setForm({ urlDesktop: '', urlMobile: '', title: '', subtitle: '', cta: '', ctaLink: '#' })
+      setForm({ urlDesktop: '', urlMobile: '', ctaLink: '#', scene: 'none' })
       toast.success('Hero slide சேர்க்கப்பட்டது!')
     } catch (e) { toast.error('Error: ' + e.message) }
   }
@@ -208,29 +208,24 @@ function HeroSection({ toast }) {
         </div>
 
         {/* Slide metadata */}
+        {/* Slide metadata */}
         <div style={{ marginTop: '1.25rem' }}>
           <div className="ap-form-row">
             <div className="ap-form-group">
-              <label>தலைப்பு (Title)</label>
-              <input className="ap-input" placeholder="TNPSC Group IV Coaching" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
+              <label>Destination Link (If user clicks banner)</label>
+              <input className="ap-input" placeholder="/courses or https://..." value={form.ctaLink} onChange={e => setForm(f => ({ ...f, ctaLink: e.target.value }))} />
             </div>
             <div className="ap-form-group">
-              <label>துணை தலைப்பு (Subtitle)</label>
-              <input className="ap-input" placeholder="2024 Batch Now Open" value={form.subtitle} onChange={e => setForm(f => ({ ...f, subtitle: e.target.value }))} />
-            </div>
-          </div>
-          <div className="ap-form-row">
-            <div className="ap-form-group">
-              <label>CTA Button Text</label>
-              <input className="ap-input" placeholder="Enroll Now" value={form.cta} onChange={e => setForm(f => ({ ...f, cta: e.target.value }))} />
-            </div>
-            <div className="ap-form-group">
-              <label>CTA Link (optional)</label>
-              <input className="ap-input" placeholder="https://lms.nermai.in" value={form.ctaLink} onChange={e => setForm(f => ({ ...f, ctaLink: e.target.value }))} />
+              <label>3D Enhancement Layer</label>
+              <select className="ap-input" value={form.scene} onChange={e => setForm(f => ({ ...f, scene: e.target.value }))}>
+                <option value="none">None (Pure Image)</option>
+                <option value="admissions">Admissions Depth Layer</option>
+                <option value="results">Results Depth Layer</option>
+              </select>
             </div>
           </div>
           <button className="ap-btn ap-btn-primary" onClick={handleAdd}>
-            <i className="fa-solid fa-plus"></i> Slide சேர்
+            <i className="fa-solid fa-plus"></i> Add Banner to Carousel
           </button>
         </div>
       </div>
@@ -260,8 +255,11 @@ function HeroSection({ toast }) {
                     )}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div className="ap-item-title">{slide.title || 'Untitled slide'}</div>
-                    <div className="ap-item-sub">{slide.subtitle || ''}</div>
+                    <div className="ap-item-title">Banner {slide.id.substring(0, 5)}</div>
+                    <div className="ap-item-sub">
+                      3D Layer: {slide.scene || 'none'}
+                      {slide.ctaLink && ` | Link: ${slide.ctaLink}`}
+                    </div>
                     <div style={{ fontSize: '0.65rem', color: 'var(--gray-400)', marginTop: '2px' }}>
                       {deskUrl ? '🖥️ Desktop ✓' : '🖥️ No desktop'}&nbsp;&nbsp;
                       {mobUrl  ? '📱 Mobile ✓'  : '📱 No mobile'}
