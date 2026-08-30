@@ -46,17 +46,25 @@ export default function BannerSlide({ banner, isActive }) {
           inset: -10, // slight bleed for parallax/scale
           y: yBg,
           scale: scaleBg,
-          backgroundImage: `url(${banner.bgImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          zIndex: 2, // Sits above ambient 3D if needed, or you can reverse z-index based on effect intent
-          // We don't darken or obscure the artwork here since it IS the content.
+          zIndex: 2, // Sits above ambient 3D if needed
         }}
         // Subtle Ken Burns entrance
         initial={{ scale: 1.05 }}
         animate={{ scale: 1 }}
         transition={{ duration: 6, ease: "easeOut" }}
-      />
+      >
+        <picture>
+          {banner.bgImageMobile && banner.bgImageMobile !== banner.bgImage && (
+            <source media="(max-width: 768px)" srcSet={banner.bgImageMobile} />
+          )}
+          <img 
+            src={banner.bgImage} 
+            alt="Promotional Banner" 
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            draggable="false"
+          />
+        </picture>
+      </motion.div>
       
     </motion.div>
   );
