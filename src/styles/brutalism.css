@@ -39,17 +39,21 @@
   font-weight: 700;
 }
 
-/* Hero Carousel Aspect Ratio */
+/* Hero Carousel Aspect Ratio — Commercial Banner */
 .hero-banner-container {
   position: relative;
   width: 100%;
   overflow: hidden;
   border-bottom: 4px solid var(--n-ink);
-  aspect-ratio: 16 / 5; /* Matches 1920x600 Desktop */
+  /* Exact 16:5 ratio as per 1920×600 admin spec */
+  aspect-ratio: 16 / 5;
+  max-height: 600px; /* Hard cap so it never goes taller */
 }
 
 @media (max-width: 768px) {
   .hero-banner-container {
-    aspect-ratio: 3 / 4; /* Matches 768x1024 Mobile */
+    /* Switch to 3:4 portrait for mobile as per admin spec */
+    aspect-ratio: 3 / 4;
+    max-height: none; /* Let it breathe on mobile */
   }
 }
