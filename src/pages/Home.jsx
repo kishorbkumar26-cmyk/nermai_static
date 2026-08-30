@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import Header from '../components/Header'
-import HeroCarousel from '../components/HeroCarousel'
+import Hero from '../components/hero/Hero'
 import StatsBar from '../components/StatsBar'
 import Courses from '../components/Courses'
 import WhyNermai from '../components/WhyNermai'
@@ -107,8 +107,8 @@ export default function Home() {
       <Header />
 
       <main>
-        {/* ── HERO: Admin-managed sliding banners ── */}
-        <HeroCarousel />
+        {/* ── HERO: Full-Width Cinematic Banners ── */}
+        <Hero />
 
         {/* ── EXAM MARQUEE STRIP ── */}
         {visibility.results !== false && <ExamMarquee />}
