@@ -2,14 +2,19 @@ import { useState, useEffect } from 'react'
 import { fbFirestore } from '../../firebase/firestore'
 
 /* ── tiny helpers ─────────────────────────────────────────────────────────── */
-function Field({ label, value, onChange, type = 'text', placeholder = '' }) {
+function Field({ label, value, onChange, type = 'text', placeholder = '', options = [] }) {
   return (
     <div className="ap-form-group">
       <label>{label}</label>
-      {type === 'textarea'
-        ? <textarea className="ap-input ap-textarea" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={3} />
-        : <input type={type} className="ap-input" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} />
-      }
+      {type === 'textarea' ? (
+        <textarea className="ap-input ap-textarea" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={3} />
+      ) : type === 'select' ? (
+        <select className="ap-input" value={value} onChange={e => onChange(e.target.value)}>
+          {options.map(opt => <option key={opt.value || opt} value={opt.value || opt}>{opt.label || opt}</option>)}
+        </select>
+      ) : (
+        <input type={type} className="ap-input" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} />
+      )}
     </div>
   )
 }
@@ -139,7 +144,19 @@ function FeaturesEditor({ features, onChange }) {
             )}
           </div>
           <div className="ap-form-row">
-            <Field label="Icon Name (e.g. GraduationCap)" value={feat.icon} onChange={v => update(i, 'icon', v)} placeholder="GraduationCap" />
+            <Field 
+              label="Select Icon" 
+              type="select" 
+              value={feat.icon} 
+              onChange={v => update(i, 'icon', v)} 
+              options={[
+                'GraduationCap', 'BookOpen', 'PenTool', 'LineChart', 
+                'CalendarCheck', 'UserCircle', 'Star', 'Trophy', 
+                'Users', 'Shield', 'Target', 'Lightbulb', 
+                'Zap', 'Rocket', 'CheckCircle', 'FileText', 
+                'Monitor', 'Bookmark'
+              ]} 
+            />
             <Field label="Image URL (Overrides Icon)" value={feat.imageUrl} onChange={v => update(i, 'imageUrl', v)} placeholder="https://..." />
           </div>
           <Field label="Title" value={feat.title} onChange={v => update(i, 'title', v)} placeholder="Structured Classes" />
