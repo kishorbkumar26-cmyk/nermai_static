@@ -20,15 +20,29 @@ function StatsEditor({ stats, onChange }) {
     const next = stats.map((s, idx) => idx === i ? { ...s, [key]: val } : s)
     onChange(next)
   }
+  const add = () => onChange([...stats, { num: '', label: '', sublabel: '' }])
+  const remove = (i) => onChange(stats.filter((_, idx) => idx !== i))
+
   return (
     <div>
       <p style={{ fontSize: '0.82rem', color: 'var(--gray-400)', marginBottom: '1.25rem' }}>
-        Edit the 4 stat numbers shown in the orange banner below the hero image.
+        Edit the stat numbers shown in the orange banner below the hero image.
       </p>
       {stats.map((stat, i) => (
-        <div key={i} className="ap-card" style={{ marginBottom: '0.75rem', padding: '1rem' }}>
-          <div style={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--maroon)', marginBottom: '0.75rem' }}>
-            Stat {i + 1}
+        <div key={i} className="ap-card" style={{ marginBottom: '0.75rem', padding: '1rem', position: 'relative' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+            <div style={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--maroon)' }}>
+              Stat {i + 1}
+            </div>
+            {stats.length > 1 && (
+              <button 
+                onClick={() => remove(i)} 
+                title="Remove Stat"
+                style={{ background: 'transparent', border: 'none', color: '#e53e3e', cursor: 'pointer' }}
+              >
+                <i className="fa-solid fa-trash" />
+              </button>
+            )}
           </div>
           <div className="ap-form-row">
             <Field label="Number (e.g. 2400+)" value={stat.num}      onChange={v => update(i, 'num', v)} placeholder="2400+" />
@@ -37,6 +51,14 @@ function StatsEditor({ stats, onChange }) {
           <Field label="Tamil Sub-Label" value={stat.sublabel} onChange={v => update(i, 'sublabel', v)} placeholder="பயிற்சி பெற்றவர்கள்" />
         </div>
       ))}
+      <button 
+        onClick={add}
+        className="btn" 
+        style={{ marginTop: '0.5rem', width: '100%', justifyContent: 'center', background: 'var(--gray-100)', color: 'var(--gray-700)', border: '1px dashed var(--gray-300)' }}
+      >
+        <i className="fa-solid fa-plus" style={{ marginRight: '8px' }} />
+        Add Stat
+      </button>
     </div>
   )
 }

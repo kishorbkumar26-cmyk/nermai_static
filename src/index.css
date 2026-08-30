@@ -628,8 +628,9 @@ ul, ol { list-style: none; }
   padding: var(--space-5) 0;
 }
 .stats-bar-inner {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: var(--space-6);
 }
 .stat-item {
@@ -1674,9 +1675,9 @@ ul, ol { list-style: none; }
   .section { padding: var(--space-12) 0; }
   .header-nav, .header-cta { display: none; }
   .header-hamburger { display: flex; }
-  .stats-bar-inner { grid-template-columns: repeat(2, 1fr); }
-  .stat-item + .stat-item { border-left: none; }
-  .stat-item:nth-child(2n+1) { border-right: 1px solid rgba(255,255,255,0.2); }
+  .stat-item { flex: 1 1 45%; }
+  .stat-item + .stat-item { border-left: none !important; }
+  .stat-item:nth-child(2n+1) { border-right: 1px solid rgba(255,255,255,0.2) !important; }
   .why-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; gap: var(--space-8); }
   .ap-form-row { grid-template-columns: 1fr; }
@@ -3090,7 +3091,7 @@ ul, ol { list-style: none; }
   padding: var(--space-8) 0 !important;
   border-bottom: 2px solid rgba(230,92,0,0.25);
 }
-.stat-item { color: var(--cream) !important; padding: var(--space-5) var(--space-6) !important; }
+.stat-item { flex: 1 1 200px; text-align: center; color: var(--cream) !important; padding: var(--space-5) var(--space-6) !important; }
 .stat-item + .stat-item { border-left: 1px solid rgba(255,255,255,0.08) !important; }
 .stat-number {
   font-size: clamp(2.5rem, 5vw, 4rem) !important;
@@ -3666,11 +3667,11 @@ ul, ol { list-style: none; }
 
 /* ── Responsive Fixes ────────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
-  .stats-bar-inner { grid-template-columns: repeat(2, 1fr); }
-  .stat-item + .stat-item:nth-child(3) { border-left: none; border-top: 1px solid rgba(255,255,255,0.08); }
+  .stat-item { flex: 1 1 45%; }
+  .stat-item + .stat-item:nth-child(3) { border-left: none; border-top: 1px solid rgba(255,255,255,0.08) !important; }
 }
 @media (max-width: 640px) {
-  .stats-bar-inner { grid-template-columns: repeat(2, 1fr); }
+  .stat-item { flex: 1 1 45%; }
   .stat-number { font-size: 2.2rem !important; }
   .wyg-grid { grid-template-columns: 1fr; }
   .cta-final-heading { font-size: 2rem; }
