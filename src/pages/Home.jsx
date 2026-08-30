@@ -11,6 +11,7 @@ import Gallery from '../components/Gallery'
 import Testimonials from '../components/Testimonials'
 import FAQ from '../components/FAQ'
 import Footer from '../components/Footer'
+import EventsCalendar from '../components/EventsCalendar'
 import { LMS_URL } from '../constants'
 import { fbFirestore } from '../firebase/firestore'
 
@@ -119,53 +120,80 @@ export default function Home() {
         {visibility.about !== false && (
           <section className="section about-intro-section" id="about">
             <div className="container">
-            <div className="about-intro-grid">
-              {/* Left: results image */}
-              <div className="reveal about-intro-img-wrap">
-                <div className="about-img-frame">
-                  {about.imageUrl && (
-                    <img
-                      src={about.imageUrl}
-                      alt={about.imageLabel || 'Nermai IAS Academy Results'}
-                      style={{ width: '100%', display: 'block', objectFit: 'cover' }}
-                      onError={e => { e.currentTarget.style.display = 'none' }}
-                    />
-                  )}
-                  <div className="about-img-label">{about.imageLabel}</div>
-                </div>
-
-                {/* Badges row */}
-                <div className="about-badges-row">
-                  {(about.badges || []).map((b, i) => (
-                    <div key={i} className="about-badge-v2">
-                      <span className="about-badge-num">{b.num}</span>
-                      <span className="about-badge-label">{b.label}</span>
+              <div 
+                className="about-intro-grid" 
+                style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: visibility.events !== false && about.eventsData?.length !== 0 ? '1fr 1fr' : '1fr',
+                  gap: '5rem',
+                  alignItems: 'start'
+                }}
+              >
+                
+                {/* Left: Introduction text + Image/Badges group */}
+                <div 
+                  className="reveal about-intro-text"
+                  style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    alignItems: visibility.events !== false ? 'flex-start' : 'center',
+                    textAlign: visibility.events !== false ? 'left' : 'center',
+                    maxWidth: visibility.events !== false ? 'none' : '800px',
+                    margin: visibility.events !== false ? '0' : '0 auto'
+                  }}
+                >
+                  <span className="eyebrow">{about.eyebrow || 'About Nermai'}</span>
+                  <h2 className="about-main-heading">
+                    {(about.title || DEFAULT_ABOUT.title).split('\n').map((line, i) => (
+                      <span key={i}>{line}{i === 0 && <br />}</span>
+                    ))}
+                  </h2>
+                  <div className="about-divider" style={{ margin: visibility.events !== false ? '1.5rem 0' : '1.5rem auto' }} />
+                  <p className="about-para">{about.para1}</p>
+                  <p className="about-para">{about.para2}</p>
+                  
+                  <div className="about-stamp" style={{ margin: visibility.events !== false ? '2rem 0' : '2rem auto' }}>
+                    <div className="stamp-text">NERMAI</div>
+                    <div className="stamp-sub">IAS ACADEMY</div>
+                    <div className="stamp-meta">PUDUCHERRY · INDIA · EST. 2011</div>
+                  </div>
+                  <a href="/why-nermai" className="btn btn-outline about-cta-btn">
+                    Our Story <i className="fa-solid fa-arrow-right" style={{ marginLeft: '8px' }} />
+                  </a>
+                  
+                  {/* Image and Badges Group */}
+                  <div className="about-img-group" style={{ marginTop: '3rem', width: '100%', maxWidth: '500px' }}>
+                    <div className="about-img-frame">
+                      {about.imageUrl && (
+                        <img
+                          src={about.imageUrl}
+                          alt={about.imageLabel || 'Nermai IAS Academy Results'}
+                          style={{ width: '100%', display: 'block', objectFit: 'cover' }}
+                          onError={e => { e.currentTarget.style.display = 'none' }}
+                        />
+                      )}
+                      <div className="about-img-label">{about.imageLabel}</div>
                     </div>
-                  ))}
+                    
+                    <div className="about-badges-row">
+                      {(about.badges || []).map((b, i) => (
+                        <div key={i} className="about-badge-v2">
+                          <span className="about-badge-num">{b.num}</span>
+                          <span className="about-badge-label">{b.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              {/* Right: Introduction text */}
-              <div className="reveal about-intro-text">
-                <span className="eyebrow">{about.eyebrow || 'About Nermai'}</span>
-                <h2 className="about-main-heading">
-                  {(about.title || DEFAULT_ABOUT.title).split('\n').map((line, i) => (
-                    <span key={i}>{line}{i === 0 && <br />}</span>
-                  ))}
-                </h2>
-                <div className="about-divider" />
-                <p className="about-para">{about.para1}</p>
-                <p className="about-para">{about.para2}</p>
-                <div className="about-stamp">
-                  <div className="stamp-text">NERMAI</div>
-                  <div className="stamp-sub">IAS ACADEMY</div>
-                  <div className="stamp-meta">PUDUCHERRY · INDIA · EST. 2011</div>
-                </div>
-                <a href="/why-nermai" className="btn btn-outline about-cta-btn">
-                  Our Story <i className="fa-solid fa-arrow-right" style={{ marginLeft: '8px' }} />
-                </a>
+                {/* Right: Events Calendar */}
+                {visibility.events !== false && (
+                  <div className="reveal">
+                    <EventsCalendar />
+                  </div>
+                )}
+                
               </div>
-            </div>
             </div>
           </section>
         )}

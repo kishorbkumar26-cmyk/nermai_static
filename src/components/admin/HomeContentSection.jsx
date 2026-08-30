@@ -233,6 +233,45 @@ function AboutEditor({ about, onChange }) {
   )
 }
 
+/* ── Events Editor ───────────────────────────────────────────────────────── */
+function EventsEditor({ events = [], onChange }) {
+  const update = (i, key, val) => onChange(events.map((e, idx) => idx === i ? { ...e, [key]: val } : e))
+  const add = () => onChange([...events, { dateLine1: 'AUG', dateLine2: '01', title: '', subtitle: '', visible: true }])
+  const remove = (i) => onChange(events.filter((_, idx) => idx !== i))
+
+  return (
+    <div>
+      <p style={{ fontSize: '0.82rem', color: 'var(--gray-400)', marginBottom: '1.25rem' }}>
+        Edit the Upcoming Events calendar displayed on the homepage.
+      </p>
+      {events.map((ev, i) => (
+        <div key={i} className="ap-card" style={{ marginBottom: '0.75rem', padding: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--maroon)' }}>
+                Event {i + 1}
+              </div>
+              <Toggle label="Visible" checked={ev.visible !== false} onChange={v => update(i, 'visible', v)} />
+            </div>
+            <button onClick={() => remove(i)} className="btn" style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #f87171', padding: '0.25rem 0.75rem', fontSize: '0.75rem', borderRadius: '4px' }}>
+              <i className="fa-solid fa-trash" style={{ marginRight: '6px' }} /> Delete
+            </button>
+          </div>
+          <div className="ap-form-row">
+            <Field label="Month (e.g. AUG)" value={ev.dateLine1} onChange={v => update(i, 'dateLine1', v)} placeholder="AUG" />
+            <Field label="Day (e.g. 31)"    value={ev.dateLine2} onChange={v => update(i, 'dateLine2', v)} placeholder="31" />
+          </div>
+          <Field label="Title" value={ev.title} onChange={v => update(i, 'title', v)} placeholder="Short NIQ" />
+          <Field label="Subtitle / Description" value={ev.subtitle} onChange={v => update(i, 'subtitle', v)} type="textarea" placeholder="for construction of Selfie Point - Last date" />
+        </div>
+      ))}
+      <button onClick={add} className="btn" style={{ marginTop: '0.5rem', width: '100%', justifyContent: 'center', background: 'var(--gray-100)', color: 'var(--gray-700)', border: '1px dashed var(--gray-300)' }}>
+        <i className="fa-solid fa-plus" style={{ marginRight: '8px' }} /> Add Event
+      </button>
+    </div>
+  )
+}
+
 /* ── Steps Editor ────────────────────────────────────────────────────────── */
 function StepsEditor({ steps, onChange }) {
   const update = (i, key, val) => onChange(steps.map((s, idx) => idx === i ? { ...s, [key]: val } : s))
@@ -273,12 +312,16 @@ const TABS = [
   { id: 'stats',      icon: 'fa-chart-simple',  label: 'Stats Bar' },
   { id: 'features',   icon: 'fa-bolt',          label: 'Features' },
   { id: 'courses',    icon: 'fa-book-bookmark', label: 'Courses' },
+  { id: 'events',     icon: 'fa-calendar-days', label: 'Events' },
   { id: 'about',      icon: 'fa-address-card',  label: 'About' },
   { id: 'steps',      icon: 'fa-stairs',        label: 'How It Works' }
 ]
 
 const DEFAULTS = {
-  visibility: { stats: true, about: true, features: true, courses: true, steps: true, results: true, gallery: true, testimonials: true, faq: true },
+  visibility: { stats: true, about: true, features: true, courses: true, steps: true, results: true, gallery: true, testimonials: true, faq: true, events: true },
+  events: [
+    { dateLine1: 'AUG', dateLine2: '31', title: 'Short NIQ', subtitle: 'for construction of Selfie Point - Last date', visible: true },
+  ],
   stats: [
     { num: '2400+', label: 'Students',  sublabel: 'பயிற்சி பெற்ற மாணவர்கள்' },
     { num: '14+',   label: 'Years',     sublabel: 'ஆண்டுகள் அனுபவம்' },
@@ -328,6 +371,7 @@ export default function HomeContentSection({ toast }) {
       if (s.homeContent) {
         setContent(prev => ({
           visibility: s.homeContent.visibility || prev.visibility,
+          events:   s.homeContent.events   || prev.events,
           stats:    s.homeContent.stats    || prev.stats,
           features: s.homeContent.features || prev.features,
           courses:  s.homeContent.courses  || prev.courses,
@@ -389,6 +433,7 @@ export default function HomeContentSection({ toast }) {
       {activeTab === 'stats'    && <StatsEditor    stats={content.stats}       onChange={v => setContent(c => ({ ...c, stats: v }))} />}
       {activeTab === 'features' && <FeaturesEditor features={content.features} onChange={v => setContent(c => ({ ...c, features: v }))} />}
       {activeTab === 'courses'  && <CoursesEditor  courses={content.courses}   onChange={v => setContent(c => ({ ...c, courses: v }))} />}
+      {activeTab === 'events'   && <EventsEditor   events={content.events}     onChange={v => setContent(c => ({ ...c, events: v }))} />}
       {activeTab === 'about'    && <AboutEditor    about={content.about}       onChange={v => setContent(c => ({ ...c, about: v }))} />}
       {activeTab === 'steps'    && <StepsEditor    steps={content.steps}       onChange={v => setContent(c => ({ ...c, steps: v }))} />}
 

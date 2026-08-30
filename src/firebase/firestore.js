@@ -60,8 +60,15 @@ const DEFAULT_SETTINGS = {
       results: true,
       gallery: true,
       testimonials: true,
-      faq: true
+      faq: true,
+      events: true
     },
+    events: [
+      { dateLine1: 'AUG', dateLine2: '31', title: 'Short NIQ', subtitle: 'for construction of Selfie Point - Last date', visible: true },
+      { dateLine1: 'AUG', dateLine2: '31', title: 'Short NIQ', subtitle: 'for Toilet repair work - Last date', visible: true },
+      { dateLine1: 'SEPT', dateLine2: '15', title: 'NSPC 2026 - QUIZ', subtitle: 'Students/Scholars/Faculty/Staff can participate in this nationwide online quiz', visible: true },
+      { dateLine1: 'NOV', dateLine2: '12', title: 'ICAISDA 26', subtitle: 'Two days International Conference organized by CSE', visible: true }
+    ],
     stats: [
       { num: '2400+', label: 'Students',  sublabel: 'பயிற்சி பெற்ற மாணவர்கள்' },
       { num: '14+',   label: 'Years',     sublabel: 'ஆண்டுகள் அனுபவம்' },

@@ -3130,8 +3130,14 @@ ul, ol { list-style: none; }
 .about-img-frame {
   position: relative;
   border: 2px solid var(--ink);
-  box-shadow: 6px 6px 0 var(--maroon);
+  box-shadow: 12px 12px 0 var(--maroon);
   overflow: hidden;
+  transition: transform 0.4s ease-out;
+  transform: perspective(1000px) rotateY(12deg) rotateX(4deg);
+  transform-style: preserve-3d;
+}
+.about-img-frame:hover {
+  transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
 }
 .about-img-label {
   position: absolute;
@@ -3792,4 +3798,89 @@ ul, ol { list-style: none; }
 @media (max-width: 768px) {
   .hero-cinematic-title { font-size: clamp(2.5rem, 12vw, 4rem); }
   .hero-cinematic-content { padding: var(--space-12) var(--space-5) var(--space-16); }
+}
+
+/* ── Events Calendar ─────────────────────────────────────────────────────── */
+.events-calendar-container {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+}
+.events-header {
+  background: #a30000;
+  color: #fff;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.events-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+.events-header button {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.events-body {
+  padding: 1rem;
+}
+.events-list {
+  display: flex;
+  flex-direction: column;
+}
+.event-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 2px dashed #a30000;
+  align-items: center;
+}
+.event-item:last-child {
+  border-bottom: none;
+}
+.event-date {
+  background: #a30000;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 60px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.event-date-month {
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+.event-date-day {
+  font-weight: 800;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.event-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.event-title {
+  color: #0000ff;
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: underline;
+}
+.event-subtitle {
+  color: #333;
+  font-size: 0.9rem;
+  margin: 0;
 }
