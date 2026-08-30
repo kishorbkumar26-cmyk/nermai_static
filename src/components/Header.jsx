@@ -157,13 +157,14 @@ export default function Header() {
           >
             <i className="fa-solid fa-xmark" />
           </button>
-          {/* Mobile Nav */}
-          <nav className="header-mobile-nav">
-            {NAV_ITEMS.filter(item => {
-              if (item.href === '/courses' && pageVisibility?.courses === false) return false
-              if (item.href === '/#results' && pageVisibility?.results === false) return false
-              return true
-            }).map(item => {
+        </div>
+
+        <div className="mobile-nav-links">
+          {NAV_ITEMS.filter(item => {
+            if (item.href === '/courses' && pageVisibility?.courses === false) return false
+            if (item.href === '/#results' && pageVisibility?.results === false) return false
+            return true
+          }).map(item => {
             if (item.type === 'route') {
               return (
                 <Link key={item.href} to={item.href} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
