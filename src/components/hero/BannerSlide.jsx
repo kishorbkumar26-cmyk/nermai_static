@@ -162,6 +162,6 @@ export default function BannerSlide({ banner, isActive }) {
 
         </div>
       </motion.div>
-    </div>
+    </motion.div>
   );
 }
