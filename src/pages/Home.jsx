@@ -107,11 +107,11 @@ export default function Home() {
       <Header />
 
       <main>
-        {/* ── HERO: Full-Width Cinematic Banners ── */}
-        <Hero />
-
         {/* ── EXAM MARQUEE STRIP ── */}
         {visibility.results !== false && <ExamMarquee />}
+
+        {/* ── HERO: Full-Width Cinematic Banners ── */}
+        <Hero />
 
         {/* ── STATS BAR ── */}
         {visibility.stats !== false && <StatsBar />}

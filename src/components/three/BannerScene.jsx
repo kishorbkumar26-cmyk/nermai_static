@@ -34,21 +34,9 @@ export default function BannerScene({ type }) {
         <Environment preset="city" />
         
         <ParallaxGroup>
-          {type === 'admissions' && (
-            <group position={[0, 0, -5]}>
-              {/* Subtle ambient floating geometries behind the text */}
-              <FloatingPaper position={[-6, -2, -3]} rotation={[0, -Math.PI / 6, Math.PI / 12]} />
-              <FloatingPaper position={[6, 2, -1]} rotation={[Math.PI / 8, Math.PI / 4, 0]} />
-            </group>
-          )}
-
-          {type === 'results' && (
-            <group position={[0, 0, -2]}>
-              {/* Subtle floating result depth elements */}
-              <FloatingPaper position={[-5, 2, -2]} rotation={[0, 0, -Math.PI / 24]} />
-              <FloatingPaper position={[5, -1, -4]} rotation={[0, -Math.PI / 12, Math.PI / 24]} />
-            </group>
-          )}
+          {/* Subtle enhancements can be added here in the future.
+              For now, the scene is strictly contained to the Hero banner container 
+              and does not use any large blocking geometries. */}
         </ParallaxGroup>
       </Suspense>
     </Canvas>
