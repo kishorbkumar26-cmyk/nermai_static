@@ -27,22 +27,33 @@ export default function EventsCalendar({ eventsData }) {
       
       <div className="events-body">
         <div className="events-list">
-          {events.map((ev, i) => (
-            <div key={i} className="event-item">
-              <div className="event-date">
-                <span className="event-date-month">{ev.dateLine1}</span>
-                <span className="event-date-day">{ev.dateLine2}</span>
+          {events.map((ev, i) => {
+            let month = 'MMM'
+            let day = '00'
+            if (ev.date) {
+              const d = new Date(ev.date)
+              if (!isNaN(d.valueOf())) {
+                month = d.toLocaleString('en-US', { month: 'short' }).toUpperCase()
+                day = d.getDate().toString()
+              }
+            }
+            return (
+              <div key={i} className="event-item">
+                <div className="event-date">
+                  <span className="event-date-month">{month}</span>
+                  <span className="event-date-day">{day}</span>
+                </div>
+                <div className="event-content">
+                  {ev.url ? (
+                    <a href={ev.url} target="_blank" rel="noopener noreferrer" className="event-title link-title">{ev.title}</a>
+                  ) : (
+                    <span className="event-title text-title">{ev.title}</span>
+                  )}
+                  <p className="event-subtitle">{ev.subtitle}</p>
+                </div>
               </div>
-              <div className="event-content">
-                {ev.url ? (
-                  <a href={ev.url} target="_blank" rel="noopener noreferrer" className="event-title link-title">{ev.title}</a>
-                ) : (
-                  <span className="event-title text-title">{ev.title}</span>
-                )}
-                <p className="event-subtitle">{ev.subtitle}</p>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     </div>

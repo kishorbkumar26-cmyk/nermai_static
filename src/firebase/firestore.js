@@ -64,10 +64,10 @@ const DEFAULT_SETTINGS = {
       events: true
     },
     events: [
-      { dateLine1: 'AUG', dateLine2: '31', title: 'Short NIQ', subtitle: 'for construction of Selfie Point - Last date', url: '', visible: true },
-      { dateLine1: 'AUG', dateLine2: '31', title: 'Short NIQ', subtitle: 'for Toilet repair work - Last date', url: '', visible: true },
-      { dateLine1: 'SEPT', dateLine2: '15', title: 'NSPC 2026 - QUIZ', subtitle: 'Students/Scholars/Faculty/Staff can participate in this nationwide online quiz', url: '', visible: true },
-      { dateLine1: 'NOV', dateLine2: '12', title: 'ICAISDA 26', subtitle: 'Two days International Conference organized by CSE', url: '', visible: true }
+      { date: '2026-08-31', title: 'Short NIQ', subtitle: 'for construction of Selfie Point - Last date', url: '', visible: true },
+      { date: '2026-08-31', title: 'Short NIQ', subtitle: 'for Toilet repair work - Last date', url: '', visible: true },
+      { date: '2026-09-15', title: 'NSPC 2026 - QUIZ', subtitle: 'Students/Scholars/Faculty/Staff can participate in this nationwide online quiz', url: '', visible: true },
+      { date: '2026-11-12', title: 'ICAISDA 26', subtitle: 'Two days International Conference organized by CSE', url: '', visible: true }
     ],
     stats: [
       { num: '2400+', label: 'Students',  sublabel: 'பயிற்சி பெற்ற மாணவர்கள்' },

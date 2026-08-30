@@ -236,7 +236,7 @@ function AboutEditor({ about, onChange }) {
 /* ── Events Editor ───────────────────────────────────────────────────────── */
 function EventsEditor({ events = [], onChange }) {
   const update = (i, key, val) => onChange(events.map((e, idx) => idx === i ? { ...e, [key]: val } : e))
-  const add = () => onChange([...events, { dateLine1: 'AUG', dateLine2: '01', title: '', subtitle: '', url: '', visible: true }])
+  const add = () => onChange([...events, { date: new Date().toISOString().split('T')[0], title: '', subtitle: '', url: '', visible: true }])
   const remove = (i) => onChange(events.filter((_, idx) => idx !== i))
 
   return (
@@ -258,8 +258,7 @@ function EventsEditor({ events = [], onChange }) {
             </button>
           </div>
           <div className="ap-form-row">
-            <Field label="Month (e.g. AUG)" value={ev.dateLine1} onChange={v => update(i, 'dateLine1', v)} placeholder="AUG" />
-            <Field label="Day (e.g. 31)"    value={ev.dateLine2} onChange={v => update(i, 'dateLine2', v)} placeholder="31" />
+            <Field label="Event Date" type="date" value={ev.date} onChange={v => update(i, 'date', v)} />
           </div>
           <Field label="Title" value={ev.title} onChange={v => update(i, 'title', v)} placeholder="Short NIQ" />
           <Field label="URL (Optional, turns title into a link)" value={ev.url} onChange={v => update(i, 'url', v)} placeholder="https://..." />
@@ -321,7 +320,7 @@ const TABS = [
 const DEFAULTS = {
   visibility: { stats: true, about: true, features: true, courses: true, steps: true, results: true, gallery: true, testimonials: true, faq: true, events: true },
   events: [
-    { dateLine1: 'AUG', dateLine2: '31', title: 'Short NIQ', subtitle: 'for construction of Selfie Point - Last date', url: '', visible: true },
+    { date: '2026-08-31', title: 'Short NIQ', subtitle: 'for construction of Selfie Point - Last date', url: '', visible: true },
   ],
   stats: [
     { num: '2400+', label: 'Students',  sublabel: 'பயிற்சி பெற்ற மாணவர்கள்' },
