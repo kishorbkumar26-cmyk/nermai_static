@@ -3,6 +3,7 @@ import { fbFirestore } from '../firebase/firestore'
 import { driveStorage } from '../services/driveStorage'
 import { getGoogleDriveCDNUrl } from '../utils/imageOptimizer'
 import HomeContentSection from './admin/HomeContentSection'
+import FooterContentSection from './admin/FooterContentSection'
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
 function useToast() {
@@ -869,6 +870,7 @@ const SECTIONS = [
   { id: 'testimonials',  label: 'Reviews',      icon: 'fa-quote-right' },
   { id: 'gallery',       label: 'Gallery',      icon: 'fa-images' },
   { id: 'siteinfo',      label: 'Site Info',    icon: 'fa-circle-info' },
+  { id: 'footer',        label: 'Footer',       icon: 'fa-shoe-prints' },
   { id: 'drive',         label: 'Drive',        icon: 'fa-brands fa-google-drive' }
 ]
 
@@ -883,6 +885,7 @@ export function AdminPanelContent({ activeSection, toast }) {
       {activeSection === 'testimonials' && <TestimonialsSection toast={toast} />}
       {activeSection === 'gallery'      && <GallerySection toast={toast} />}
       {activeSection === 'siteinfo'     && <SiteInfoSection toast={toast} />}
+      {activeSection === 'footer'       && <FooterContentSection toast={toast} />}
       {activeSection === 'drive'        && <DriveSection toast={toast} />}
     </>
   )
@@ -1035,6 +1038,7 @@ export default function AdminPortal() {
               {activeSection === 'testimonials' && <TestimonialsSection toast={toast} />}
               {activeSection === 'gallery'      && <GallerySection toast={toast} />}
               {activeSection === 'siteinfo'     && <SiteInfoSection toast={toast} />}
+              {activeSection === 'footer'       && <FooterContentSection toast={toast} />}
               {activeSection === 'drive'        && <DriveSection toast={toast} />}
             </div>
           </div>

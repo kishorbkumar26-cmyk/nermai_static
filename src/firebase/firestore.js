@@ -119,6 +119,46 @@ const DEFAULT_SETTINGS = {
       { num: '04', title: 'பயிற்சி + தேர்வுகள்',                   desc: 'Attend classes, take mock tests, and track your progress.' },
       { num: '05', title: 'இலக்கை அடையுங்கள்',                    desc: 'Clear the exam and become a Government Officer.' }
     ]
+  },
+  footer: {
+    cta: {
+      heading: "Begin It's first step to success",
+      sub: "Contact us for registration, seat availability, feedback or complaints",
+      btnText: "Contact Us",
+      btnLink: "/contact"
+    },
+    brand: {
+      desc: "An institution run & administered by the volunteers of Nermai Trust & Nermai Samuga Iyakkam, with an objective to empower youths especially from rural & Economically/Socially weaker sections in public employment (Government Recruitments).",
+      badge: "Non Profit · Non Commercial"
+    },
+    contact: {
+      address: "No. 156 / 3, (1st & 2nd Floor), Nanbargal Nagar,\nPondy – Villianur Main Road, Oulgaret,\nPuducherry – 605 010",
+      phones: "919876543210, +91 9999999999",
+      email: "info@nermai.in"
+    },
+    usefulLinks: [
+      { label: 'Examinations', link: '/#examinations' },
+      { label: 'Gallery', link: '/#gallery' },
+      { label: 'About Us', link: '/why-nermai' },
+      { label: 'Contact Us', link: '/contact' },
+      { label: 'All Courses', link: '/courses' }
+    ],
+    notifications: [
+      { label: 'Banking', link: 'https://lms.nermai.in' },
+      { label: 'Exam Notifications', link: 'https://lms.nermai.in' },
+      { label: 'Study Material', link: 'https://lms.nermai.in' },
+      { label: 'Pondicherry Recruitments', link: 'https://lms.nermai.in' },
+      { label: 'Central Recruitments', link: 'https://lms.nermai.in' }
+    ],
+    coursesLinks: [
+      { label: 'UPSC Civil Service', link: '/courses/upsc' },
+      { label: 'TNPSC / Railways', link: '/courses/tnpsc' },
+      { label: 'UDC / LDC / VAO', link: '/courses/udc-ldc' },
+      { label: 'Banking', link: '/courses/banking' }
+    ],
+    bottom: {
+      meta: "Non Profit | Non Commercial"
+    }
   }
 }
 
