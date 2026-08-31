@@ -121,12 +121,14 @@ input, textarea, select { font-family: var(--font-body); }
 ul, ol { list-style: none; }
 
 /* ── Layout Utilities ───────────────────────────────────────────────────────── */
-.container {
+.container,
+.container-wide,
+.container-narrow {
   width: 100%;
-  max-width: 1280px;
   margin: 0 auto;
   padding: 0 var(--space-6);
 }
+.container { max-width: 1280px; }
 .container-wide { max-width: 1440px; }
 .container-narrow { max-width: 880px; }
 
