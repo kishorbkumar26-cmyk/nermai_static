@@ -97,6 +97,73 @@ export default function FooterContentSection({ toast }) {
     )
   }
 
+  // Social Links Manager
+  const renderSocialLinksManager = () => {
+    const list = footer?.socialLinks || [
+      { name: 'YouTube', link: 'https://youtube.com', iconClass: 'fa-brands fa-youtube', iconUrl: '' },
+      { name: 'Instagram', link: 'https://instagram.com', iconClass: 'fa-brands fa-instagram', iconUrl: '' },
+      { name: 'Telegram', link: 'https://t.me/', iconClass: 'fa-brands fa-telegram', iconUrl: '' }
+    ]
+    
+    const addLink = () => {
+      save({ ...footer, socialLinks: [...list, { name: 'New Social', link: '#', iconUrl: '', iconClass: 'fa-solid fa-link' }] })
+    }
+    
+    const updateLink = (idx, field, value) => {
+      const newList = [...list]
+      newList[idx][field] = value
+      setFooter({ ...footer, socialLinks: newList })
+    }
+    
+    const removeLink = (idx) => {
+      const newList = list.filter((_, i) => i !== idx)
+      save({ ...footer, socialLinks: newList })
+    }
+
+    return (
+      <div className="ap-card" style={{ marginBottom: '1.5rem' }}>
+        <h3 className="ap-subtitle">Social Media Links</h3>
+        <p style={{ fontSize: '0.8rem', color: 'var(--gray-500)', marginBottom: '1rem' }}>
+          If FontAwesome icons are not showing, you can paste an Image URL for the logo instead. Image URLs will override FontAwesome classes.
+        </p>
+        {list.map((item, i) => (
+          <div key={i} style={{ border: '1px solid var(--gray-200)', padding: '1rem', marginBottom: '1rem', borderRadius: '4px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+              <div style={{ fontWeight: 600 }}>Social Link {i + 1}</div>
+              <button className="ap-btn ap-btn-danger" onClick={() => removeLink(i)} style={{ padding: '0.25rem 0.5rem' }}>
+                <i className="fa-solid fa-trash" /> Remove
+              </button>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '0.5rem' }}>
+              <div className="ap-form-group" style={{ marginBottom: 0 }}>
+                <label className="ap-label" style={{ fontSize: '0.7rem' }}>Platform Name</label>
+                <input type="text" className="ap-input" value={item.name} onChange={e => updateLink(i, 'name', e.target.value)} placeholder="YouTube" />
+              </div>
+              <div className="ap-form-group" style={{ marginBottom: 0 }}>
+                <label className="ap-label" style={{ fontSize: '0.7rem' }}>URL</label>
+                <input type="text" className="ap-input" value={item.link} onChange={e => updateLink(i, 'link', e.target.value)} placeholder="https://..." />
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="ap-form-group" style={{ marginBottom: 0 }}>
+                <label className="ap-label" style={{ fontSize: '0.7rem' }}>Image URL (Overrides Icon)</label>
+                <input type="text" className="ap-input" value={item.iconUrl || ''} onChange={e => updateLink(i, 'iconUrl', e.target.value)} placeholder="https://..." />
+              </div>
+              <div className="ap-form-group" style={{ marginBottom: 0 }}>
+                <label className="ap-label" style={{ fontSize: '0.7rem' }}>FontAwesome Class</label>
+                <input type="text" className="ap-input" value={item.iconClass || ''} onChange={e => updateLink(i, 'iconClass', e.target.value)} placeholder="fa-brands fa-youtube" />
+              </div>
+            </div>
+            {item.iconUrl && <img src={item.iconUrl} alt="preview" style={{ height: '30px', marginTop: '0.5rem' }} onError={(e) => e.target.style.display = 'none'} />}
+          </div>
+        ))}
+        <button className="ap-btn ap-btn-secondary" onClick={addLink} style={{ marginTop: '0.5rem' }}>
+          + Add Social Link
+        </button>
+      </div>
+    )
+  }
+
   if (!footer) return <p>Loading footer config...</p>
 
   return (
@@ -154,6 +221,7 @@ export default function FooterContentSection({ toast }) {
       </div>
 
       <div style={{ marginTop: '2rem' }}>
+        {renderSocialLinksManager()}
         {renderLinksManager('Useful Links', 'usefulLinks')}
         {renderLinksManager('Notifications', 'notifications')}
         {renderLinksManager('Courses Links', 'coursesLinks')}

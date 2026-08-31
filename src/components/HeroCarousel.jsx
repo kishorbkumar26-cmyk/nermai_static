@@ -5,13 +5,11 @@ import { LMS_URL } from '../constants'
 
 const DEFAULT_SLIDES = [
   {
-    id: 'default_0',
-    urlDesktop: '',
-    urlMobile: '',
-    url: '',
-    title: 'நேர்மையான கல்வி',
-    subtitle: 'வெற்றிக்கான உறுதியான பாதை',
-    cta: 'Enroll Now'
+    id: 'default',
+    url: 'https://nermaiiasacademy.in/wp-content/uploads/2024/10/UPSC-100424-scaled.jpg',
+    title: 'Nermai Education',
+    subtitle: 'A definite path to success',
+    ctaLink: '/courses'
   }
 ]
 
@@ -30,7 +28,7 @@ function HeroCinematicDefault({ cta }) {
           Prepare with<br /><em>Purpose.</em>
         </h1>
         <p className="hero-cinematic-subtitle">
-          நேர்மையான கல்வி · வெற்றிக்கான உறுதியான பாதை
+          Nermai Education · A definite path to success
         </p>
         <p className="hero-cinematic-tagline">
           Serve with Integrity.

@@ -53,6 +53,7 @@ export default function CourseContentSection({ toast }) {
   const [activeTab, setActiveTab] = useState('content')
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [docStatus, setDocStatus] = useState('new') // 'new' | 'draft' | 'published'
 
   // Load course list from homeContent.courses
   useEffect(() => {
@@ -73,9 +74,9 @@ export default function CourseContentSection({ toast }) {
     if (!selectedSlug) return
     setLoading(true)
     const cObj = courseList.find(c => c.slug === selectedSlug)
-    fbFirestore.getCourseContent(selectedSlug).then(snap => {
-      if (snap.exists()) {
-        const data = snap.data()
+    fbFirestore.getCourseContent(selectedSlug).then(data => {
+      if (data) {
+        setDocStatus(data.isLive ? 'published' : 'draft')
         // Ensure visibility object exists
         setContent({ 
           ...EMPTY_CONTENT, 
@@ -83,8 +84,13 @@ export default function CourseContentSection({ toast }) {
           visibility: { ...EMPTY_CONTENT.visibility, ...(data.visibility || {}) }
         })
       } else {
+        setDocStatus('new')
         setContent({ ...EMPTY_CONTENT, ...cObj }) // fallback to basic list info
       }
+    }).catch(e => {
+      console.error('Error fetching course:', e)
+      setDocStatus('new')
+      setContent({ ...EMPTY_CONTENT, ...cObj })
     }).finally(() => setLoading(false))
   }, [selectedSlug])
 
@@ -94,7 +100,8 @@ export default function CourseContentSection({ toast }) {
     setSaving(true)
     try {
       await fbFirestore.saveCourseContent(selectedSlug, content)
-      toast.success(`"${content.name || selectedSlug}" content சேமிக்கப்பட்டது!`)
+      setDocStatus(content.isLive ? 'published' : 'draft')
+      toast.success(`"${content.name || selectedSlug}" content saved!`)
     } catch (e) {
       toast.error(e.message)
     } finally {
@@ -124,7 +131,10 @@ export default function CourseContentSection({ toast }) {
             ))}
           </select>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', paddingTop: '1.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingTop: '1.25rem' }}>
+          <div style={{ padding: '4px 10px', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.05em', background: docStatus === 'published' ? '#dcfce7' : (docStatus === 'draft' ? '#fef08a' : '#f1f5f9'), color: docStatus === 'published' ? '#166534' : (docStatus === 'draft' ? '#854d0e' : '#475569') }}>
+            {docStatus === 'published' ? 'PUBLISHED' : (docStatus === 'draft' ? 'DRAFT' : 'NOT PUBLISHED')}
+          </div>
           <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>
             <input
               type="checkbox"
@@ -133,7 +143,7 @@ export default function CourseContentSection({ toast }) {
               style={{ width: 16, height: 16, accentColor: 'var(--saffron)' }}
             />
             <span style={{ color: content.isLive ? '#16a34a' : 'var(--gray-400)' }}>
-              {content.isLive ? '✓ Published' : 'Draft (Coming Soon)'}
+              Set as Published
             </span>
           </label>
         </div>

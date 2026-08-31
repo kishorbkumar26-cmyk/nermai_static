@@ -17,9 +17,9 @@ export default function Gallery() {
       <div className="container">
         <div className="section-header" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
           <span className="eyebrow">GALLERY</span>
-          <h2 className="section-title">வகுப்பறை தருணங்கள்</h2>
+          <h2 className="section-title">Classroom Moments</h2>
           <p className="section-desc">
-            நேர்மை அகாடமியின் நேரடி வகுப்பறை மற்றும் நிகழ்வுகளின் புகைப்படங்கள்.
+            Photos from Nermai Academy's live classes and events.
           </p>
         </div>
 

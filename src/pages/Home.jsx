@@ -10,7 +10,9 @@ import WhatYouGet from '../components/WhatYouGet'
 import Results from '../components/Results'
 import Gallery from '../components/Gallery'
 import Testimonials from '../components/Testimonials'
+import ToppersWall from '../components/ToppersWall'
 import FAQ from '../components/FAQ'
+import OfficeLocations from '../components/OfficeLocations'
 import Footer from '../components/Footer'
 import EventsCalendar from '../components/EventsCalendar'
 import { LMS_URL } from '../constants'
@@ -185,6 +187,9 @@ export default function Home() {
         {/* ── RESULTS ── */}
         {visibility.results !== false && <Results />}
 
+        {/* ── TOPPERS WALL ── */}
+        <ToppersWall />
+
         {/* ── GALLERY ── */}
         {visibility.gallery !== false && <Gallery />}
 
@@ -206,12 +211,12 @@ export default function Home() {
               </div>
               <span className="eyebrow cta-eyebrow">BEGIN YOUR JOURNEY</span>
               <h2 className="cta-final-heading">
-                உங்கள் வெற்றிப் பயணம்<br />
-                <em>இன்றே தொடங்கட்டும்.</em>
+                Your Success Journey<br />
+                <em>Starts Today.</em>
               </h2>
               <p className="cta-final-sub">
-                தேர்வை மட்டும் நோக்கமாகக் கொள்ளாதீர்கள்.<br />
-                தயாரிப்பை முறையாகத் தொடங்குங்கள்.
+                Don't just aim for the exam.<br />
+                Start your preparation systematically.
               </p>
               <div className="cta-final-actions">
                 <a href={LMS_URL} className="btn btn-primary btn-lg cta-enroll-btn" id="home-enroll-btn" target="_blank" rel="noopener noreferrer">
@@ -229,6 +234,7 @@ export default function Home() {
         </section>
       </main>
 
+      <OfficeLocations />
       <Footer />
     </>
   )

@@ -4,27 +4,10 @@ import { fbFirestore } from '../firebase/firestore'
 import { LMS_URL, CONTACT, COURSES } from '../constants'
 
 export default function Footer() {
-  const [socials, setSocials] = useState({
-    facebook: CONTACT.facebook,
-    instagram: CONTACT.instagram,
-    youtube: CONTACT.youtube,
-    twitter: CONTACT.twitter,
-  })
-  
   const [footerData, setFooterData] = useState(null)
 
   useEffect(() => {
     fbFirestore.getSettings().then(s => {
-      if (s.siteInfo) {
-        // Only update social links from Firestore, not critical contact info
-        setSocials(prev => ({
-          ...prev,
-          ...(s.siteInfo.facebook  ? { facebook:  s.siteInfo.facebook }  : {}),
-          ...(s.siteInfo.instagram ? { instagram: s.siteInfo.instagram } : {}),
-          ...(s.siteInfo.youtube   ? { youtube:   s.siteInfo.youtube }   : {}),
-          ...(s.siteInfo.twitter   ? { twitter:   s.siteInfo.twitter }   : {}),
-        }))
-      }
       if (s.footer) {
         setFooterData(s.footer)
       }
@@ -65,7 +48,12 @@ export default function Footer() {
     coursesLinks: COURSES.slice(0, 4).map(c => ({ label: c.name, link: `/courses/${c.slug}` })),
     bottom: {
       meta: "Non Profit | Non Commercial"
-    }
+    },
+    socialLinks: [
+      { name: 'YouTube', link: CONTACT.youtube || '#', iconClass: 'fa-brands fa-youtube', iconUrl: '' },
+      { name: 'Instagram', link: CONTACT.instagram || '#', iconClass: 'fa-brands fa-instagram', iconUrl: '' },
+      { name: 'Telegram', link: CONTACT.telegram || '#', iconClass: 'fa-brands fa-telegram', iconUrl: '' }
+    ]
   }
 
 
@@ -102,21 +90,15 @@ export default function Footer() {
               <p className="footer-brand-desc">{f.brand.desc}</p>
               <div className="footer-tagline-badge">{f.brand.badge}</div>
               <div className="footer-socials">
-                <a href={socials.facebook} className="footer-social-btn" aria-label="Facebook" rel="noopener noreferrer" target="_blank">
-                  <i className="fa-brands fa-facebook-f" />
-                </a>
-                <a href={socials.instagram} className="footer-social-btn" aria-label="Instagram" rel="noopener noreferrer" target="_blank">
-                  <i className="fa-brands fa-instagram" />
-                </a>
-                <a href={socials.youtube || '#'} className="footer-social-btn" aria-label="YouTube" rel="noopener noreferrer" target="_blank">
-                  <i className="fa-brands fa-youtube" />
-                </a>
-                <a href={socials.twitter || '#'} className="footer-social-btn" aria-label="Twitter / X" rel="noopener noreferrer" target="_blank">
-                  <i className="fa-brands fa-x-twitter" />
-                </a>
-                <a href={`https://wa.me/${CONTACT.phones[0].replace(/\D/g, '')}`} className="footer-social-btn" aria-label="WhatsApp" rel="noopener noreferrer" target="_blank">
-                  <i className="fa-brands fa-whatsapp" />
-                </a>
+                {(f.socialLinks || []).map((social, i) => (
+                  <a key={i} href={social.link || '#'} className="footer-social-btn" aria-label={social.name} rel="noopener noreferrer" target="_blank">
+                    {social.iconUrl ? (
+                      <img src={social.iconUrl} alt={social.name} style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
+                    ) : (
+                      <i className={social.iconClass || "fa-solid fa-link"} />
+                    )}
+                  </a>
+                ))}
               </div>
             </div>
 

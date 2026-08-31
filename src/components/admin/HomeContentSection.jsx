@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { fbFirestore } from '../../firebase/firestore'
+import { driveStorage } from '../../services/driveStorage'
 
 /* ── tiny helpers ─────────────────────────────────────────────────────────── */
 function Field({ label, value, onChange, type = 'text', placeholder = '', options = [] }) {
@@ -39,6 +40,7 @@ function VisibilityEditor({ visibility = {}, onChange }) {
     { key: 'about', label: 'About Nermai Section' },
     { key: 'steps', label: 'How It Works (Steps)' },
     { key: 'results', label: 'Results & Marquee' },
+    { key: 'toppers', label: 'Toppers Carousel' },
     { key: 'gallery', label: 'Gallery Section' },
     { key: 'testimonials', label: 'Testimonials' },
     { key: 'faq', label: 'FAQ Section' }
@@ -102,7 +104,7 @@ function StatsEditor({ stats, onChange }) {
             <Field label="Number (e.g. 2400+)" value={stat.num}      onChange={v => update(i, 'num', v)} placeholder="2400+" />
             <Field label="English Label"        value={stat.label}    onChange={v => update(i, 'label', v)} placeholder="Students" />
           </div>
-          <Field label="Tamil Sub-Label" value={stat.sublabel} onChange={v => update(i, 'sublabel', v)} placeholder="பயிற்சி பெற்றவர்கள்" />
+          <Field label="Tamil Sub-Label" value={stat.sublabel} onChange={v => update(i, 'sublabel', v)} placeholder="Trained people" />
         </div>
       ))}
       <button 
@@ -199,7 +201,7 @@ function CoursesEditor({ courses, onChange }) {
           </div>
           <Field label="Image URL (Overrides Emoji)" value={course.imageUrl || ''} onChange={v => update(i, 'imageUrl', v)} placeholder="https://..." />
           {course.imageUrl && (
-            <img src={course.imageUrl} alt="preview" style={{ width: '100%', maxHeight: '120px', objectFit: 'contain', marginTop: '0.75rem', border: '1px solid var(--gray-200)', background: '#fff' }} onError={e => e.target.style.display='none'} />
+            <img src={driveStorage.formatImageUrl(course.imageUrl) || course.imageUrl} alt="preview" style={{ width: '100%', maxHeight: '120px', objectFit: 'contain', marginTop: '0.75rem', border: '1px solid var(--gray-200)', background: '#fff' }} onError={e => e.target.style.display='none'} />
           )}
           <div className="ap-form-row">
             <Field label="Course Name" value={course.name}    onChange={v => update(i, 'name', v)} placeholder="UPSC Civil Service" />
@@ -351,13 +353,29 @@ function TickerEditor({ ticker = { visible: true, items: [] }, onChange }) {
   const add = () => updateItems([...ticker.items, { text: '', link: '' }])
   const remove = (i) => updateItems(ticker.items.filter((_, idx) => idx !== i))
 
+  const updateSpeed = (v) => onChange({ ...ticker, speed: Number(v) || 35 })
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
         <p style={{ fontSize: '0.82rem', color: 'var(--gray-400)', margin: 0 }}>
           Manage the running ticker that appears above the Hero banner.
         </p>
-        <Toggle label="Enable Ticker on Homepage" checked={ticker.visible !== false} onChange={updateVis} />
+        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--gray-600)' }}>Speed (Seconds):</label>
+            <input 
+              type="number" 
+              className="ap-input" 
+              style={{ width: '80px', padding: '0.25rem 0.5rem', height: 'auto' }} 
+              value={ticker.speed || 35} 
+              onChange={e => updateSpeed(e.target.value)} 
+              min="5" 
+              max="150" 
+            />
+          </div>
+          <Toggle label="Enable Ticker on Homepage" checked={ticker.visible !== false} onChange={updateVis} />
+        </div>
       </div>
       
       {ticker.items.map((item, i) => (
@@ -397,16 +415,16 @@ const TABS = [
 ]
 
 const DEFAULTS = {
-  visibility: { stats: true, about: true, features: true, courses: true, steps: true, results: true, gallery: true, testimonials: true, faq: true, events: true },
-  ticker: { visible: true, items: [] },
+  visibility: { stats: true, about: true, features: true, courses: true, steps: true, results: true, gallery: true, testimonials: true, faq: true, events: true, toppers: true },
+  ticker: { visible: true, speed: 35, items: [] },
   events: [
     { date: '2026-08-31', title: 'Short NIQ', subtitle: 'for construction of Selfie Point - Last date', url: '', visible: true },
   ],
   stats: [
-    { num: '2400+', label: 'Students',  sublabel: 'பயிற்சி பெற்ற மாணவர்கள்' },
-    { num: '14+',   label: 'Years',     sublabel: 'ஆண்டுகள் அனுபவம்' },
-    { num: '28+',   label: 'Batches',   sublabel: 'வெற்றிகரமான தொகுதிகள்' },
-    { num: '98%',   label: 'Success',   sublabel: 'வெற்றி விகிதம்' },
+    { num: '2400+', label: 'Students',  sublabel: 'Trained Students' },
+    { num: '14+',   label: 'Years',     sublabel: 'Years of Experience' },
+    { num: '28+',   label: 'Batches',   sublabel: 'Successful Batches' },
+    { num: '98%',   label: 'Success',   sublabel: 'Success Rate' },
   ],
   features: [
     { icon: 'fa-solid fa-graduation-cap', title: 'Structured Classes',  desc: 'Daily scheduled classes with expert faculty.' },
@@ -432,11 +450,11 @@ const DEFAULTS = {
     badges: [{ num: '187+', label: 'Results' }, { num: '14+', label: 'Years' }, { num: '2400+', label: 'Students' }]
   },
   steps: [
-    { num: '01', title: 'உங்கள் இலக்கை தேர்வு செய்யுங்கள்', desc: 'Choose from TNPSC, UPSC, Police or Banking.' },
-    { num: '02', title: 'பயிற்சியை தேர்வு செய்யுங்கள்',        desc: 'Find the right batch and course structure.' },
+    { num: '01', title: 'Choose Your Goal', desc: 'Choose from TNPSC, UPSC, Police or Banking.' },
+    { num: '02', title: 'Choose Your Course',        desc: 'Find the right batch and course structure.' },
     { num: '03', title: 'Join Class Platform',                    desc: 'Redirect to our LMS portal.' },
-    { num: '04', title: 'பயிற்சி + தேர்வுகள்',                   desc: 'Classes, mock tests, progress tracking.' },
-    { num: '05', title: 'இலக்கை அடையுங்கள்',                    desc: 'Clear the exam and become a Government Officer.' },
+    { num: '04', title: 'Training + Tests',                   desc: 'Classes, mock tests, progress tracking.' },
+    { num: '05', title: 'Achieve Your Goal',                    desc: 'Clear the exam and become a Government Officer.' },
   ]
 }
 
@@ -468,7 +486,7 @@ export default function HomeContentSection({ toast }) {
     setSaving(true)
     try {
       await fbFirestore.updateSettings({ homeContent: content })
-      toast.success('Home content சேமிக்கப்பட்டது! Page refresh செய்யவும்.')
+      toast.success('Home content saved! Please refresh the page.')
     } catch (e) {
       toast.error(e.message)
     } finally {
@@ -528,7 +546,7 @@ export default function HomeContentSection({ toast }) {
           style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
         >
           {saving
-            ? <><i className="fa-solid fa-spinner fa-spin" /> சேமிக்கிறது...</>
+            ? <><i className="fa-solid fa-spinner fa-spin" /> Saving...</>
             : <><i className="fa-solid fa-floppy-disk" /> Save All Changes</>
           }
         </button>

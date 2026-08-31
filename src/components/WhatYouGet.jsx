@@ -35,7 +35,7 @@ export default function WhatYouGet() {
       <div className="container">
         <div className="section-header" style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
           <span className="eyebrow">NERMAI CLASS PLATFORM</span>
-          <h2 className="section-title">Nermai Class Platform-ல் என்ன கிடைக்கும்?</h2>
+          <h2 className="section-title">What do you get on Nermai Class Platform?</h2>
         </div>
 
         <div className="wyg-grid">
@@ -66,7 +66,7 @@ export default function WhatYouGet() {
 
         <div style={{ textAlign: 'center', marginTop: 'var(--space-12)' }}>
           <p style={{ marginBottom: 'var(--space-6)', fontSize: '1.1rem', color: 'var(--gray-600)' }}>
-            இவை அனைத்தும் Nermai Class Platform-ல்
+            All this on Nermai Class Platform
           </p>
           <a href={LMS_URL} className="btn btn-primary btn-lg">
             JOIN NERMAI <i className="fa-solid fa-arrow-right" style={{ marginLeft: '8px' }} />

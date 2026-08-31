@@ -19,6 +19,7 @@ export const CONTACT = {
   youtube: 'https://youtube.com',
   twitter: 'https://twitter.com',
   linkedin: 'https://linkedin.com',
+  telegram: 'https://t.me/',
 }
 
 /** Hero image recommended dimensions shown in admin panel */

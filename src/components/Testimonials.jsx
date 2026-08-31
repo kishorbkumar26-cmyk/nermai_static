@@ -21,10 +21,10 @@ export default function Testimonials() {
     <section className="testimonials-section section" id="testimonials">
       <div className="container">
         <div className="section-header">
-          <span className="eyebrow">💬 மாணவர் கருத்துகள்</span>
-          <h2 className="section-title">அவர்கள் சொல்வதை கேளுங்கள்</h2>
+          <span className="eyebrow">💬 Student Reviews</span>
+          <h2 className="section-title">Hear What They Say</h2>
           <p className="section-desc">
-            நேர்மையில் பயிற்சி பெற்று வெற்றி பெற்றவர்களின் நேர்மையான கருத்துகள்.
+            Honest feedback from successful Nermai students.
           </p>
         </div>
 

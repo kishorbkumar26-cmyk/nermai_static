@@ -79,7 +79,7 @@ export default function CourseDetailPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => { window.scrollTo(0, 0) }, [slug])
-  useReveal()
+  useReveal([content])
 
   useEffect(() => {
     Promise.all([
@@ -249,7 +249,7 @@ export default function CourseDetailPage() {
 
         {/* ── FAQS ── */}
         {content.faqs && content.faqs.length > 0 && (
-          <FAQ faqs={content.faqs} eyebrow="Course FAQs" title={<>அடிக்கடி கேட்கப்படும்<br />கேள்விகள்</>} />
+          <FAQ faqs={content.faqs} eyebrow="Course FAQs" title={<>Frequently Asked<br />Questions</>} />
         )}
 
         {/* ── CTA ── */}

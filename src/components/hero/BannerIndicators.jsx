@@ -1,7 +1,6 @@
 import React from 'react';
 
 export default function BannerIndicators({ total, current, onChange }) {
-  if (total <= 1) return null;
 
   return (
     <div style={{

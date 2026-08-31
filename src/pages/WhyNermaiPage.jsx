@@ -75,7 +75,7 @@ export default function WhyNermaiPage() {
                 An Institute Run by Volunteers, For the People
               </h1>
               <p style={{ color: 'rgba(255,255,255,0.8)', maxWidth: '600px', lineHeight: 1.8, fontSize: '1.1rem' }}>
-                நேர்மை IAS Academy is not just a coaching centre — it is a social movement to democratise
+                Nermai IAS Academy is not just a coaching centre — it is a social movement to democratise
                 access to quality civil services preparation for every aspirant, regardless of economic background.
               </p>
             </div>

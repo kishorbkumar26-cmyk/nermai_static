@@ -51,12 +51,26 @@ const DEFAULT_SETTINGS = {
   siteInfo: {
     phone: '+91 98765 43210',
     email: 'info@nermai.in',
-    address: 'நேர்மை பயிற்சி மையம், Chennai - 600001, Tamil Nadu',
+    address: 'Nermai Training Center, Chennai - 600001, Tamil Nadu',
     whatsapp: '919876543210',
     instagram: '#',
     facebook: '#',
     youtube: '#',
     telegram: '#'
+  },
+  footer: {
+    cta: { heading: '', sub: '', btnText: '', btnLink: '' },
+    brand: { desc: '', badge: '' },
+    contact: { address: '', phones: '', email: '' },
+    usefulLinks: [],
+    notifications: [],
+    coursesLinks: [],
+    bottom: { meta: '' }
+  },
+  officeLocations: {
+    visible: true,
+    title: 'Our Office Locations',
+    locations: []
   },
   homeContent: {
     visibility: {
@@ -78,10 +92,10 @@ const DEFAULT_SETTINGS = {
       { date: '2026-11-12', title: 'ICAISDA 26', subtitle: 'Two days International Conference organized by CSE', url: '', visible: true }
     ],
     stats: [
-      { num: '2400+', label: 'Students',  sublabel: 'பயிற்சி பெற்ற மாணவர்கள்' },
-      { num: '14+',   label: 'Years',     sublabel: 'ஆண்டுகள் அனுபவம்' },
-      { num: '28+',   label: 'Batches',   sublabel: 'வெற்றிகரமான தொகுதிகள்' },
-      { num: '98%',   label: 'Success',   sublabel: 'வெற்றி விகிதம்' }
+      { num: '2400+', label: 'Students',  sublabel: 'Trained Students' },
+      { num: '14+',   label: 'Years',     sublabel: 'Years of Experience' },
+      { num: '28+',   label: 'Batches',   sublabel: 'Successful Batches' },
+      { num: '98%',   label: 'Success',   sublabel: 'Success Rate' }
     ],
     features: [
       { icon: 'GraduationCap', title: 'Structured Classes',  desc: 'Daily scheduled classes with expert faculty in Tamil & English medium.', imageUrl: '', visible: true },
@@ -113,11 +127,11 @@ const DEFAULT_SETTINGS = {
       ]
     },
     steps: [
-      { num: '01', title: 'உங்கள் இலக்கை தேர்வு செய்யுங்கள்', desc: 'Choose from TNPSC, UPSC, Police or Banking on our Website.' },
-      { num: '02', title: 'பயிற்சியை தேர்வு செய்யுங்கள்',        desc: 'Find the right batch and course structure for your needs.' },
-      { num: '03', title: 'Join Class Platform',                    desc: 'Redirect to our dedicated learning management portal.' },
-      { num: '04', title: 'பயிற்சி + தேர்வுகள்',                   desc: 'Attend classes, take mock tests, and track your progress.' },
-      { num: '05', title: 'இலக்கை அடையுங்கள்',                    desc: 'Clear the exam and become a Government Officer.' }
+      { num: '01', title: 'Choose Your Goal', desc: 'Choose from TNPSC, UPSC, Police or Banking on our Website.' },
+      { num: '02', title: 'Choose Your Course',        desc: 'Find the right batch and course structure for your needs.' },
+      { num: '03', title: 'Enroll / Login',           desc: 'Access your student dashboard and course materials.' },
+      { num: '04', title: 'Training + Tests',                   desc: 'Attend classes, take mock tests, and track your progress.' },
+      { num: '05', title: 'Achieve Your Goal',                    desc: 'Clear the exam and become a Government Officer.' }
     ],
     ticker: {
       visible: true,
@@ -171,22 +185,22 @@ const DEFAULT_SETTINGS = {
 }
 
 const DEFAULT_NOTICES = [
-  { title: 'TNPSC Group IV தேர்வு அறிவிப்பு 2024', content: 'TNPSC Group IV தேர்வுக்கான விண்ணப்பங்கள் ஏற்கப்படுகின்றன. கடைசி தேதி: 30 செப்டம்பர் 2024.', priority: 'high', date: new Date().toISOString().split('T')[0] },
-  { title: 'புதிய தொகுதி ஆரம்பம் — அக்டோபர் 2024', content: 'UPSC Prelims 2025-க்கான புதிய batch அக்டோபர் 1 முதல் ஆரம்பிக்கிறது. இடங்கள் குறைவு.', priority: 'normal', date: new Date().toISOString().split('T')[0] },
-  { title: 'TN Police SI தேர்வு விண்ணப்பம்', content: 'தமிழ்நாடு காவல்துறை Sub-Inspector தேர்வுக்கான மாதிரி வினாக்கள் கிடைக்கும்.', priority: 'normal', date: new Date().toISOString().split('T')[0] }
+  { title: 'TNPSC Group IV Exam Notification 2024', content: 'Applications for TNPSC Group IV exam are being accepted. Last date: 30 September 2024.', priority: 'high', date: new Date().toISOString().split('T')[0] },
+  { title: 'New Batch Starts — October 2024', content: 'New batch for UPSC Prelims 2025 starts from October 1st. Limited seats.', priority: 'normal', date: new Date().toISOString().split('T')[0] },
+  { title: 'TN Police SI Exam Application', content: 'Model questions for Tamil Nadu Police Sub-Inspector exam are available.', priority: 'normal', date: new Date().toISOString().split('T')[0] }
 ]
 
 const DEFAULT_TOPPERS = [
-  { name: 'Kavitha S.', rank: '1', exam: 'TNPSC Group II', year: '2024', photo: '', quote: 'நேர்மையின் வழிகாட்டுதலால் மட்டுமே இந்த வெற்றி சாத்தியமானது.' },
-  { name: 'Murugan R.', rank: '3', exam: 'TNPSC Group I', year: '2023', photo: '', quote: 'தினமும் 8 மணி நேரம் படித்தேன். நேர்மை அகாடமி என் தன்னம்பிக்கையை வளர்த்தது.' },
+  { name: 'Kavitha S.', rank: '1', exam: 'TNPSC Group II', year: '2024', photo: '', quote: 'This success was possible only through Nermai\'s guidance.' },
+  { name: 'Murugan R.', rank: '3', exam: 'TNPSC Group I', year: '2023', photo: '', quote: 'I studied 8 hours daily. Nermai Academy built my self-confidence.' },
   { name: 'Priya M.', rank: '7', exam: 'UPSC CSE', year: '2023', photo: '', quote: 'Current affairs and Tamil medium materials were exceptional here.' },
   { name: 'Selvam K.', rank: '2', exam: 'TN Police SI', year: '2024', photo: '', quote: 'Physical training guidance along with academics made the difference.' }
 ]
 
 const DEFAULT_TESTIMONIALS = [
-  { name: 'Anitha Devi', role: 'TNPSC Group IV தேர்வாளர்', quote: 'நேர்மையில் படித்ததால் முதல் முயற்சியிலேயே வெற்றி பெற்றேன். ஆசிரியர்களின் அர்ப்பணிப்பு மிகவும் சிறப்பானது.' },
+  { name: 'Anitha Devi', role: 'TNPSC Group IV Aspirant', quote: 'I succeeded in my first attempt by studying at Nermai. The dedication of the teachers is outstanding.' },
   { name: 'Rajkumar P.', role: 'TN Police Constable', quote: 'The study materials and mock tests were exactly aligned with the exam pattern. Highly recommend!' },
-  { name: 'Lakshmi N.', role: 'UPSC Aspirant', quote: 'தமிழ் வழியில் UPSC பயிற்சி கிடைப்பது மிகவும் அரிது. நேர்மை அதை சாத்தியமாக்கியது.' },
+  { name: 'Lakshmi N.', role: 'UPSC Aspirant', quote: 'Getting UPSC training in Tamil is very rare. Nermai made it possible.' },
   { name: 'Vikram S.', role: 'TNPSC Group II', quote: 'Excellent current affairs coverage and daily tests kept me on track throughout my preparation.' }
 ]
 
@@ -318,10 +332,9 @@ export const fbFirestore = {
     try {
       const q = query(toppersCol(), orderBy('createdAt', 'asc'))
       const snap = await getDocs(q)
-      const items = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-      return items.length > 0 ? items : DEFAULT_TOPPERS.map((t, i) => ({ id: `default_${i}`, ...t }))
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }))
     } catch {
-      return DEFAULT_TOPPERS.map((t, i) => ({ id: `default_${i}`, ...t }))
+      return []
     }
   },
 
@@ -329,8 +342,8 @@ export const fbFirestore = {
     const q = query(toppersCol(), orderBy('createdAt', 'asc'))
     return onSnapshot(q, (snap) => {
       const items = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-      callback(items.length > 0 ? items : DEFAULT_TOPPERS.map((t, i) => ({ id: `default_${i}`, ...t })))
-    }, () => callback(DEFAULT_TOPPERS.map((t, i) => ({ id: `default_${i}`, ...t }))))
+      callback(items)
+    }, () => callback([]))
   },
 
   async addTopper(data) {

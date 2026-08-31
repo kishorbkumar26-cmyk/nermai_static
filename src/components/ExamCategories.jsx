@@ -30,11 +30,11 @@ export default function ExamCategories() {
     <section className="exams-section section" id="exams">
       <div className="container">
         <div className="section-header">
-          <span className="eyebrow">📖 தேர்வு வகைகள்</span>
-          <h2 className="section-title">எந்த தேர்வுக்கு<br />தயாராகிறீர்கள்?</h2>
+          <span className="eyebrow">📖 Exam Categories</span>
+          <h2 className="section-title">Which exam are you<br />preparing for?</h2>
           <p className="section-desc">
-            TNPSC முதல் UPSC வரை — அனைத்து அரசு வேலை தேர்வுகளுக்கும்
-            தமிழ் வழியில் தரமான பயிற்சி.
+            From TNPSC to UPSC — for all government exams
+            Quality training in Tamil medium.
           </p>
         </div>
 
@@ -71,7 +71,7 @@ export default function ExamCategories() {
                   {card.batches}
                 </span>
                 <button className="btn btn-outline btn-sm">
-                  பதிவு செய் <i className="fa-solid fa-arrow-right"></i>
+                  Enroll <i className="fa-solid fa-arrow-right"></i>
                 </button>
               </div>
             </div>

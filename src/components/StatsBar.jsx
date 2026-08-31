@@ -18,10 +18,10 @@ function animateCounter(el, numStr) {
 }
 
 const DEFAULT_STATS = [
-  { num: '2400+', label: 'Students',  sublabel: 'பயிற்சி பெற்ற மாணவர்கள்' },
-  { num: '14+',   label: 'Years',     sublabel: 'ஆண்டுகள் அனுபவம்' },
-  { num: '28+',   label: 'Batches',   sublabel: 'வெற்றிகரமான தொகுதிகள்' },
-  { num: '98%',   label: 'Success',   sublabel: 'வெற்றி விகிதம்' },
+  { num: '2400+', label: 'Students',  sublabel: 'Trained Students' },
+  { num: '14+',   label: 'Years',     sublabel: 'Years of Experience' },
+  { num: '28+',   label: 'Batches',   sublabel: 'Successful Batches' },
+  { num: '98%',   label: 'Success',   sublabel: 'Success Rate' },
 ]
 
 export default function StatsBar() {

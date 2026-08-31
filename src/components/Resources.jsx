@@ -45,9 +45,9 @@ export default function Resources() {
       <div className="container">
         <div className="section-header">
           <span className="eyebrow">FREE RESOURCES</span>
-          <h2 className="section-title">இலவச பயிற்சி வளங்கள்</h2>
+          <h2 className="section-title">Free Training Resources</h2>
           <p className="section-desc">
-            உங்கள் தயாரிப்பை மேம்படுத்த நாங்கள் வழங்கும் இலவச வளங்கள்.
+            Free resources we provide to enhance your preparation.
           </p>
         </div>
 

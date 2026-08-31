@@ -7,7 +7,7 @@ export default function WhyNermai() {
         <div className="section-header" style={{ textAlign: 'center', marginBottom: 'var(--space-16)' }}>
           <span className="eyebrow" style={{ color: 'var(--saffron)' }}>DIFFERENCE</span>
           <h2 className="section-title" style={{ color: 'var(--white)', fontSize: 'clamp(2rem, 4vw, 3.5rem)' }}>
-            ஏன் நேர்மையை<br />தேர்ந்தெடுக்க வேண்டும்?
+            Why Choose<br />Nermai?
           </h2>
         </div>
 
@@ -15,7 +15,7 @@ export default function WhyNermai() {
           
           <div className="why-item reveal" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div className="mono" style={{ color: 'var(--saffron)', fontSize: '1.5rem', marginBottom: 'var(--space-2)' }}>01</div>
-            <h3 style={{ fontSize: '2rem', fontFamily: 'var(--font-display)', marginBottom: 'var(--space-3)' }}>தமிழ் வழி பயிற்சி</h3>
+            <h3 style={{ fontSize: '2rem', fontFamily: 'var(--font-display)', marginBottom: 'var(--space-3)' }}>Tamil Medium Training</h3>
             <p style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, maxWidth: '600px', margin: '0 auto' }}>
               Competitive exam preparation uniquely designed and delivered for Tamil-medium aspirants to ensure crystal-clear conceptual understanding.
             </p>
@@ -23,7 +23,7 @@ export default function WhyNermai() {
 
           <div className="why-item reveal" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div className="mono" style={{ color: 'var(--saffron)', fontSize: '1.5rem', marginBottom: 'var(--space-2)' }}>02</div>
-            <h3 style={{ fontSize: '2rem', fontFamily: 'var(--font-display)', marginBottom: 'var(--space-3)' }}>முறையான பாடத்திட்டம்</h3>
+            <h3 style={{ fontSize: '2rem', fontFamily: 'var(--font-display)', marginBottom: 'var(--space-3)' }}>Structured Curriculum</h3>
             <p style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, maxWidth: '600px', margin: '0 auto' }}>
               Highly structured learning modules strictly based on the latest examination requirements and syllabus updates.
             </p>
@@ -31,7 +31,7 @@ export default function WhyNermai() {
 
           <div className="why-item reveal" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div className="mono" style={{ color: 'var(--saffron)', fontSize: '1.5rem', marginBottom: 'var(--space-2)' }}>03</div>
-            <h3 style={{ fontSize: '2rem', fontFamily: 'var(--font-display)', marginBottom: 'var(--space-3)' }}>தேர்வு பயிற்சி</h3>
+            <h3 style={{ fontSize: '2rem', fontFamily: 'var(--font-display)', marginBottom: 'var(--space-3)' }}>Exam Practice</h3>
             <p style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, maxWidth: '600px', margin: '0 auto' }}>
               Rigorous regular mock tests, daily practice sets, and detailed evaluations to consistently measure and improve your preparation.
             </p>
@@ -39,7 +39,7 @@ export default function WhyNermai() {
 
           <div className="why-item reveal" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div className="mono" style={{ color: 'var(--saffron)', fontSize: '1.5rem', marginBottom: 'var(--space-2)' }}>04</div>
-            <h3 style={{ fontSize: '2rem', fontFamily: 'var(--font-display)', marginBottom: 'var(--space-3)' }}>தொடர்ச்சியான வழிகாட்டுதல்</h3>
+            <h3 style={{ fontSize: '2rem', fontFamily: 'var(--font-display)', marginBottom: 'var(--space-3)' }}>Continuous Guidance</h3>
             <p style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, maxWidth: '600px', margin: '0 auto' }}>
               Consistent academic guidance, personal mentorship, and psychological support throughout your demanding preparation journey.
             </p>

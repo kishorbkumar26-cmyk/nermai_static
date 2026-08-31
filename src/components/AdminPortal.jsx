@@ -35,7 +35,7 @@ function FileDropZone({ onUpload, uploading, progress }) {
       onClick={() => inputRef.current?.click()}
     >
       <i className={`fa-solid ${uploading ? 'fa-spinner fa-spin' : 'fa-cloud-arrow-up'}`}></i>
-      <p>{uploading ? `Uploading... ${progress}%` : 'படத்தை இங்கே இழுக்கவும் அல்லது Click செய்யவும்'}</p>
+      <p>{uploading ? `Uploading... ${progress}%` : 'Drag image here or Click to upload'}</p>
       <p style={{ fontSize: '0.7rem', marginTop: '0.5rem', color: 'var(--gray-400)' }}>PNG, JPG, WebP · max 10MB</p>
       <input ref={inputRef} type="file" accept="image/*" onChange={e => handleFile(e.target.files[0])} />
       {uploading && (
@@ -104,19 +104,19 @@ function HeroSection({ toast }) {
 
   const handleAdd = async () => {
     if (!form.urlDesktop && !form.urlMobile && !form.title) {
-      toast.error('குறைந்தது ஒரு image அல்லது title தேவை')
+      toast.error('At least one image or title is required')
       return
     }
     try {
       await fbFirestore.addHeroSlide(form)
       setForm({ urlDesktop: '', urlMobile: '', ctaLink: '#', scene: 'none' })
-      toast.success('Hero slide சேர்க்கப்பட்டது!')
+      toast.success('Hero slide added successfully!')
     } catch (e) { toast.error('Error: ' + e.message) }
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('இந்த slide ஐ நீக்கவா?')) return
-    try { await fbFirestore.deleteHeroSlide(id); toast.success('Slide நீக்கப்பட்டது') }
+    if (!confirm('Are you sure you want to delete this slide?')) return
+    try { await fbFirestore.deleteHeroSlide(id); toast.success('Slide deleted successfully') }
     catch (e) { toast.error(e.message) }
   }
 
@@ -254,10 +254,10 @@ function HeroSection({ toast }) {
       {/* Current slides list */}
       <div className="ap-card">
         <div style={{ fontWeight: 700, marginBottom: '1rem', color: 'var(--ink)' }}>
-          தற்போதைய Slides ({slides.length})
+          Current Slides ({slides.length})
         </div>
         {slides.length === 0 ? (
-          <div className="ap-empty"><i className="fa-solid fa-image"></i><p>Slides இல்லை — மேலே add செய்யவும்</p></div>
+          <div className="ap-empty"><i className="fa-solid fa-image"></i><p>No slides found — Add a new slide above</p></div>
         ) : (
           <div className="ap-items-list">
             {slides.map((slide, i) => {
@@ -320,56 +320,56 @@ function NoticesSection({ toast }) {
   }, [])
 
   const handleAdd = async () => {
-    if (!form.title) { toast.error('தலைப்பு தேவை'); return }
+    if (!form.title) { toast.error('Title required'); return }
     try {
       await fbFirestore.addNotice(form)
       setForm({ title: '', content: '', priority: 'normal', date: new Date().toISOString().split('T')[0] })
-      toast.success('அறிவிப்பு சேர்க்கப்பட்டது!')
+      toast.success('Notice added successfully!')
     } catch (e) { toast.error(e.message) }
   }
 
   const handleDelete = async (id) => {
     if (id.startsWith('default_')) { toast.info('Default notices cannot be deleted'); return }
-    if (!confirm('இந்த அறிவிப்பை நீக்கவா?')) return
-    try { await fbFirestore.deleteNotice(id); toast.success('நீக்கப்பட்டது') }
+    if (!confirm('Are you sure you want to delete this notice?')) return
+    try { await fbFirestore.deleteNotice(id); toast.success('Deleted successfully') }
     catch (e) { toast.error(e.message) }
   }
 
   return (
     <div>
-      <h2 className="ap-section-title"><i className="fa-solid fa-bell"></i> அறிவிப்புகள் (Notices)</h2>
+      <h2 className="ap-section-title"><i className="fa-solid fa-bell"></i> Notices</h2>
 
       <div className="ap-card">
         <div className="ap-form-group">
-          <label>தலைப்பு *</label>
-          <input className="ap-input" placeholder="TNPSC Group IV தேர்வு அறிவிப்பு 2024" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
+          <label>Title *</label>
+          <input className="ap-input" placeholder="TNPSC Group IV Exam 2024" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
         </div>
         <div className="ap-form-group">
-          <label>விவரம் (Content)</label>
-          <textarea className="ap-input ap-textarea" placeholder="முழு விவரங்களை இங்கே எழுதவும்..." value={form.content} onChange={e => setForm(f => ({ ...f, content: e.target.value }))} />
+          <label>Content</label>
+          <textarea className="ap-input ap-textarea" placeholder="Write full details here..." value={form.content} onChange={e => setForm(f => ({ ...f, content: e.target.value }))} />
         </div>
         <div className="ap-form-row">
           <div className="ap-form-group">
-            <label>முன்னுரிமை (Priority)</label>
+            <label>Priority</label>
             <select className="ap-input ap-select" value={form.priority} onChange={e => setForm(f => ({ ...f, priority: e.target.value }))}>
-              <option value="normal">சாதாரண (Normal)</option>
-              <option value="high">உயர் முன்னுரிமை (High)</option>
+              <option value="normal">Normal</option>
+              <option value="high">High Priority</option>
             </select>
           </div>
           <div className="ap-form-group">
-            <label>தேதி (Date)</label>
+            <label>Date</label>
             <input type="date" className="ap-input" value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
           </div>
         </div>
         <button className="ap-btn ap-btn-primary" onClick={handleAdd}>
-          <i className="fa-solid fa-plus"></i> அறிவிப்பு சேர்
+          <i className="fa-solid fa-plus"></i> Add Notice
         </button>
       </div>
 
       <div className="ap-card">
-        <div style={{ fontWeight: 700, marginBottom: '1rem' }}>தற்போதைய அறிவிப்புகள் ({notices.length})</div>
+        <div style={{ fontWeight: 700, marginBottom: '1rem' }}>Current Notices ({notices.length})</div>
         {notices.length === 0 ? (
-          <div className="ap-empty"><i className="fa-solid fa-bell-slash"></i><p>அறிவிப்புகள் இல்லை</p></div>
+          <div className="ap-empty"><i className="fa-solid fa-bell-slash"></i><p>No Notices</p></div>
         ) : (
           <div className="ap-items-list">
             {notices.map(n => (
@@ -410,35 +410,57 @@ function ToppersSection({ toast }) {
       const result = await driveStorage.processAndUploadImage(file, { subFolderName: 'nermai-toppers' })
       setProgress(90)
       setForm(f => ({ ...f, photo: result.url }))
-      toast.success('Photo upload ஆனது!')
+      toast.success('Photo uploaded successfully!')
     } catch (e) { toast.error(e.message) }
     finally { setUploading(false); setProgress(0) }
   }
 
   const handleAdd = async () => {
-    if (!form.name || !form.rank) { toast.error('பெயர் மற்றும் rank தேவை'); return }
+    if (!form.name || !form.rank) { toast.error('Name and rank required'); return }
+    
+    let finalExam = form.exam;
+    if (form.exam === 'Others') {
+      if (!form.customExam || !form.customExam.trim()) {
+        toast.error('Please specify the exam manually');
+        return;
+      }
+      finalExam = form.customExam.trim();
+    }
+
     try {
-      await fbFirestore.addTopper(form)
-      setForm({ name: '', rank: '', exam: 'TNPSC Group II', year: new Date().getFullYear().toString(), photo: '', quote: '' })
-      toast.success('Topper சேர்க்கப்பட்டது!')
+      await fbFirestore.addTopper({ ...form, exam: finalExam })
+      setForm({ name: '', rank: '', exam: 'TNPSC Group II', customExam: '', year: new Date().getFullYear().toString(), photo: '', quote: '' })
+      toast.success('Topper added successfully!')
     } catch (e) { toast.error(e.message) }
   }
 
   const handleDelete = async (id) => {
     if (id.startsWith('default_')) { toast.info('Default data cannot be deleted'); return }
-    if (!confirm('நீக்கவா?')) return
-    try { await fbFirestore.deleteTopper(id); toast.success('நீக்கப்பட்டது') }
+    if (!confirm('Are you sure you want to delete?')) return
+    try { await fbFirestore.deleteTopper(id); toast.success('Deleted successfully') }
+    catch (e) { toast.error(e.message) }
+  }
+
+  const handleToggleVisibility = async (t) => {
+    if (t.id.startsWith('default_')) { toast.info('Default data cannot be modified. Please add your own toppers first.'); return }
+    try { 
+      await fbFirestore.updateTopper(t.id, { visible: t.visible === false ? true : false })
+      toast.success(t.visible === false ? 'Topper made visible' : 'Topper hidden')
+    }
     catch (e) { toast.error(e.message) }
   }
 
   return (
     <div>
-      <h2 className="ap-section-title"><i className="fa-solid fa-trophy"></i> வெற்றியாளர்கள் (Toppers)</h2>
+      <h2 className="ap-section-title">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        Toppers
+      </h2>
 
       <div className="ap-card">
         <div className="ap-form-row">
           <div className="ap-form-group">
-            <label>பெயர் *</label>
+            <label>Name *</label>
             <input className="ap-input" placeholder="Kavitha S." value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
           </div>
           <div className="ap-form-group">
@@ -448,60 +470,92 @@ function ToppersSection({ toast }) {
         </div>
         <div className="ap-form-row">
           <div className="ap-form-group">
-            <label>தேர்வு (Exam)</label>
+            <label>Exam</label>
             <select className="ap-input ap-select" value={form.exam} onChange={e => setForm(f => ({ ...f, exam: e.target.value }))}>
-              {['TNPSC Group I', 'TNPSC Group II', 'TNPSC Group IV', 'UPSC CSE', 'TN Police SI', 'TN Police Constable', 'IBPS PO', 'SBI PO'].map(e => (
+              {['TNPSC Group I', 'TNPSC Group II', 'TNPSC Group IV', 'UPSC CSE', 'TN Police SI', 'TN Police Constable', 'IBPS PO', 'SBI PO', 'Others'].map(e => (
                 <option key={e} value={e}>{e}</option>
               ))}
             </select>
+            {form.exam === 'Others' && (
+              <input 
+                className="ap-input" 
+                style={{ marginTop: '0.5rem' }} 
+                placeholder="Specify exam manually..." 
+                value={form.customExam || ''} 
+                onChange={e => setForm(f => ({ ...f, customExam: e.target.value }))} 
+              />
+            )}
           </div>
           <div className="ap-form-group">
-            <label>ஆண்டு (Year)</label>
+            <label>Year</label>
             <input className="ap-input" placeholder="2024" value={form.year} onChange={e => setForm(f => ({ ...f, year: e.target.value }))} />
           </div>
         </div>
         <div className="ap-form-group">
           <label>Photo</label>
           <FileDropZone onUpload={handlePhotoUpload} uploading={uploading} progress={progress} />
+          <div style={{ marginTop: '0.75rem' }}>
+            <label style={{ fontSize: '0.75rem', color: 'var(--gray-500)', marginBottom: '0.25rem', display: 'block' }}>Or paste an Image URL / Google Drive ID manually:</label>
+            <input 
+              type="text" 
+              className="ap-input" 
+              placeholder="e.g. 1a2b3c4d5e6f7g8h9i0j or https://..." 
+              value={form.photo} 
+              onChange={e => setForm(f => ({ ...f, photo: e.target.value }))} 
+            />
+          </div>
           {form.photo && (
-            <div style={{ marginTop: '0.5rem' }}>
+            <div style={{ marginTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <img src={driveStorage.formatImageUrl(form.photo) || form.photo} alt="Preview" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: '50%', border: '3px solid var(--saffron)' }} onError={e => { e.target.style.display = 'none' }} />
+              <span style={{ fontSize: '0.8rem', color: 'var(--emerald)' }}><i className="fa-solid fa-check"></i> Image loaded</span>
             </div>
           )}
         </div>
         <div className="ap-form-group">
-          <label>கருத்து (Quote)</label>
-          <textarea className="ap-input ap-textarea" placeholder="நேர்மையின் வழிகாட்டுதலால்..." value={form.quote} onChange={e => setForm(f => ({ ...f, quote: e.target.value }))} />
+          <label>Quote</label>
+          <textarea className="ap-input ap-textarea" placeholder="Guided by Nermai..." value={form.quote} onChange={e => setForm(f => ({ ...f, quote: e.target.value }))} />
         </div>
         <button className="ap-btn ap-btn-primary" onClick={handleAdd}>
-          <i className="fa-solid fa-plus"></i> Topper சேர்
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          Add Topper
         </button>
       </div>
 
       <div className="ap-card">
-        <div style={{ fontWeight: 700, marginBottom: '1rem' }}>வெற்றியாளர்கள் ({toppers.length})</div>
+        <div style={{ fontWeight: 700, marginBottom: '1rem' }}>Toppers ({toppers.length})</div>
         {toppers.length === 0 ? (
-          <div className="ap-empty"><i className="fa-solid fa-trophy"></i><p>Toppers இல்லை</p></div>
+          <div className="ap-empty">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+            <p style={{ marginTop: '0.5rem' }}>No Toppers</p>
+          </div>
         ) : (
           <div className="ap-items-list">
             {toppers.map(t => {
               const photoUrl = driveStorage.formatImageUrl(t.photo)
+              const isHidden = t.visible === false
               return (
-                <div key={t.id} className="ap-item">
+                <div key={t.id} className="ap-item" style={{ opacity: isHidden ? 0.6 : 1 }}>
                   {photoUrl ? (
                     <img src={photoUrl} alt={t.name} className="ap-item-thumb" style={{ borderRadius: '50%' }} onError={e => { e.target.style.display = 'none' }} />
                   ) : (
                     <div className="ap-item-thumb" style={{ background: 'var(--gray-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'var(--gray-400)' }}>
-                      <i className="fa-solid fa-user"></i>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     </div>
                   )}
-                  <div>
-                    <div className="ap-item-title">{t.name} — Rank {t.rank}</div>
+                  <div style={{ flex: 1 }}>
+                    <div className="ap-item-title">{t.name} — Rank {t.rank} {isHidden && <span style={{ fontSize: '0.7rem', background: 'var(--gray-200)', padding: '2px 6px', borderRadius: '4px', marginLeft: '6px', color: 'var(--gray-600)' }}>Hidden</span>}</div>
                     <div className="ap-item-sub">{t.exam} · {t.year}</div>
                   </div>
-                  <div className="ap-item-actions">
-                    <button className="ap-btn ap-btn-danger" onClick={() => handleDelete(t.id)}>
-                      <i className="fa-solid fa-trash"></i>
+                  <div className="ap-item-actions" style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button className="ap-btn" style={{ background: isHidden ? 'var(--gray-200)' : '#10b981', color: isHidden ? 'var(--gray-600)' : 'white', padding: '0.4rem 0.6rem' }} onClick={() => handleToggleVisibility(t)} title="Toggle Visibility">
+                      {isHidden ? (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+                      ) : (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                      )}
+                    </button>
+                    <button className="ap-btn ap-btn-danger" style={{ padding: '0.4rem 0.6rem' }} onClick={() => handleDelete(t.id)} title="Delete Topper">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                     </button>
                   </div>
                 </div>
@@ -525,45 +579,45 @@ function TestimonialsSection({ toast }) {
   }, [])
 
   const handleAdd = async () => {
-    if (!form.name || !form.quote) { toast.error('பெயர் மற்றும் கருத்து தேவை'); return }
+    if (!form.name || !form.quote) { toast.error('Name and quote required'); return }
     try {
       await fbFirestore.addTestimonial(form)
       setForm({ name: '', role: '', quote: '' })
-      toast.success('கருத்து சேர்க்கப்பட்டது!')
+      toast.success('Testimonial added successfully!')
     } catch (e) { toast.error(e.message) }
   }
 
   const handleDelete = async (id) => {
     if (id.startsWith('default_')) { toast.info('Default data cannot be deleted'); return }
-    if (!confirm('நீக்கவா?')) return
-    try { await fbFirestore.deleteTestimonial(id); toast.success('நீக்கப்பட்டது') }
+    if (!confirm('Are you sure you want to delete?')) return
+    try { await fbFirestore.deleteTestimonial(id); toast.success('Deleted successfully') }
     catch (e) { toast.error(e.message) }
   }
 
   return (
     <div>
-      <h2 className="ap-section-title"><i className="fa-solid fa-quote-right"></i> கருத்துகள் (Testimonials)</h2>
+      <h2 className="ap-section-title"><i className="fa-solid fa-quote-right"></i> Testimonials</h2>
       <div className="ap-card">
         <div className="ap-form-group">
-          <label>மாணவர் பெயர் *</label>
+          <label>Student Name *</label>
           <input className="ap-input" placeholder="Anitha Devi" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
         </div>
         <div className="ap-form-group">
-          <label>பதவி / தேர்வு</label>
-          <input className="ap-input" placeholder="TNPSC Group IV தேர்வாளர்" value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))} />
+          <label>Role / Exam</label>
+          <input className="ap-input" placeholder="TNPSC Group IV Aspirant" value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))} />
         </div>
         <div className="ap-form-group">
-          <label>கருத்து *</label>
-          <textarea className="ap-input ap-textarea" placeholder="நேர்மையில் படித்ததால்..." value={form.quote} onChange={e => setForm(f => ({ ...f, quote: e.target.value }))} />
+          <label>Quote *</label>
+          <textarea className="ap-input ap-textarea" placeholder="Studying at Nermai..." value={form.quote} onChange={e => setForm(f => ({ ...f, quote: e.target.value }))} />
         </div>
         <button className="ap-btn ap-btn-primary" onClick={handleAdd}>
-          <i className="fa-solid fa-plus"></i> கருத்து சேர்
+          <i className="fa-solid fa-plus"></i> Add Testimonial
         </button>
       </div>
       <div className="ap-card">
-        <div style={{ fontWeight: 700, marginBottom: '1rem' }}>கருத்துகள் ({items.length})</div>
+        <div style={{ fontWeight: 700, marginBottom: '1rem' }}>Testimonials ({items.length})</div>
         {items.length === 0 ? (
-          <div className="ap-empty"><i className="fa-solid fa-comments"></i><p>கருத்துகள் இல்லை</p></div>
+          <div className="ap-empty"><i className="fa-solid fa-comments"></i><p>No Testimonials</p></div>
         ) : (
           <div className="ap-items-list">
             {items.map(t => (
@@ -611,23 +665,23 @@ function GallerySection({ toast }) {
   }
 
   const handleAdd = async () => {
-    if (!form.url) { toast.error('படம் தேவை (URL missing)'); return }
+    if (!form.url) { toast.error('Image URL is required'); return }
     try {
       await fbFirestore.addGalleryImage(form)
       setForm({ url: '', caption: '' })
-      toast.success('படம் சேர்க்கப்பட்டது!')
+      toast.success('Image added successfully!')
     } catch (e) { toast.error(e.message) }
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('இந்த படத்தை நீக்கவா?')) return
-    try { await fbFirestore.deleteGalleryImage(id); toast.success('நீக்கப்பட்டது') }
+    if (!confirm('Are you sure you want to delete this image?')) return
+    try { await fbFirestore.deleteGalleryImage(id); toast.success('Deleted successfully') }
     catch (e) { toast.error(e.message) }
   }
 
   return (
     <div>
-      <h2 className="ap-section-title"><i className="fa-solid fa-images"></i> கேலரி (Gallery)</h2>
+      <h2 className="ap-section-title"><i className="fa-solid fa-images"></i> Gallery</h2>
       
       <div className="ap-card">
         <div className="ap-form-group">
@@ -640,18 +694,18 @@ function GallerySection({ toast }) {
           )}
         </div>
         <div className="ap-form-group">
-          <label>தலைப்பு / விவரம் (Caption - Optional)</label>
-          <input className="ap-input" placeholder="மாணவர் பாராட்டு விழா 2024" value={form.caption} onChange={e => setForm(f => ({ ...f, caption: e.target.value }))} />
+          <label>Caption (Optional)</label>
+          <input className="ap-input" placeholder="Student Felicitation 2024" value={form.caption} onChange={e => setForm(f => ({ ...f, caption: e.target.value }))} />
         </div>
         <button className="ap-btn ap-btn-primary" onClick={handleAdd}>
-          <i className="fa-solid fa-plus"></i> கேலரியில் சேர்
+          <i className="fa-solid fa-plus"></i> Add to Gallery
         </button>
       </div>
 
       <div className="ap-card">
-        <div style={{ fontWeight: 700, marginBottom: '1rem' }}>புகைப்படங்கள் ({images.length})</div>
+        <div style={{ fontWeight: 700, marginBottom: '1rem' }}>Photos ({images.length})</div>
         {images.length === 0 ? (
-          <div className="ap-empty"><i className="fa-solid fa-image"></i><p>படங்கள் இல்லை</p></div>
+          <div className="ap-empty"><i className="fa-solid fa-image"></i><p>No images</p></div>
         ) : (
           <div className="ap-items-list" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '1rem' }}>
             {images.map(img => {
@@ -690,15 +744,15 @@ function DriveSection({ toast }) {
 
   const handleSaveDrive = async () => {
     driveStorage.saveConfig(config)
-    toast.success('Drive config சேமிக்கப்பட்டது!')
+    toast.success('Drive config saved!')
   }
 
   const handleSavePasscode = async () => {
-    if (!passcode || passcode.length < 4) { toast.error('குறைந்தது 4 characters தேவை'); return }
+    if (!passcode || passcode.length < 4) { toast.error('Minimum 4 characters required'); return }
     try {
       await fbFirestore.updateSettings({ passcode })
       setPasscode('')
-      toast.success('Passcode மாற்றப்பட்டது!')
+      toast.success('Passcode changed!')
     } catch (e) { toast.error(e.message) }
   }
 
@@ -744,7 +798,7 @@ function DriveSection({ toast }) {
       <div className="ap-card">
         <div style={{ fontWeight: 700, color: 'var(--ink)', marginBottom: '0.5rem' }}>Drive URL → CDN Converter</div>
         <p style={{ fontSize: '0.82rem', color: 'var(--gray-500)', marginBottom: '1rem' }}>
-          எந்த Google Drive share link-ஐயும் fast CDN URL-ஆக மாற்றவும்.
+          Convert any Google Drive share link to a fast CDN URL.
         </p>
         <input
           className="ap-input"
@@ -773,14 +827,14 @@ function DriveSection({ toast }) {
       <div className="ap-card">
         <div style={{ fontWeight: 700, color: 'var(--ink)', marginBottom: '1rem' }}>
           <i className="fa-solid fa-lock" style={{ marginRight: '8px' }}></i>
-          Admin Passcode மாற்று
+          Change Admin Passcode
         </div>
         <div className="ap-form-group">
-          <label>புதிய Passcode</label>
-          <input type="password" className="ap-input" placeholder="புதிய passcode..." value={passcode} onChange={e => setPasscode(e.target.value)} style={{ letterSpacing: '0.2em' }} />
+          <label>New Passcode</label>
+          <input type="password" className="ap-input" placeholder="New passcode..." value={passcode} onChange={e => setPasscode(e.target.value)} style={{ letterSpacing: '0.2em' }} />
         </div>
         <button className="ap-btn ap-btn-primary" onClick={handleSavePasscode}>
-          <i className="fa-solid fa-key"></i> Passcode மாற்று
+          <i className="fa-solid fa-key"></i> Change Passcode
         </button>
       </div>
     </div>
@@ -805,7 +859,7 @@ function SiteInfoSection({ toast }) {
   const handleSave = async () => {
     try {
       await fbFirestore.updateSettings({ siteInfo: info })
-      toast.success('Site info சேமிக்கப்பட்டது!')
+      toast.success('Site info saved!')
     } catch (e) { toast.error(e.message) }
   }
 
@@ -854,7 +908,7 @@ function SiteInfoSection({ toast }) {
           <input className="ap-input" placeholder="https://instagram.com/..." value={info.instagram} onChange={e => setInfo(i => ({ ...i, instagram: e.target.value }))} />
         </div>
         <button className="ap-btn ap-btn-primary" onClick={handleSave}>
-          <i className="fa-solid fa-floppy-disk"></i> சேமி (Save)
+          <i className="fa-solid fa-floppy-disk"></i> Save
         </button>
       </div>
     </div>
@@ -921,7 +975,7 @@ export default function AdminPortal() {
         setPasscode('')
         setPasscodeError('')
       } else {
-        setPasscodeError('தவறான passcode. மீண்டும் முயற்சி செய்யுங்கள்.')
+        setPasscodeError('Incorrect passcode. Please try again.')
       }
     } catch (e) {
       setPasscodeError('Error: ' + e.message)
@@ -964,8 +1018,8 @@ export default function AdminPortal() {
             <div className="passcode-modal-icon">
               <i className="fa-solid fa-shield-halved"></i>
             </div>
-            <h2 className="passcode-modal-title">நேர்மை Admin</h2>
-            <p className="passcode-modal-sub">Admin passcode உள்ளிடவும்</p>
+            <h2 className="passcode-modal-title">Nermai Admin</h2>
+            <p className="passcode-modal-sub">Enter Admin passcode</p>
             <input
               type="password"
               className={`passcode-input${passcodeError ? ' error' : ''}`}
@@ -981,14 +1035,14 @@ export default function AdminPortal() {
                 className="btn btn-outline"
                 onClick={() => { setShowPasscode(false); setPasscode(''); setPasscodeError('') }}
               >
-                ரத்து செய்
+                Cancel
               </button>
               <button
                 className="btn btn-primary"
                 onClick={handlePasscodeSubmit}
                 disabled={checking || !passcode}
               >
-                {checking ? <><i className="fa-solid fa-spinner fa-spin"></i> சரிபார்க்கிறது...</> : <>உள்நுழை <i className="fa-solid fa-arrow-right"></i></>}
+                {checking ? <><i className="fa-solid fa-spinner fa-spin"></i> Verifying...</> : <>Login <i className="fa-solid fa-arrow-right"></i></>}
               </button>
             </div>
           </div>
@@ -1003,7 +1057,7 @@ export default function AdminPortal() {
             <div className="ap-header">
               <div className="ap-header-title">
                 <i className="fa-solid fa-shield-halved" style={{ color: 'var(--gold-light)' }}></i>
-                நேர்மை Admin Portal
+                Nermai Admin Portal
               </div>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <button className="ap-header-close" onClick={handleLogout} title="Logout">

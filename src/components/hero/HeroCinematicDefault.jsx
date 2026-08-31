@@ -16,7 +16,7 @@ export default function HeroCinematicDefault({ cta }) {
           Prepare with<br /><em>Purpose.</em>
         </h1>
         <p className="hero-cinematic-subtitle">
-          நேர்மையான கல்வி · வெற்றிக்கான உறுதியான பாதை
+          Nermai Education · A definite path to success
         </p>
         <p className="hero-cinematic-tagline">
           Serve with Integrity.

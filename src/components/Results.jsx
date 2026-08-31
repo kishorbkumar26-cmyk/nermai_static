@@ -97,7 +97,7 @@ export default function Results() {
           <span className="eyebrow">OUR RESULTS</span>
           <h2 className="section-title">Success Stories & Results</h2>
           <p className="section-desc">
-            நேர்மை IAS Academy-ல் படித்து வெற்றி பெற்ற மாணவர்களின் சான்றுகள்.
+            Nermai IAS Academy-ல் படித்து வெற்றி பெற்ற மாணவர்களின் சான்றுகள்.
           </p>
         </div>
 

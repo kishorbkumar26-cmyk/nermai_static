@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { fbFirestore } from '../firebase/firestore'
+import { driveStorage } from '../services/driveStorage'
 import { LMS_URL } from '../constants'
 
 const DEFAULT_COURSES = [
@@ -17,7 +18,30 @@ export default function Courses() {
 
   useEffect(() => {
     fbFirestore.getSettings().then(s => {
-      if (s.homeContent?.courses?.length) setCourses(s.homeContent.courses)
+      if (s.homeContent?.courses?.length) {
+        const baseCourses = s.homeContent.courses
+        setCourses(baseCourses)
+        
+        // Fetch custom logos from course details to keep them synced
+        Promise.all(
+          baseCourses.map(c => 
+            fbFirestore.getCourseContent(c.slug)
+              .then(data => ({ slug: c.slug, data: data || null }))
+              .catch(() => ({ slug: c.slug, data: null }))
+          )
+        ).then(results => {
+          setCourses(prev => prev.map(c => {
+            const detail = results.find(r => r.slug === c.slug)?.data
+            if (detail && detail.iconType === 'url' && detail.iconUrl) {
+              return { ...c, imageUrl: driveStorage.formatImageUrl(detail.iconUrl) || detail.iconUrl }
+            }
+            if (detail && detail.iconType === 'emoji' && detail.icon) {
+              return { ...c, icon: detail.icon, imageUrl: '' }
+            }
+            return c
+          }))
+        })
+      }
     })
   }, [])
 
@@ -34,14 +58,15 @@ export default function Courses() {
         </div>
 
         <div className="courses-grid">
-          {courses.filter(c => c.visible !== false).map((course, i) => (
+          {courses.filter(c => c.visible !== false).map((course, i) => {
+            const formattedImageUrl = driveStorage.formatImageUrl(course.imageUrl) || course.imageUrl;
+            return (
             <div key={i} className="course-card reveal" style={{ '--reveal-delay': `${i * 80}ms` }}>
               <div className="course-card-num">{String(i + 1).padStart(2, '0')}</div>
-              {course.imageUrl ? (
-                <img src={course.imageUrl} alt={course.name} className="course-card-image" />
-              ) : (
-                <div className="course-card-icon">{course.icon}</div>
-              )}
+              {formattedImageUrl ? (
+                <img src={formattedImageUrl} alt={course.name} className="course-card-image" referrerPolicy="no-referrer" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+              ) : null}
+              <div className="course-card-icon" style={{ display: formattedImageUrl ? 'none' : 'block' }}>{course.icon}</div>
               <div className="course-card-body">
                 <div className="course-card-name">{course.name}</div>
                 <div className="course-card-subname">{course.subname}</div>
@@ -61,7 +86,8 @@ export default function Courses() {
                 </a>
               </div>
             </div>
-          ))}
+            )
+          })}
         </div>
 
         <div style={{ textAlign: 'center', marginTop: 'var(--space-10)' }}>

@@ -11,11 +11,11 @@ const STEP_STYLES = [
 ]
 
 const DEFAULT_STEPS = [
-  { num: '01', title: 'உங்கள் இலக்கை தேர்வு செய்யுங்கள்', desc: 'Choose from TNPSC, UPSC, Police or Banking on our Website.' },
-  { num: '02', title: 'பயிற்சியை தேர்வு செய்யுங்கள்',        desc: 'Find the right batch and course structure for your needs.' },
-  { num: '03', title: 'Join Class Platform',                    desc: 'Redirect to our dedicated learning management portal.' },
-  { num: '04', title: 'பயிற்சி + தேர்வுகள்',                   desc: 'Attend classes, take mock tests, and track your progress.' },
-  { num: '05', title: 'இலக்கை அடையுங்கள்',                    desc: 'Clear the exam and become a Government Officer.' },
+  { num: '01', title: 'Choose Your Goal', desc: 'Choose from TNPSC, UPSC, Police or Banking on our Website.' },
+  { num: '02', title: 'Choose Your Course',        desc: 'Find the right batch and course structure for your needs.' },
+  { num: '03', title: 'Enroll / Login',                    desc: 'Redirect to our dedicated learning management portal.' },
+  { num: '04', title: 'Training + Tests',                   desc: 'Attend classes, take mock tests, and track your progress.' },
+  { num: '05', title: 'Achieve Your Goal',                    desc: 'Clear the exam and become a Government Officer.' },
 ]
 
 export default function HowNermaiWorks() {
@@ -32,7 +32,7 @@ export default function HowNermaiWorks() {
       <div className="container-narrow">
         <div className="section-header" style={{ textAlign: 'center', marginBottom: 'var(--space-16)' }}>
           <span className="eyebrow">YOUR JOURNEY</span>
-          <h2 className="section-title">நேர்மையுடன் உங்கள் பயணம்</h2>
+          <h2 className="section-title">Your Journey with Nermai</h2>
           <p className="section-desc">
             How our two platforms work together to guarantee your success.
           </p>

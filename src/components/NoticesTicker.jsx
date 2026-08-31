@@ -19,7 +19,7 @@ export default function NoticesTicker() {
     <div className="notice-ticker" aria-label="Latest notices">
       <div className="notice-ticker-label">
         <i className="fa-solid fa-bell"></i>
-        அறிவிப்புகள்
+        Notices
       </div>
       <div className="notice-ticker-track">
         <div className="notice-ticker-inner" ref={trackRef}>

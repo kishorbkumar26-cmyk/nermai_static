@@ -23,7 +23,7 @@ export default function AdminPage() {
         sessionStorage.setItem('nermai_admin', '1')
         navigate('/admin/dashboard')
       } else {
-        setError('❌ தவறான passcode. மீண்டும் முயற்சி செய்யுங்கள்.')
+        setError('❌ Incorrect passcode. Please try again.')
       }
     } catch (err) {
       setError('Connection error: ' + err.message)
@@ -36,11 +36,11 @@ export default function AdminPage() {
     <div className="admin-login-page">
       <div className="admin-login-card">
         {/* Logo */}
-        <div className="admin-login-logo">
-          <div className="admin-login-badge">ந</div>
-          <div className="admin-login-brand">
-            <span className="admin-login-name">NERMAI IAS ACADEMY</span>
-            <span className="admin-login-sub">ADMIN PORTAL · v2.0</span>
+        <div className="admin-login-logo" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', justifyContent: 'center', marginBottom: '2rem' }}>
+          <img src="/nermai-logo.png" alt="Nermai IAS Academy Logo" style={{ height: '56px', width: 'auto' }} />
+          <div className="admin-login-brand" style={{ textAlign: 'left' }}>
+            <span className="admin-login-name" style={{ display: 'block', fontSize: '1.2rem', fontWeight: 800, letterSpacing: '0.05em', lineHeight: 1.2 }}>NERMAI IAS ACADEMY</span>
+            <span className="admin-login-sub" style={{ display: 'block', fontSize: '0.75rem', color: 'var(--gray-500)', letterSpacing: '0.05em' }}>ADMIN PORTAL · v2.0</span>
           </div>
         </div>
 
