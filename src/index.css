@@ -3572,13 +3572,11 @@ ul, ol { list-style: none; }
 .hero-carousel-section {
   position: relative;
   overflow: hidden;
-  min-height: calc(100svh - 68px);
   background: var(--maroon-deep);
 }
 .hero-carousel-section .hero-carousel-placeholder {
   border-radius: 0 !important;
   border: none !important;
-  min-height: calc(100svh - 68px);
 }
 .hero-slide-text-overlay {
   position: absolute;
@@ -3647,7 +3645,7 @@ ul, ol { list-style: none; }
 .hero-cinematic-default {
   position: relative;
   width: 100%;
-  min-height: calc(100svh - 68px);
+  aspect-ratio: 32 / 9;
   background: var(--maroon-deep);
   display: flex;
   align-items: center;

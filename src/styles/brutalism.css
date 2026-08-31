@@ -45,9 +45,9 @@
   width: 100%;
   overflow: hidden;
   border-bottom: 4px solid var(--n-ink);
-  /* Exact 16:5 ratio as per 1920×600 admin spec */
-  aspect-ratio: 16 / 5;
-  max-height: 600px; /* Hard cap so it never goes taller */
+  /* Wider aspect ratio to reduce height (approx 16:4.5) */
+  aspect-ratio: 32 / 9;
+  max-height: 480px; /* Hard cap so it never goes taller */
 }
 
 @media (max-width: 768px) {
