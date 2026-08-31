@@ -3023,19 +3023,19 @@ ul, ol { list-style: none; }
   background: var(--saffron-dark) !important;
 }
 
-/* ── Exam Marquee Strip ───────────────────────────────────────────────────── */
-.exam-marquee-strip {
-  background: var(--maroon-deep);
+/* ── Top Ticker (Running Info) ─────────────────────────────────────────────── */
+.top-ticker-strip {
+  background: #ffffff;
   overflow: hidden;
-  height: 42px;
+  height: 40px;
   display: flex;
   align-items: center;
-  border-top: 2px solid var(--saffron);
-  border-bottom: 2px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid var(--gray-200);
   position: relative;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
-.exam-marquee-strip::before,
-.exam-marquee-strip::after {
+.top-ticker-strip::before,
+.top-ticker-strip::after {
   content: '';
   position: absolute;
   top: 0; bottom: 0;
@@ -3043,45 +3043,47 @@ ul, ol { list-style: none; }
   z-index: 2;
   pointer-events: none;
 }
-.exam-marquee-strip::before {
+.top-ticker-strip::before {
   left: 0;
-  background: linear-gradient(90deg, var(--maroon-deep), transparent);
+  background: linear-gradient(90deg, #ffffff, transparent);
 }
-.exam-marquee-strip::after {
+.top-ticker-strip::after {
   right: 0;
-  background: linear-gradient(-90deg, var(--maroon-deep), transparent);
+  background: linear-gradient(-90deg, #ffffff, transparent);
 }
-.exam-marquee-inner {
+.top-ticker-inner {
   display: flex;
   align-items: center;
   gap: 0;
-  animation: marquee-scroll 28s linear infinite;
+  animation: top-ticker-scroll 35s linear infinite;
   will-change: transform;
   white-space: nowrap;
 }
-.exam-marquee-inner:hover { animation-play-state: paused; }
-@keyframes marquee-scroll {
+.top-ticker-inner:hover { animation-play-state: paused; }
+@keyframes top-ticker-scroll {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
-.exam-marquee-item {
+.top-ticker-item {
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.6rem;
   padding: 0 1.5rem;
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 0.18em;
-  font-weight: 700;
-  color: rgba(253,246,236,0.65);
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--maroon);
 }
-.exam-marquee-dot {
-  width: 4px; height: 4px;
-  border-radius: 50%;
-  background: var(--saffron);
-  flex-shrink: 0;
-  opacity: 0.8;
+.top-ticker-icon {
+  color: var(--saffron);
+  font-size: 0.9rem;
+}
+.top-ticker-link {
+  color: inherit;
+  text-decoration: none;
+}
+.top-ticker-link:hover {
+  text-decoration: underline;
 }
 
 /* ── Stats Bar: Dramatic Dark Version ────────────────────────────────────── */
@@ -3638,7 +3640,7 @@ ul, ol { list-style: none; }
   .stat-number { font-size: 2.2rem !important; }
   .wyg-grid { grid-template-columns: 1fr; }
   .cta-final-heading { font-size: 2rem; }
-  .exam-marquee-item { padding: 0 1rem; }
+  .top-ticker-item { padding: 0 1rem; }
 }
 
 /* ── Cinematic Hero Default (when no admin images) ───────────────────────── */

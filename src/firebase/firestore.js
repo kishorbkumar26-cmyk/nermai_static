@@ -118,7 +118,15 @@ const DEFAULT_SETTINGS = {
       { num: '03', title: 'Join Class Platform',                    desc: 'Redirect to our dedicated learning management portal.' },
       { num: '04', title: 'பயிற்சி + தேர்வுகள்',                   desc: 'Attend classes, take mock tests, and track your progress.' },
       { num: '05', title: 'இலக்கை அடையுங்கள்',                    desc: 'Clear the exam and become a Government Officer.' }
-    ]
+    ],
+    ticker: {
+      visible: true,
+      items: [
+        { text: 'Classroom GS PCM 2027 - Admission Open', link: '#' },
+        { text: 'Online GS PCM 2027 - Admission Open', link: '#' },
+        { text: 'StepUp Mentorship 2027 - Admission Open', link: '#' }
+      ]
+    }
   },
   footer: {
     cta: {

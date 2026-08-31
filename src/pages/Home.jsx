@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Hero from '../components/hero/Hero'
+import TopTicker from '../components/TopTicker'
 import StatsBar from '../components/StatsBar'
 import Courses from '../components/Courses'
 import WhyNermai from '../components/WhyNermai'
@@ -27,27 +28,6 @@ const DEFAULT_ABOUT = {
     { num: '14+',   label: 'Years' },
     { num: '2400+', label: 'Students' },
   ]
-}
-
-const MARQUEE_ITEMS = [
-  'UPSC CIVIL SERVICES', 'TNPSC GROUP I', 'TNPSC GROUP II', 'TNPSC GROUP IV',
-  'TN POLICE SI', 'TN POLICE PC', 'VAO', 'BANKING · IBPS · SBI',
-  'PUDUCHERRY UDC · LDC', 'DEPUTY TAHSILDAR', 'SSC CGL', 'RBI GRADE B',
-]
-
-function ExamMarquee() {
-  return (
-    <div className="exam-marquee-strip" aria-hidden="true">
-      <div className="exam-marquee-inner">
-        {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
-          <span key={i} className="exam-marquee-item">
-            <span className="exam-marquee-dot" />
-            {item}
-          </span>
-        ))}
-      </div>
-    </div>
-  )
 }
 
 function ScrollProgress() {
@@ -82,6 +62,7 @@ function initReveal() {
 
 export default function Home() {
   const [about, setAbout] = useState(DEFAULT_ABOUT)
+  const [ticker, setTicker] = useState({ visible: false, items: [] })
   const [visibility, setVisibility] = useState({
     stats: true, about: true, features: true, courses: true, steps: true,
     results: true, gallery: true, testimonials: true, faq: true
@@ -89,6 +70,7 @@ export default function Home() {
 
   useEffect(() => {
     fbFirestore.getSettings().then(s => {
+      if (s.homeContent?.ticker) setTicker(s.homeContent.ticker)
       if (s.homeContent?.about) setAbout(ab => ({ ...DEFAULT_ABOUT, ...s.homeContent.about }))
       if (s.homeContent?.visibility) setVisibility(v => ({ ...v, ...s.homeContent.visibility }))
     })
@@ -104,12 +86,11 @@ export default function Home() {
       {/* Scroll progress indicator */}
       <ScrollProgress />
 
-      <Header />
+      <div id="top" />
+      <Header activePath="/" />
+      <TopTicker ticker={ticker} />
 
       <main>
-        {/* ── EXAM MARQUEE STRIP ── */}
-        {visibility.results !== false && <ExamMarquee />}
-
         {/* ── HERO: Full-Width Cinematic Banners ── */}
         <Hero />
 

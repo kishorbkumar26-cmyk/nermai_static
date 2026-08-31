@@ -335,9 +335,55 @@ function StepsEditor({ steps, onChange }) {
   )
 }
 
+/* ── Ticker Editor ───────────────────────────────────────────────────────── */
+function TickerEditor({ ticker = { visible: true, items: [] }, onChange }) {
+  const updateItems = (newItems) => onChange({ ...ticker, items: newItems })
+  const updateVis = (v) => onChange({ ...ticker, visible: v })
+  
+  const updateItem = (i, key, val) => {
+    const next = ticker.items.map((it, idx) => idx === i ? { ...it, [key]: val } : it)
+    updateItems(next)
+  }
+  const add = () => updateItems([...ticker.items, { text: '', link: '' }])
+  const remove = (i) => updateItems(ticker.items.filter((_, idx) => idx !== i))
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+        <p style={{ fontSize: '0.82rem', color: 'var(--gray-400)', margin: 0 }}>
+          Manage the running ticker that appears above the Hero banner.
+        </p>
+        <Toggle label="Enable Ticker on Homepage" checked={ticker.visible !== false} onChange={updateVis} />
+      </div>
+      
+      {ticker.items.map((item, i) => (
+        <div key={i} className="ap-card" style={{ marginBottom: '0.75rem', padding: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+            <div style={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--maroon)' }}>
+              Message {i + 1}
+            </div>
+            <button onClick={() => remove(i)} className="btn" style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #f87171', padding: '0.25rem 0.75rem', fontSize: '0.75rem', borderRadius: '4px' }}>
+              <i className="fa-solid fa-trash" style={{ marginRight: '6px' }} /> Delete
+            </button>
+          </div>
+          <div className="ap-form-row">
+            <Field label="Scrolling Text" value={item.text} onChange={v => updateItem(i, 'text', v)} placeholder="e.g. Admission Open for GS 2027" />
+            <Field label="Link URL (Optional)" value={item.link} onChange={v => updateItem(i, 'link', v)} placeholder="https://... or /contact" />
+          </div>
+        </div>
+      ))}
+      <button onClick={add} className="btn" style={{ marginTop: '0.5rem', width: '100%', justifyContent: 'center', background: 'var(--gray-100)', color: 'var(--gray-700)', border: '1px dashed var(--gray-300)' }}>
+        <i className="fa-solid fa-plus" style={{ marginRight: '8px' }} /> Add Message
+      </button>
+    </div>
+  )
+}
+
+
 /* ── Main HomeContentSection ─────────────────────────────────────────────── */
 const TABS = [
   { id: 'visibility', icon: 'fa-eye',           label: 'Visibility' },
+  { id: 'ticker',     icon: 'fa-bullhorn',      label: 'Top Ticker' },
   { id: 'stats',      icon: 'fa-chart-simple',  label: 'Stats Bar' },
   { id: 'features',   icon: 'fa-bolt',          label: 'Features' },
   { id: 'courses',    icon: 'fa-book-bookmark', label: 'Courses' },
@@ -348,6 +394,7 @@ const TABS = [
 
 const DEFAULTS = {
   visibility: { stats: true, about: true, features: true, courses: true, steps: true, results: true, gallery: true, testimonials: true, faq: true, events: true },
+  ticker: { visible: true, items: [] },
   events: [
     { date: '2026-08-31', title: 'Short NIQ', subtitle: 'for construction of Selfie Point - Last date', url: '', visible: true },
   ],
@@ -400,12 +447,13 @@ export default function HomeContentSection({ toast }) {
       if (s.homeContent) {
         setContent(prev => ({
           visibility: s.homeContent.visibility || prev.visibility,
-          events:   s.homeContent.events   || prev.events,
-          stats:    s.homeContent.stats    || prev.stats,
-          features: s.homeContent.features || prev.features,
-          courses:  s.homeContent.courses  || prev.courses,
-          about:    { ...prev.about, ...s.homeContent.about },
-          steps:    s.homeContent.steps    || prev.steps,
+          ticker:     s.homeContent.ticker     || prev.ticker,
+          events:     s.homeContent.events     || prev.events,
+          stats:      s.homeContent.stats      || prev.stats,
+          features:   s.homeContent.features   || prev.features,
+          courses:    s.homeContent.courses    || prev.courses,
+          about:      { ...prev.about, ...s.homeContent.about },
+          steps:      s.homeContent.steps      || prev.steps,
         }))
       }
       setLoading(false)
@@ -459,12 +507,13 @@ export default function HomeContentSection({ toast }) {
 
       {/* Tab content */}
       {activeTab === 'visibility' && <VisibilityEditor visibility={content.visibility} onChange={v => setContent(c => ({ ...c, visibility: v }))} />}
-      {activeTab === 'stats'    && <StatsEditor    stats={content.stats}       onChange={v => setContent(c => ({ ...c, stats: v }))} />}
-      {activeTab === 'features' && <FeaturesEditor features={content.features} onChange={v => setContent(c => ({ ...c, features: v }))} />}
-      {activeTab === 'courses'  && <CoursesEditor  courses={content.courses}   onChange={v => setContent(c => ({ ...c, courses: v }))} />}
-      {activeTab === 'events'   && <EventsEditor   events={content.events}     onChange={v => setContent(c => ({ ...c, events: v }))} />}
-      {activeTab === 'about'    && <AboutEditor    about={content.about}       onChange={v => setContent(c => ({ ...c, about: v }))} />}
-      {activeTab === 'steps'    && <StepsEditor    steps={content.steps}       onChange={v => setContent(c => ({ ...c, steps: v }))} />}
+      {activeTab === 'ticker'   && <TickerEditor   ticker={content.ticker}       onChange={v => setContent(c => ({ ...c, ticker: v }))} />}
+      {activeTab === 'stats'    && <StatsEditor    stats={content.stats}         onChange={v => setContent(c => ({ ...c, stats: v }))} />}
+      {activeTab === 'features' && <FeaturesEditor features={content.features}   onChange={v => setContent(c => ({ ...c, features: v }))} />}
+      {activeTab === 'courses'  && <CoursesEditor  courses={content.courses}     onChange={v => setContent(c => ({ ...c, courses: v }))} />}
+      {activeTab === 'events'   && <EventsEditor   events={content.events}       onChange={v => setContent(c => ({ ...c, events: v }))} />}
+      {activeTab === 'about'    && <AboutEditor    about={content.about}         onChange={v => setContent(c => ({ ...c, about: v }))} />}
+      {activeTab === 'steps'    && <StepsEditor    steps={content.steps}         onChange={v => setContent(c => ({ ...c, steps: v }))} />}
 
       {/* Save button */}
       <div style={{ position: 'sticky', bottom: '1rem', zIndex: 10, marginTop: '1.5rem' }}>
