@@ -3,6 +3,7 @@
    Palette: Deep Saffron · Rich Maroon · Cream Parchment · Ink Black · Gold Leaf
    Type:    Tiro Tamil (display) · DM Sans (body) · JetBrains Mono (data)
    ══════════════════════════════════════════════════════════════════════════════ */
+@import './styles/brutalism.css';
 
 /* ── CSS Variables ─────────────────────────────────────────────────────────── */
 :root {

@@ -30,6 +30,15 @@ const DEFAULT_ABOUT = {
   ]
 }
 
+const DEFAULT_TICKER = {
+  visible: true,
+  items: [
+    { text: 'Classroom GS PCM 2027 - Admission Open', link: '#' },
+    { text: 'Online GS PCM 2027 - Admission Open', link: '#' },
+    { text: 'StepUp Mentorship 2027 - Admission Open', link: '#' }
+  ]
+}
+
 function ScrollProgress() {
   const [progress, setProgress] = useState(0)
   useEffect(() => {
@@ -62,7 +71,7 @@ function initReveal() {
 
 export default function Home() {
   const [about, setAbout] = useState(DEFAULT_ABOUT)
-  const [ticker, setTicker] = useState({ visible: false, items: [] })
+  const [ticker, setTicker] = useState(DEFAULT_TICKER)
   const [visibility, setVisibility] = useState({
     stats: true, about: true, features: true, courses: true, steps: true,
     results: true, gallery: true, testimonials: true, faq: true
