@@ -37,7 +37,11 @@ export default function Courses() {
           {courses.filter(c => c.visible !== false).map((course, i) => (
             <div key={i} className="course-card reveal" style={{ '--reveal-delay': `${i * 80}ms` }}>
               <div className="course-card-num">{String(i + 1).padStart(2, '0')}</div>
-              <div className="course-card-icon">{course.icon}</div>
+              {course.imageUrl ? (
+                <img src={course.imageUrl} alt={course.name} className="course-card-image" />
+              ) : (
+                <div className="course-card-icon">{course.icon}</div>
+              )}
               <div className="course-card-body">
                 <div className="course-card-name">{course.name}</div>
                 <div className="course-card-subname">{course.subname}</div>

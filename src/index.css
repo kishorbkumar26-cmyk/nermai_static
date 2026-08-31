@@ -3245,6 +3245,24 @@ ul, ol { list-style: none; }
 @media (max-width: 700px) {
   .courses-grid { grid-template-columns: 1fr; }
 }
+.courses-page-icon-wrap {
+  width: 80px;
+  height: 80px;
+  background: var(--saffron-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--white);
+}
+.courses-page-image-wrap {
+  width: 120px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .course-card {
   background: var(--white);
   border: 2px solid var(--ink);
@@ -3270,9 +3288,24 @@ ul, ol { list-style: none; }
   color: var(--gray-300);
 }
 .course-card-icon {
-  font-size: 2rem;
-  line-height: 1;
-  margin-bottom: 1.25rem;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+.course-card-image {
+  width: 100%;
+  height: 140px;
+  object-fit: contain;
+  margin-bottom: 1rem;
+  background: var(--white);
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+.course-card-body {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  color: var(--ink);
+  line-height: 1.25;
+  margin-bottom: 0.35rem;
 }
 .course-card-name {
   font-family: var(--font-display);

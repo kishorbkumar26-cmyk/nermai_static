@@ -197,6 +197,10 @@ function CoursesEditor({ courses, onChange }) {
             <Field label="Emoji Icon" value={course.icon}    onChange={v => update(i, 'icon', v)} placeholder="🏛️" />
             <Field label="URL Slug"   value={course.slug}    onChange={v => update(i, 'slug', v)} placeholder="upsc" />
           </div>
+          <Field label="Image URL (Overrides Emoji)" value={course.imageUrl || ''} onChange={v => update(i, 'imageUrl', v)} placeholder="https://..." />
+          {course.imageUrl && (
+            <img src={course.imageUrl} alt="preview" style={{ width: '100%', maxHeight: '120px', objectFit: 'contain', marginTop: '0.75rem', border: '1px solid var(--gray-200)', background: '#fff' }} onError={e => e.target.style.display='none'} />
+          )}
           <div className="ap-form-row">
             <Field label="Course Name" value={course.name}    onChange={v => update(i, 'name', v)} placeholder="UPSC Civil Service" />
             <Field label="Sub Name"    value={course.subname} onChange={v => update(i, 'subname', v)} placeholder="IAS / IPS / IFS" />

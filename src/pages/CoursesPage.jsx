@@ -1,13 +1,24 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useReveal } from '../hooks/useReveal'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import { COURSES, LMS_URL } from '../constants'
+import { fbFirestore } from '../firebase/firestore'
 
 export default function CoursesPage() {
-  useEffect(() => { window.scrollTo(0, 0) }, [])
-  useReveal()
+  const [courses, setCourses] = useState(COURSES)
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    fbFirestore.getSettings().then(s => {
+      if (s.homeContent?.courses?.length) {
+        setCourses(s.homeContent.courses)
+      }
+    })
+  }, [])
+
+  useReveal([courses])
 
   return (
     <>
@@ -36,18 +47,24 @@ export default function CoursesPage() {
         <section className="section" style={{ backgroundColor: 'var(--cream)' }}>
           <div className="container">
             <div className="courses-page-list">
-              {COURSES.map((course, idx) => (
+              {courses.filter(c => c.visible !== false).map((course, idx) => (
                 <div key={course.slug} className="courses-page-row reveal">
                   <div className="courses-page-num" aria-hidden="true">
                     {String(idx + 1).padStart(2, '0')}
                   </div>
-                  <div className="courses-page-icon-wrap">
-                    <span style={{ fontSize: '2.5rem' }}>{course.icon}</span>
-                  </div>
+                  {course.imageUrl ? (
+                    <div className="courses-page-image-wrap">
+                      <img src={course.imageUrl} alt={course.name} style={{ width: '100%', maxHeight: '120px', objectFit: 'contain' }} />
+                    </div>
+                  ) : (
+                    <div className="courses-page-icon-wrap">
+                      <span style={{ fontSize: '2.5rem' }}>{course.icon}</span>
+                    </div>
+                  )}
                   <div className="courses-page-body">
                     <h2 className="courses-page-name">{course.name}</h2>
-                    <div className="courses-page-subname">{course.subName}</div>
-                    <p className="courses-page-desc">{course.description}</p>
+                    <div className="courses-page-subname">{course.subname || course.subName}</div>
+                    <p className="courses-page-desc">{course.desc || course.description}</p>
                     <div className="course-card-tags" style={{ marginTop: '0.75rem' }}>
                       {course.tags.map(tag => (
                         <span key={tag} className="course-tag">{tag}</span>
