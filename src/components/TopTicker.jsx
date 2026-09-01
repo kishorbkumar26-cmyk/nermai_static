@@ -5,7 +5,8 @@ export default function TopTicker({ ticker }) {
     return null
   }
 
-  // To ensure continuous scrolling, we duplicate the items
+  // To ensure continuous scrolling, we duplicate the items twice
+  // and animate from 0 to -50%
   const displayItems = [...ticker.items, ...ticker.items, ...ticker.items, ...ticker.items]
 
   // Default to 35 seconds if not set
@@ -15,18 +16,32 @@ export default function TopTicker({ ticker }) {
     <div className="top-ticker-strip">
       <div 
         className="top-ticker-inner" 
-        style={{ animation: `top-ticker-scroll ${speed}s linear infinite` }}
+        style={{ '--ticker-speed': `${speed}s` }}
       >
-        {displayItems.map((item, i) => (
-          <span key={i} className="top-ticker-item">
-            <i className="fa-solid fa-bell top-ticker-icon" />
-            {item.link ? (
-              <a href={item.link} className="top-ticker-link">{item.text}</a>
-            ) : (
-              <span>{item.text}</span>
-            )}
-          </span>
-        ))}
+        <div className="top-ticker-track">
+          {displayItems.map((item, i) => (
+            <span key={`first-${i}`} className="top-ticker-item">
+              <i className="fa-solid fa-bell top-ticker-icon" />
+              {item.link ? (
+                <a href={item.link} className="top-ticker-link">{item.text}</a>
+              ) : (
+                <span>{item.text}</span>
+              )}
+            </span>
+          ))}
+        </div>
+        <div className="top-ticker-track" aria-hidden="true">
+          {displayItems.map((item, i) => (
+            <span key={`second-${i}`} className="top-ticker-item">
+              <i className="fa-solid fa-bell top-ticker-icon" />
+              {item.link ? (
+                <a href={item.link} className="top-ticker-link">{item.text}</a>
+              ) : (
+                <span>{item.text}</span>
+              )}
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   )

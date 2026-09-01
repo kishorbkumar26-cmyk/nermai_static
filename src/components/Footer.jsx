@@ -15,7 +15,7 @@ export default function Footer() {
   }, [])
 
   // Provide a safe fallback if Firestore footer data is missing during transition
-  const f = footerData || {
+  const defaultFooter = {
     cta: {
       heading: "Begin It's first step to success",
       sub: "Contact us for registration, seat availability, feedback or complaints",
@@ -49,12 +49,20 @@ export default function Footer() {
     bottom: {
       meta: "Non Profit | Non Commercial"
     },
+    contactCard: {
+      heading: '"NERMAI IAS ACADEMY" is ready — download the file or scan the QR code.',
+      desc: "Scan the QR with the iPhone Camera app, or Android's Camera/Google Lens — it'll offer to add the contact directly. Or share the downloaded .vcf file instead.",
+      qrImage: '/media_1787746745912.png', // Using one of the uploaded pngs as fallback if it's the QR, or just empty
+      vcfUrl: '/NERMAI_IAS_ACADEMY.vcf'
+    },
     socialLinks: [
       { name: 'YouTube', link: CONTACT.youtube || '#', iconClass: 'fa-brands fa-youtube', iconUrl: '' },
       { name: 'Instagram', link: CONTACT.instagram || '#', iconClass: 'fa-brands fa-instagram', iconUrl: '' },
       { name: 'Telegram', link: CONTACT.telegram || '#', iconClass: 'fa-brands fa-telegram', iconUrl: '' }
     ]
   }
+
+  const f = footerData ? { ...defaultFooter, ...footerData, contactCard: footerData.contactCard || defaultFooter.contactCard } : defaultFooter;
 
 
   return (
@@ -79,6 +87,38 @@ export default function Footer() {
       {/* Main footer grid */}
       <div className="footer-main">
         <div className="container">
+          {f.contactCard && (f.contactCard.heading || f.contactCard.qrImage) && (
+            <div className="footer-contact-card" style={{ 
+              backgroundColor: '#eef2ee', 
+              padding: '2rem', 
+              borderRadius: '8px', 
+              marginBottom: '3rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.5rem',
+              color: '#333'
+            }}>
+              <h4 style={{ fontSize: '1.1rem', fontWeight: 500, margin: 0, textAlign: 'center' }}>
+                {f.contactCard.heading}
+              </h4>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', alignItems: 'center', justifyContent: 'center' }}>
+                {f.contactCard.qrImage && (
+                  <div style={{ flexShrink: 0, background: '#fff', padding: '10px', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+                    <img src={f.contactCard.qrImage} alt="QR Code" style={{ width: '150px', height: '150px', objectFit: 'contain' }} />
+                  </div>
+                )}
+                <div style={{ maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'flex-start' }}>
+                  <a href={f.contactCard.vcfUrl || '#'} download className="btn btn-primary" style={{ backgroundColor: '#222', color: '#fff', border: 'none', padding: '0.8rem 1.5rem' }}>
+                    Download .vcf
+                  </a>
+                  <p style={{ fontSize: '0.9rem', lineHeight: '1.5', color: '#555', margin: 0 }}>
+                    {f.contactCard.desc}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="footer-grid">
 
             {/* About */}

@@ -52,6 +52,8 @@ export default function HeroCarousel() {
   const [active, setActive] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const timerRef = useRef(null)
+  const touchStartRef = useRef(null)
+  const touchEndRef = useRef(null)
 
   useEffect(() => {
     const unsub = fbFirestore.onHeroSlidesChanged(items => {
@@ -85,9 +87,35 @@ export default function HeroCarousel() {
   const prev = () => goTo((active - 1 + slides.length) % slides.length)
   const next = () => goTo((active + 1) % slides.length)
 
+  // Touch/Swipe support for mobile & iOS
+  const handleTouchStart = (e) => {
+    touchStartRef.current = e.targetTouches[0].clientX
+    touchEndRef.current = null
+  }
+  const handleTouchMove = (e) => {
+    touchEndRef.current = e.targetTouches[0].clientX
+  }
+  const handleTouchEnd = () => {
+    if (!touchStartRef.current || !touchEndRef.current) return
+    const diff = touchStartRef.current - touchEndRef.current
+    const minSwipeDistance = 50
+    if (Math.abs(diff) > minSwipeDistance) {
+      if (diff > 0) next()  // swipe left → next
+      else prev()             // swipe right → prev
+    }
+    touchStartRef.current = null
+    touchEndRef.current = null
+  }
+
   return (
     <section className="hero-carousel-section" id="home" aria-label="Hero slideshow">
-      <div className="hero-carousel">
+      <div
+        className="hero-carousel"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+
         {/* Slides */}
         {slides.map((slide, i) => {
           const desktopUrl = driveStorage.formatImageUrl(slide.urlDesktop || slide.url)

@@ -131,8 +131,8 @@ export default function CourseDetailPage() {
   // Show "Coming Soon" if not published
   if (!content.isLive) return <ComingSoon course={content} />
 
-  const syllabusItems = (content.syllabus || '').split('\n').filter(Boolean)
-  const eligibilityItems = (content.eligibility || '').split('\n').filter(Boolean)
+  // Render HTML content safely
+  const renderRichText = (html) => ({ __html: html || '' })
 
   return (
     <>
@@ -184,62 +184,50 @@ export default function CourseDetailPage() {
                 <div className="reveal about-intro-text" style={{ gridColumn: '1 / -1' }}>
                   <span className="eyebrow">Overview</span>
                   <h2 className="section-title" style={{ marginTop: 'var(--space-2)' }}>About This Course</h2>
-                  <p style={{ color: 'var(--gray-600)', lineHeight: 1.9, whiteSpace: 'pre-wrap' }}>{content.overview}</p>
+                  <div className="rich-text-content" style={{ color: 'var(--gray-600)', lineHeight: 1.9 }} dangerouslySetInnerHTML={renderRichText(content.overview)} />
                 </div>
               </div>
             </div>
           </section>
         )}
 
-        {/* ── 3-COLUMN: Syllabus / Eligibility / Batch & Fee ── */}
+        {/* ── RICH TEXT CONTENT LAYOUT ── */}
         <section className="section" style={{ background: 'var(--white)' }}>
           <div className="container">
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '3rem', maxWidth: '900px', margin: '0 auto' }}>
 
-              {/* Syllabus */}
-              {(syllabusItems.length > 0 && content.visibility?.syllabus !== false) && (
-                <div className="reveal brut-frame" style={{ padding: '1.5rem' }}>
-                  <div className="eyebrow" style={{ marginBottom: '1rem' }}>Syllabus</div>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                    {syllabusItems.map((item, i) => (
-                      <li key={i} style={{ display: 'flex', gap: '0.5rem', padding: '0.45rem 0', borderBottom: i < syllabusItems.length - 1 ? '1px solid var(--gray-100)' : 'none', fontSize: '0.88rem', color: 'var(--gray-700)' }}>
-                        <i className="fa-solid fa-check" style={{ color: 'var(--saffron)', marginTop: 2, flexShrink: 0 }} />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
+              {/* Syllabus / What You'll Learn */}
+              {(content.syllabus && content.visibility?.syllabus !== false) && (
+                <div className="reveal">
+                  <div className="eyebrow" style={{ marginBottom: '1rem', color: 'var(--maroon)' }}>Course Curriculum</div>
+                  <h2 className="section-title" style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>What You Will Learn</h2>
+                  <div className="rich-text-content brut-frame" style={{ padding: '2rem', background: 'var(--cream)', borderRadius: '8px' }} dangerouslySetInnerHTML={renderRichText(content.syllabus)} />
                 </div>
               )}
 
               {/* Eligibility */}
-              {(eligibilityItems.length > 0 && content.visibility?.eligibility !== false) && (
-                <div className="reveal brut-frame" style={{ padding: '1.5rem' }}>
-                  <div className="eyebrow" style={{ marginBottom: '1rem' }}>Eligibility</div>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                    {eligibilityItems.map((item, i) => (
-                      <li key={i} style={{ display: 'flex', gap: '0.5rem', padding: '0.45rem 0', borderBottom: i < eligibilityItems.length - 1 ? '1px solid var(--gray-100)' : 'none', fontSize: '0.88rem', color: 'var(--gray-700)' }}>
-                        <i className="fa-solid fa-circle-dot" style={{ color: 'var(--maroon)', marginTop: 2, flexShrink: 0 }} />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
+              {(content.eligibility && content.visibility?.eligibility !== false) && (
+                <div className="reveal">
+                  <div className="eyebrow" style={{ marginBottom: '1rem', color: 'var(--saffron)' }}>Requirements</div>
+                  <h2 className="section-title" style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>Eligibility Criteria</h2>
+                  <div className="rich-text-content" dangerouslySetInnerHTML={renderRichText(content.eligibility)} />
                 </div>
               )}
 
-              {/* Batch & Fee */}
+              {/* Batch & Fee Grid */}
               {((content.batchInfo && content.visibility?.batchInfo !== false) || (content.feeInfo && content.visibility?.feeInfo !== false)) && (
-                <div className="reveal brut-frame" style={{ padding: '1.5rem' }}>
+                <div className="reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginTop: '2rem' }}>
                   {(content.batchInfo && content.visibility?.batchInfo !== false) && (
-                    <>
-                      <div className="eyebrow" style={{ marginBottom: '0.75rem' }}>Batch Info</div>
-                      <p style={{ color: 'var(--gray-600)', fontSize: '0.88rem', lineHeight: 1.7, marginBottom: (content.feeInfo && content.visibility?.feeInfo !== false) ? '1.5rem' : 0, whiteSpace: 'pre-wrap' }}>{content.batchInfo}</p>
-                    </>
+                    <div className="brut-frame" style={{ padding: '2rem', borderTop: '4px solid var(--maroon)' }}>
+                      <div className="eyebrow" style={{ marginBottom: '1rem' }}>Batch Information</div>
+                      <div className="rich-text-content" dangerouslySetInnerHTML={renderRichText(content.batchInfo)} />
+                    </div>
                   )}
                   {(content.feeInfo && content.visibility?.feeInfo !== false) && (
-                    <>
-                      <div className="eyebrow" style={{ marginBottom: '0.75rem' }}>Fee Details</div>
-                      <p style={{ color: 'var(--gray-600)', fontSize: '0.88rem', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{content.feeInfo}</p>
-                    </>
+                    <div className="brut-frame" style={{ padding: '2rem', borderTop: '4px solid var(--saffron)' }}>
+                      <div className="eyebrow" style={{ marginBottom: '1rem' }}>Fee Structure</div>
+                      <div className="rich-text-content" dangerouslySetInnerHTML={renderRichText(content.feeInfo)} />
+                    </div>
                   )}
                 </div>
               )}

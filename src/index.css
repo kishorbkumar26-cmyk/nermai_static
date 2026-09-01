@@ -2895,6 +2895,28 @@ ul, ol { list-style: none; }
   text-align: left; transition: all 0.15s;
   border-left: 3px solid transparent;
 }
+.top-ticker-inner {
+  display: flex;
+  width: max-content;
+  animation: top-ticker-scroll var(--ticker-speed, 35s) linear infinite;
+  will-change: transform;
+}
+.top-ticker-inner:hover { animation-play-state: paused; }
+@keyframes top-ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.top-ticker-track {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.top-ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0 1.5rem;
+}
 .dash-nav-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.85); }
 .dash-nav-item.active {
   background: rgba(230,92,0,0.15);
@@ -3770,6 +3792,22 @@ ul, ol { list-style: none; }
   .stat-item { flex: 1 1 45%; }
   .stat-item + .stat-item:nth-child(3) { border-left: none; border-top: 1px solid rgba(255,255,255,0.08) !important; }
 }
+
+.ol-map-wrap {
+  width: 100%;
+  height: 200px;
+  border: 2px solid var(--ink);
+  background: var(--gray-200);
+  margin-top: auto;
+}
+
+.ol-map-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
 @media (max-width: 640px) {
   .stat-item { flex: 1 1 45%; }
   .stat-number { font-size: 2.2rem !important; }
@@ -4168,6 +4206,201 @@ ul, ol { list-style: none; }
 .ol-map-wrap {
   width: 100%;
   height: 200px;
+  justify-content: center;
+  width: 60px;
+  height: 70px;
+  border: 2px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--maroon);
+  flex-shrink: 0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.event-item:hover .event-date {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--maroon);
+}
+.event-date-month {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-bottom: 2px solid var(--ink);
+  width: 100%;
+  text-align: center;
+  padding-bottom: 2px;
+  margin-bottom: 4px;
+}
+.event-date-day {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.event-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-top: 0.25rem;
+}
+.event-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+.link-title {
+  color: var(--maroon);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  transition: color 0.2s ease;
+}
+.link-title:hover {
+  color: var(--ink);
+}
+.text-title {
+  color: var(--ink);
+  text-decoration: none;
+}
+.event-subtitle {
+  color: var(--gray-600);
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── RESPONSIVE ABOUT SECTION LAYOUT ── */
+.about-intro-grid {
+  display: grid;
+  gap: 5rem;
+  align-items: start;
+}
+
+.about-intro-grid.has-events {
+  grid-template-columns: 1fr 1fr;
+}
+
+.about-intro-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.about-intro-text.events-inactive {
+  align-items: center;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.about-intro-text.events-active {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.about-intro-text.events-active .about-divider,
+.about-intro-text.events-active .about-stamp {
+  margin: 1.5rem 0;
+}
+
+.about-intro-text.events-inactive .about-divider,
+.about-intro-text.events-inactive .about-stamp {
+  margin: 1.5rem auto;
+}
+
+@media (max-width: 992px) {
+  .about-intro-grid.has-events {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  
+  .about-intro-text.events-active {
+    align-items: center;
+    text-align: center;
+  }
+  
+  .about-intro-text.events-active .about-divider,
+  .about-intro-text.events-active .about-stamp {
+    margin: 1.5rem auto;
+  }
+}
+
+/* ── Office Locations ────────────────────────────────────────────────────── */
+.office-locations-section {
+  padding: var(--space-16) 0;
+  background-color: var(--cream);
+  border-top: 2px solid var(--gray-200);
+}
+
+.ol-header {
+  text-align: center;
+  margin-bottom: var(--space-12);
+}
+
+.ol-title {
+  font-family: var(--font-display);
+  font-size: var(--text-4xl);
+  font-weight: 800;
+  color: var(--ink);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  margin-top: 0.5rem;
+}
+
+.ol-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-8);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.ol-card {
+  background: var(--white);
+  border: 2px solid var(--ink);
+  padding: var(--space-8);
+  box-shadow: 4px 4px 0 var(--ink);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.ol-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--ink);
+}
+
+.ol-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 0.75rem;
+}
+
+.ol-card-icon {
+  font-size: 1.5rem;
+  color: var(--saffron);
+}
+
+.ol-card-name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.ol-card-address {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--gray-700);
+  margin-bottom: 1.5rem;
+  flex: 1;
+}
+
+.ol-map-wrap {
+  width: 100%;
+  height: 200px;
   border: 2px solid var(--ink);
   background: var(--gray-200);
   margin-top: auto;
@@ -4179,3 +4412,610 @@ ul, ol { list-style: none; }
   border: none;
   display: block;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   MOBILE & IOS RESPONSIVE OVERHAUL — v2
+   Fixes: safe-area, scroll, touch targets, vh, layout, typography
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── iOS Safe Area Support ───────────────────────────────────────────────── */
+.site-header {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.site-footer {
+  padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom, 0px));
+}
+
+.mobile-nav {
+  padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom, 0px)) !important;
+  padding-left: calc(0px + env(safe-area-inset-left)) !important;
+  padding-right: calc(0px + env(safe-area-inset-right)) !important;
+}
+
+.admin-corner-btn {
+  bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+  right: calc(var(--space-6) + env(safe-area-inset-right, 0px));
+}
+
+/* ── Fix hero height for iOS (100vh bug) ─────────────────────────────────── */
+.hero-carousel {
+  min-height: -webkit-fill-available;
+}
+.hero-slide {
+  min-height: -webkit-fill-available;
+}
+.hero-slide-placeholder {
+  min-height: 280px !important;
+}
+
+/* ── Sticky Header: proper z-index and iOS backdrop ─────────────────────── */
+.site-header {
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  backdrop-filter: blur(20px) saturate(1.4);
+}
+
+/* ── Mobile Nav: full-screen, body scroll lock ───────────────────────────── */
+body.mobile-nav-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  /* Prevent body scroll on iOS when nav is open */
+}
+
+.mobile-nav {
+  /* Use dvh for iOS */
+  height: 100dvh;
+  height: -webkit-fill-available;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  /* Ensure it covers notch area */
+  padding-top: max(1.5rem, env(safe-area-inset-top));
+}
+
+/* ── Touch Target Improvements ───────────────────────────────────────────── */
+.header-hamburger {
+  width: 44px;
+  height: 44px;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem;
+}
+
+.header-nav-link,
+.mobile-nav-link {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.mobile-nav-link {
+  min-height: 52px;
+  padding: 0.9rem 1.5rem;
+}
+
+.hero-arrow {
+  min-width: 44px;
+  min-height: 44px;
+  width: 48px;
+  height: 48px;
+}
+
+.hero-dot {
+  min-width: 20px;
+  min-height: 20px;
+  padding: 6px;
+}
+
+/* ── Scroll Progress Bar ──────────────────────────────────────────────────── */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--saffron), var(--gold));
+  z-index: calc(var(--z-sticky) + 10);
+  transition: width 0.1s linear;
+  pointer-events: none;
+}
+
+/* ── Tablet Responsive (1024px) ──────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .header-inner { height: 62px; }
+  
+  /* Stats: 2+2 grid */
+  .stats-bar-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .stat-item { 
+    padding: var(--space-4);
+    flex: none;
+    width: 100%;
+  }
+  .stat-item + .stat-item { border-left: none; }
+  .stat-item:nth-child(odd) { border-right: 1px solid rgba(255,255,255,0.2); }
+  .stat-item:nth-child(n+3) { border-top: 1px solid rgba(255,255,255,0.12); }
+
+  /* Why grid: 2-col */
+  .why-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Topper grid: 3 cols */
+  .toppers-grid { grid-template-columns: repeat(3, 1fr); }
+
+  /* Notices: Stack */
+  .notices-grid { grid-template-columns: 1fr; }
+
+  /* Footer: 2-col */
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Office locations: 1 col */
+  .ol-grid { grid-template-columns: 1fr; max-width: 560px; }
+}
+
+/* ── Mobile Responsive (768px) ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Container padding */
+  .container, .container-wide, .container-narrow {
+    padding: 0 var(--space-4);
+  }
+
+  /* Section padding: tighter on mobile */
+  .section { padding: var(--space-12) 0; }
+  .section-sm { padding: var(--space-8) 0; }
+  .section-lg { padding: var(--space-16) 0; }
+
+  /* Header: hide desktop nav, show hamburger */
+  .header-nav, .header-cta { display: none !important; }
+  .header-hamburger { display: flex !important; }
+  /* Show only WhatsApp in actions on mobile */
+  .header-actions .btn.header-cta { display: none !important; }
+
+  /* Hero carousel: better mobile aspect */
+  .hero-carousel {
+    height: auto;
+    min-height: 280px;
+    aspect-ratio: 4 / 5;
+    max-height: 92svh;
+  }
+
+  /* Cinematic hero: compact on mobile */
+  .hero-cinematic-default { aspect-ratio: 3 / 4; min-height: auto; }
+  .hero-cinematic-title {
+    font-size: clamp(2rem, 11vw, 3.5rem);
+    letter-spacing: -0.03em;
+  }
+  .hero-cinematic-content {
+    padding: var(--space-12) var(--space-4) var(--space-16);
+  }
+  .hero-cinematic-actions { flex-wrap: wrap; gap: 0.75rem; }
+  .hero-cinematic-actions .btn { flex: 1; min-width: 140px; justify-content: center; }
+
+  /* Hero slide text */
+  .hero-slide-title {
+    font-size: clamp(1.4rem, 6vw, 2.2rem);
+  }
+  .hero-slide-content {
+    padding: 1.25rem 1rem 2rem;
+  }
+
+  /* Stats bar: 2×2 on mobile */
+  .stats-bar-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .stat-item { padding: var(--space-3); }
+  .stat-number { font-size: 1.8rem !important; }
+  .stat-label { font-size: 0.68rem; }
+
+  /* Why grid: 1 col on mobile */
+  .why-grid { grid-template-columns: 1fr; gap: var(--space-4); }
+  .why-card-title { font-size: var(--text-xl); }
+
+  /* Toppers: 2-col grid on mobile */
+  .toppers-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-4); }
+  .topper-photo { height: 140px; }
+  .topper-name { font-size: var(--text-base); }
+
+  /* Notices: single col */
+  .notices-grid { grid-template-columns: 1fr; gap: var(--space-6); }
+  .notice-card { padding: var(--space-4); }
+
+  /* Footer: full single col */
+  .footer-grid { grid-template-columns: 1fr; gap: var(--space-8); }
+  .footer-bottom { flex-direction: column; text-align: center; gap: var(--space-3); }
+  .footer-cta-inner { flex-direction: column; text-align: center; gap: 1.25rem; }
+  .footer-cta-btn { width: 100%; justify-content: center; }
+  
+  /* Footer contact card: responsive */
+  .footer-contact-card {
+    padding: 1.5rem !important;
+    margin-bottom: 2rem !important;
+  }
+  .footer-contact-card > div { flex-direction: column !important; align-items: center !important; }
+
+  /* CTA section */
+  .cta-inner { flex-direction: column; text-align: center; gap: var(--space-6); }
+  .cta-actions { justify-content: center; flex-wrap: wrap; gap: 0.75rem; }
+  .cta-actions .btn { min-width: 160px; justify-content: center; }
+  .cta-final-heading { font-size: 1.85rem; }
+  .cta-final-actions { flex-direction: column; align-items: center; }
+  .cta-final-actions .btn { width: 100%; max-width: 320px; justify-content: center; }
+
+  /* Admin portal: full width on mobile */
+  .admin-panel { width: 100vw; }
+  .ap-form-row { grid-template-columns: 1fr; }
+  .ap-header { padding: var(--space-3) var(--space-4); }
+  .ap-body { padding: var(--space-4); }
+  .ap-nav { padding: var(--space-3) var(--space-4); overflow-x: auto; flex-wrap: nowrap; }
+  .ap-nav-btn { white-space: nowrap; flex-shrink: 0; }
+
+  /* Testimonials: 1 card at a time */
+  .testimonials-track { padding-bottom: var(--space-4); }
+  .testimonial-card { flex: 0 0 100%; }
+
+  /* Office locations */
+  .ol-grid { grid-template-columns: 1fr; gap: var(--space-6); }
+  .ol-card { padding: var(--space-6); }
+  .ol-title { font-size: var(--text-3xl); }
+
+  /* Exam tabs: horizontally scrollable */
+  .exam-tabs { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; padding-bottom: 0.5rem; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .exam-tabs::-webkit-scrollbar { display: none; }
+  .exam-tab { flex-shrink: 0; }
+
+  /* About section */
+  .about-intro-grid { gap: var(--space-6) !important; }
+  .about-main-heading { font-size: clamp(1.6rem, 6vw, 2.5rem); }
+  .about-img-group { max-width: 100% !important; }
+
+  /* Gallery grid */
+  .gallery-section .grid,
+  .results-gallery-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.5rem !important; }
+
+  /* Course grid */
+  .courses-grid { grid-template-columns: 1fr; gap: 1.25rem; }
+  .course-card { padding: 1.25rem; }
+  
+  /* Courses page grid */
+  .course-grid { grid-template-columns: 1fr; }
+
+  /* Course detail page */
+  .courses-page-image-wrap { width: 80px; }
+
+  /* FAQ */
+  .faq-q-v2 { padding: 1.25rem 0; }
+  .faq-q-text { font-size: 0.95rem; }
+  .faq-a-inner { padding: 0 0 1.25rem 1.5rem; }
+
+  /* Toppers wall (3D card) */
+  .topperswall-container {
+    gap: 1rem;
+    padding: 0 var(--space-2);
+  }
+}
+
+/* ── Small Mobile (480px) ─────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  html { font-size: 15px; }
+
+  /* Hero: full portrait on tiny screens */
+  .hero-carousel {
+    aspect-ratio: 3 / 4;
+    min-height: 320px;
+    max-height: 100svh;
+  }
+  .hero-cinematic-title { font-size: clamp(1.75rem, 10vw, 2.75rem); }
+
+  /* Stats: 2-col compact */
+  .stat-number { font-size: 1.5rem !important; }
+  .stat-label { font-size: 0.6rem; }
+
+  /* Toppers: 1-col stack on tiny screens */
+  .toppers-grid { grid-template-columns: 1fr; }
+  .topper-card { max-width: 320px; margin: 0 auto; }
+
+  /* Gallery: 1-col */
+  .gallery-section .grid,
+  .results-gallery-grid { grid-template-columns: 1fr !important; }
+
+  /* Exam grid: 1-col */
+  .exam-grid { grid-template-columns: 1fr; }
+
+  /* Hero actions: full width stack */
+  .hero-actions { flex-direction: column; gap: 0.75rem; }
+  .hero-actions .btn { justify-content: center; width: 100%; }
+  .hero-cinematic-actions .btn { width: 100%; }
+
+  /* Footer contact card */
+  .footer-contact-card { padding: 1rem !important; }
+
+  /* Section titles: smaller on tiny screens */
+  .section-title { font-size: 1.6rem !important; }
+
+  /* Why cards: no big number */
+  .why-number { font-size: 2.5rem; opacity: 0.1; }
+
+  /* Toast container: full width on mobile */
+  .toast-container {
+    left: var(--space-3);
+    right: var(--space-3);
+    max-width: none;
+    top: var(--space-3);
+  }
+
+  /* Mobile nav items: smaller text on tiny screens */
+  .mobile-nav-link { font-size: 1.15rem; padding: 0.85rem 1.25rem; }
+  .mobile-nav-footer .btn { padding: 0.85rem 1.25rem; }
+
+  /* Admin panel: smaller padding */
+  .ap-card { padding: var(--space-4); }
+  .ap-section-title { font-size: var(--text-xl); }
+
+  /* Header logo: compact on tiny */
+  .header-logo-name { font-size: 1rem; }
+  .header-logo-sub { font-size: 0.55rem; }
+
+  /* CTA */
+  .cta-final-heading { font-size: 1.6rem; letter-spacing: -0.02em; }
+  
+  /* WYG Section (What You Get) */
+  .wyg-grid { grid-template-columns: 1fr !important; }
+
+  /* Top ticker */
+  .top-ticker-item { padding: 0 0.75rem; font-size: 0.78rem; }
+
+  /* Notice ticker: hide label on tiny */
+  .notice-ticker-label { padding: 0 var(--space-2); font-size: 0.6rem; }
+}
+
+/* ── Extra Small (360px and below) ──────────────────────────────────────── */
+@media (max-width: 360px) {
+  .container, .container-wide, .container-narrow { padding: 0 var(--space-3); }
+  html { font-size: 14px; }
+  .header-inner { gap: var(--space-3); }
+}
+
+/* ── iOS Specific Fixes ───────────────────────────────────────────────────── */
+/* Fix 100vh on iOS Safari (address bar causes issues) */
+@supports (-webkit-touch-callout: none) {
+  .hero-carousel {
+    height: -webkit-fill-available;
+    max-height: -webkit-fill-available;
+    min-height: 280px;
+  }
+  .hero-slide { height: -webkit-fill-available; }
+  .mobile-nav { height: -webkit-fill-available; }
+}
+
+/* Prevent iOS double-tap zoom on buttons */
+button, a, [role="button"] { touch-action: manipulation; }
+
+/* Fix iOS input zoom (inputs should be at least 16px to prevent auto-zoom) */
+input, select, textarea {
+  font-size: max(16px, 1rem) !important;
+}
+@media (max-width: 768px) {
+  .ap-input { font-size: 16px !important; }
+  .passcode-input { font-size: 20px !important; }
+}
+
+/* Fix iOS form element styling */
+input[type="text"], input[type="email"], input[type="tel"],
+input[type="password"], input[type="number"], textarea, select {
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: var(--radius);
+}
+
+/* Fix iOS button styling */
+button { -webkit-appearance: none; appearance: none; }
+
+/* Smooth scrolling iframe fix for iOS */
+iframe { -webkit-overflow-scrolling: touch; }
+
+/* Fix iOS position:fixed with input focus (keyboard pushes fixed elements) */
+@media (max-width: 768px) {
+  .mobile-nav { position: fixed; }
+}
+
+/* ── English-Dominant Typography Improvements ────────────────────────────── */
+
+/* Make English body text more prominent */
+.hero-cinematic-tagline {
+  font-family: var(--font-body) !important;
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  font-weight: 500;
+  color: rgba(253,246,236,0.65);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Section descriptions: more readable English */
+.section-desc {
+  font-size: 1.05rem;
+  font-family: var(--font-body);
+  color: var(--gray-500);
+  line-height: 1.75;
+}
+
+/* Hero eyebrow: English first */
+.hero-eyebrow, .hero-cinematic-eyebrow {
+  font-family: var(--font-mono);
+  letter-spacing: 0.18em;
+  font-size: 0.65rem;
+}
+
+/* About badges: English labels larger */
+.about-badge-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  color: var(--gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.about-badge-num {
+  font-family: var(--font-mono);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--saffron);
+  line-height: 1.1;
+}
+
+/* ── Swipe/Touch Carousel Enhancement ───────────────────────────────────── */
+.hero-carousel {
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.testimonials-carousel {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
+}
+
+/* ── Gallery Responsive Grid ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Results gallery */
+  .results-gallery .gallery-img-wrap {
+    border-radius: 4px;
+  }
+}
+
+/* ── Print Media ─────────────────────────────────────────────────────────── */
+@media print {
+  .site-header, .mobile-nav, .admin-corner-btn,
+  .hero-carousel-section, .stats-bar, .scroll-progress-bar { display: none !important; }
+  body { background: white; color: black; }
+}
+
+/* ── Reduced Motion ──────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hero-progress-fill { animation: none; }
+  .ticker-scroll, .notice-ticker-inner { animation-play-state: paused !important; }
+}
+
+/* ── Dark Mode Respect ───────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  /* We intentionally don't force dark mode on this site as it uses
+     a curated warm palette. Just add minor tweaks here if needed. */
+}
+
+/* ── Orientation: Landscape Mobile ──────────────────────────────────────── */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero-carousel {
+    aspect-ratio: auto;
+    height: 100svh;
+    min-height: 280px;
+  }
+  .mobile-nav {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mobile-nav-link { min-height: 44px; padding: 0.65rem 1.5rem; font-size: 1.05rem; }
+}
+
+/* ── Utility: Visually Hidden (Accessibility) ────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Image Loading Improvements ──────────────────────────────────────────── */
+img[loading="lazy"] { background: var(--gray-100); }
+img { image-rendering: -webkit-optimize-contrast; }
+
+/* ── Overflow fix for all sections ───────────────────────────────────────── */
+section, .section { max-width: 100vw; overflow-x: hidden; }
+.container, .container-wide, .container-narrow { max-width: min(100%, var(--container-max, 1280px)); }
+
+/* ── Admin Portal Mobile Fixes ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .admin-panel-overlay { align-items: flex-end; justify-content: stretch; }
+  .admin-panel {
+    width: 100vw !important;
+    height: 94svh;
+    height: 94dvh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    animation: slide-in-bottom 0.35s var(--ease-out);
+  }
+  @keyframes slide-in-bottom {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .ap-hero-dim-guide { flex-direction: column; }
+  .ap-hero-dim-badge { flex-direction: row; }
+
+  /* Admin image upload: stack tabs vertically */
+  .aiu-tabs { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+  .aiu-tabs::-webkit-scrollbar { display: none; }
+}
+
+/* ── Header Contact Icon ─────────────────────────────────────────────────── */
+.header-contact-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #25D366;
+  color: white;
+  flex-shrink: 0;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.header-contact-icon:hover { transform: scale(1.1); box-shadow: 0 4px 14px rgba(37,211,102,0.4); }
+
+/* ── Exam Categories: Better Mobile Tab Scroll ────────────────────────────── */
+@media (max-width: 640px) {
+  .exam-tabs {
+    margin-left: calc(-1 * var(--space-4));
+    margin-right: calc(-1 * var(--space-4));
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+    mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+  }
+}
+
+/* ── Better Notice Card on Mobile ────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .notice-card-title { font-size: 0.95rem; }
+  .notice-card-content { font-size: 0.82rem; }
+  .notices-section { padding: var(--space-10) 0; }
+}
+
+/* ── Toppers Carousel: Swipe-friendly on Mobile ──────────────────────────── */
+@media (max-width: 768px) {
+  .toppers-section { padding: var(--space-10) 0; }
+  .toppers-grid { gap: var(--space-4); }
+}
+
+/* ── Results Section Mobile ──────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .result-stats-grid { grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+  .result-stat-value { font-size: 2rem; }
+}
+
+/* -- Rich Text Editor Content ---------------------------------------------- */
+.rich-text-content p { margin-bottom: 1rem; line-height: 1.8; }
+.rich-text-content ul, .rich-text-content ol { margin-bottom: 1rem; padding-left: 1.5rem; list-style-position: outside; }
+.rich-text-content li { margin-bottom: 0.5rem; line-height: 1.6; }
+.rich-text-content li::marker { color: var(--saffron); }
+.rich-text-content strong { font-weight: 700; color: var(--ink); }
+.rich-text-content a { color: var(--maroon); text-decoration: underline; }
+.rich-text-content h1, .rich-text-content h2, .rich-text-content h3 { font-family: var(--font-display); font-weight: 700; color: var(--maroon); margin-top: 1.5rem; margin-bottom: 1rem; }
+.rich-text-content table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+.rich-text-content th, .rich-text-content td { border: 1px solid var(--gray-300); padding: 0.5rem; }

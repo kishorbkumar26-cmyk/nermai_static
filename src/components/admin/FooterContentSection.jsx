@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { fbFirestore } from '../../firebase/firestore'
+import AdminImageUpload from './AdminImageUpload'
 
 export default function FooterContentSection({ toast }) {
   const [footer, setFooter] = useState(null)
@@ -18,7 +19,8 @@ export default function FooterContentSection({ toast }) {
           usefulLinks: [],
           notifications: [],
           coursesLinks: [],
-          bottom: { meta: '' }
+          bottom: { meta: '' },
+          contactCard: { heading: '', desc: '', qrImage: '', vcfUrl: '' }
         })
       }
     })
@@ -144,17 +146,23 @@ export default function FooterContentSection({ toast }) {
                 <input type="text" className="ap-input" value={item.link} onChange={e => updateLink(i, 'link', e.target.value)} placeholder="https://..." />
               </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div style={{ marginTop: '0.75rem' }}>
+              <AdminImageUpload
+                label="Custom Social Icon / Logo Image"
+                value={item.iconUrl || ''}
+                onChange={val => updateLink(i, 'iconUrl', val)}
+                subFolderName="nermai-social-icons"
+                maxWidth={300}
+                aspectRatio="contain"
+                hint="Icon (overrides FontAwesome class)"
+                placeholder="Paste Drive URL or custom icon image URL..."
+                toast={toast}
+              />
               <div className="ap-form-group" style={{ marginBottom: 0 }}>
-                <label className="ap-label" style={{ fontSize: '0.7rem' }}>Image URL (Overrides Icon)</label>
-                <input type="text" className="ap-input" value={item.iconUrl || ''} onChange={e => updateLink(i, 'iconUrl', e.target.value)} placeholder="https://..." />
-              </div>
-              <div className="ap-form-group" style={{ marginBottom: 0 }}>
-                <label className="ap-label" style={{ fontSize: '0.7rem' }}>FontAwesome Class</label>
+                <label className="ap-label" style={{ fontSize: '0.7rem' }}>FontAwesome Class (Used if no image uploaded)</label>
                 <input type="text" className="ap-input" value={item.iconClass || ''} onChange={e => updateLink(i, 'iconClass', e.target.value)} placeholder="fa-brands fa-youtube" />
               </div>
             </div>
-            {item.iconUrl && <img src={item.iconUrl} alt="preview" style={{ height: '30px', marginTop: '0.5rem' }} onError={(e) => e.target.style.display = 'none'} />}
           </div>
         ))}
         <button className="ap-btn ap-btn-secondary" onClick={addLink} style={{ marginTop: '0.5rem' }}>
@@ -225,6 +233,36 @@ export default function FooterContentSection({ toast }) {
         {renderLinksManager('Useful Links', 'usefulLinks')}
         {renderLinksManager('Notifications', 'notifications')}
         {renderLinksManager('Courses Links', 'coursesLinks')}
+      </div>
+
+      <div className="ap-card" style={{ marginTop: '2rem' }}>
+        <h2 className="ap-subtitle">Contact Info Card</h2>
+        <p style={{ fontSize: '0.8rem', color: 'var(--gray-500)', marginBottom: '1rem' }}>
+          This card appears in the footer for users to download contact info or scan a QR code.
+        </p>
+        <div className="ap-form-group">
+          <label className="ap-label">Heading</label>
+          <input className="ap-input" value={footer.contactCard?.heading || ''} onChange={e => handleUpdate('contactCard', 'heading', e.target.value)} placeholder="e.g. 'NERMAI IAS ACADEMY' is ready — download..." />
+        </div>
+        <div className="ap-form-group">
+          <label className="ap-label">Description</label>
+          <textarea className="ap-input" rows="2" value={footer.contactCard?.desc || ''} onChange={e => handleUpdate('contactCard', 'desc', e.target.value)} placeholder="e.g. Scan the QR with..."></textarea>
+        </div>
+        <AdminImageUpload
+          label="Contact Card QR Code Image"
+          value={footer.contactCard?.qrImage || ''}
+          onChange={val => handleUpdate('contactCard', 'qrImage', val)}
+          subFolderName="nermai-qr"
+          maxWidth={600}
+          aspectRatio="1/1"
+          hint="Square 1:1 • QR Code"
+          placeholder="Paste Google Drive QR Code link, File ID or image URL..."
+          toast={toast}
+        />
+        <div className="ap-form-group">
+          <label className="ap-label">VCF File URL (Contact Card File)</label>
+          <input className="ap-input" value={footer.contactCard?.vcfUrl || ''} onChange={e => handleUpdate('contactCard', 'vcfUrl', e.target.value)} placeholder="/NERMAI_IAS_ACADEMY.vcf" />
+        </div>
       </div>
 
       <div className="ap-card" style={{ marginTop: '2rem' }}>

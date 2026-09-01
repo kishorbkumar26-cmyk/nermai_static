@@ -28,9 +28,13 @@ export default function ToppersWall() {
   return (
     <section className="section" style={{ background: 'var(--white)', overflow: 'hidden', padding: 'var(--space-16) 0' }}>
       <div className="container" style={{ textAlign: 'center' }}>
-        <a href="#toppers-list" className="btn btn-primary" style={{ borderRadius: '50px', padding: '0.75rem 2.5rem', marginBottom: '4rem', fontSize: '1rem', fontWeight: 600 }}>
-          Toppers List &rarr;
-        </a>
+        <div className="section-header" style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+          <span className="eyebrow">WALL OF FAME</span>
+          <h2 className="section-title" style={{ marginTop: '0.5rem', marginBottom: '0.5rem' }}>Toppers List</h2>
+          <p className="section-desc" style={{ maxWidth: '560px', margin: '0 auto' }}>
+            Celebrating the proud achievers and rank holders guided by Nermai IAS Academy.
+          </p>
+        </div>
 
         <div className="toppers-carousel-container" style={{ position: 'relative', height: '400px', display: 'flex', justifyContent: 'center', alignItems: 'center', perspective: '1200px' }}>
           {visibleToppers.map((topper, i) => {

@@ -148,6 +148,11 @@ export const driveStorage = {
     return { url: fallbackDataUrl, storageType: 'local_base64', reductionPct }
   },
 
+  async uploadImage(file, options = {}) {
+    const res = await this.processAndUploadImage(file, options)
+    return res.url
+  },
+
   formatImageUrl(url) {
     if (!url || typeof url !== 'string') return null
     const trimmed = url.trim()

@@ -48,7 +48,7 @@ export default function NoticesBoard() {
                   <div className="notice-card-body">
                     <h3 className="notice-card-title">{notice.title}</h3>
                     {notice.content && (
-                      <p className="notice-card-content">{notice.content}</p>
+                      <div className="notice-card-content rich-text-content" style={{ marginTop: '0.75rem', fontSize: '0.9rem', color: 'rgba(255,255,255,0.7)' }} dangerouslySetInnerHTML={{ __html: notice.content }} />
                     )}
                     {notice.date && (
                       <div className="notice-card-date">

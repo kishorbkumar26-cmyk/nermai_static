@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react'
 import { fbFirestore } from '../../firebase/firestore'
+import AdminImageUpload from './AdminImageUpload'
+import ReactQuill from 'react-quill-new'
+import 'react-quill-new/dist/quill.snow.css'
 
 const DEFAULT_COURSES = [
   { slug: 'upsc',       name: 'UPSC Civil Service',  icon: '🏛️', iconType: 'emoji' },
@@ -42,6 +45,32 @@ function Field({ label, value, onChange, type = 'text', placeholder = '', rows =
         ? <textarea className="ap-input ap-textarea" value={value || ''} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={rows} />
         : <input type={type} className="ap-input" value={value || ''} onChange={e => onChange(e.target.value)} placeholder={placeholder} />
       }
+    </div>
+  )
+}
+
+const richTextModules = {
+  toolbar: [
+    [{ 'header': [1, 2, 3, false] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    ['link', 'clean']
+  ],
+}
+
+function RichField({ label, value, onChange }) {
+  return (
+    <div className="ap-form-group">
+      <label>{label}</label>
+      <div style={{ background: 'white', color: 'black' }}>
+        <ReactQuill 
+          theme="snow" 
+          value={value || ''} 
+          onChange={onChange} 
+          modules={richTextModules} 
+          style={{ height: '200px', marginBottom: '45px' }}
+        />
+      </div>
     </div>
   )
 }
@@ -210,17 +239,17 @@ export default function CourseContentSection({ toast }) {
             {content.iconType === 'emoji' ? (
               <Field label="Emoji Character" value={content.icon} onChange={v => update('icon', v)} placeholder="🏛️" />
             ) : (
-              <>
-                <Field label="Image URL (Google Drive share link or direct URL)" value={content.iconUrl} onChange={v => update('iconUrl', v)} placeholder="https://drive.google.com/... or https://example.com/icon.png" />
-                {content.iconUrl && (
-                  <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <img src={content.iconUrl.includes('drive.google.com') ? content.iconUrl.replace('/file/d/', '/thumbnail?id=').replace('/view?usp=sharing', '').replace('/view', '') : content.iconUrl}
-                      alt="Icon Preview" style={{ width: 48, height: 48, objectFit: 'contain', border: '1px solid var(--gray-200)', borderRadius: 0, background: '#f9f9f9' }}
-                      onError={e => e.target.style.display = 'none'} />
-                    <span style={{ fontSize: '0.75rem', color: 'var(--gray-400)' }}>Icon Preview</span>
-                  </div>
-                )}
-              </>
+              <AdminImageUpload
+                label="Course Icon Image"
+                value={content.iconUrl || ''}
+                onChange={val => update('iconUrl', val)}
+                subFolderName="nermai-course-icons"
+                maxWidth={400}
+                aspectRatio="contain"
+                hint="Square Icon • PNG or SVG recommended"
+                placeholder="Paste Google Drive URL / ID or web image link..."
+                toast={toast}
+              />
             )}
           </div>
 
@@ -229,14 +258,17 @@ export default function CourseContentSection({ toast }) {
             <div style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.75rem', color: 'var(--maroon)' }}>
               🖼️ Course Banner Image
             </div>
-            <Field label="Banner Image URL (shown as hero background)" value={content.bannerUrl || ''} onChange={v => update('bannerUrl', v)} placeholder="https://example.com/banner.jpg" />
-            {content.bannerUrl && (
-              <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <img src={content.bannerUrl.includes('drive.google.com') ? content.bannerUrl.replace('/file/d/', '/thumbnail?id=').replace('/view?usp=sharing', '').replace('/view', '') : content.bannerUrl}
-                  alt="Banner Preview" style={{ width: '100%', maxHeight: 150, objectFit: 'cover', border: '1px solid var(--gray-200)', borderRadius: 0, background: '#f9f9f9' }}
-                  onError={e => e.target.style.display = 'none'} />
-              </div>
-            )}
+            <AdminImageUpload
+              label="Course Banner / Hero Background"
+              value={content.bannerUrl || ''}
+              onChange={val => update('bannerUrl', val)}
+              subFolderName="nermai-course-banners"
+              maxWidth={1920}
+              aspectRatio="16/5"
+              hint="Wide Landscape • 1920 × 600 px"
+              placeholder="Paste Google Drive URL / ID or Banner image link..."
+              toast={toast}
+            />
           </div>
 
           {/* Basic Info */}
@@ -259,11 +291,17 @@ export default function CourseContentSection({ toast }) {
           {/* Full Page Content */}
           <div className="ap-card" style={{ marginBottom: '1rem', padding: '1rem' }}>
             <div style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.75rem', color: 'var(--maroon)' }}>📄 Full Page Content</div>
-            <Field label="Overview (shown at top of detail page)" value={content.overview} onChange={v => update('overview', v)} type="textarea" rows={4} placeholder="Full overview of the course, exam pattern, importance..." />
-            <Field label="Syllabus (each topic on a new line)" value={content.syllabus} onChange={v => update('syllabus', v)} type="textarea" rows={5} placeholder="General Studies Paper 1&#10;General Studies Paper 2&#10;Optional Subject..." />
-            <Field label="Eligibility Criteria (Supports basic HTML like <ul>)" value={content.eligibility} onChange={v => update('eligibility', v)} type="textarea" placeholder="E.g. <ul><li>Age 21-32 years</li><li>Any degree</li></ul>" />
-            <Field label="Batch Details" value={content.batchInfo} onChange={v => update('batchInfo', v)} type="textarea" placeholder="Morning / Evening / Weekend batches available..." />
-            <Field label="Fee Structure & Offers" value={content.feeInfo} onChange={v => update('feeInfo', v)} type="textarea" placeholder="Total Fee: ₹45,000. Installments available..." />
+            <div className="ap-form-row">
+              <RichField label="Overview & Introduction" value={content.overview} onChange={v => update('overview', v)} />
+              <RichField label="Syllabus" value={content.syllabus} onChange={v => update('syllabus', v)} />
+            </div>
+            <div className="ap-form-row">
+              <RichField label="Eligibility Criteria" value={content.eligibility} onChange={v => update('eligibility', v)} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <RichField label="Batch Details (Timings/Duration)" value={content.batchInfo} onChange={v => update('batchInfo', v)} />
+                <RichField label="Fee Structure (Optional)" value={content.feeInfo} onChange={v => update('feeInfo', v)} />
+              </div>
+            </div>
           </div>
 
           {/* FAQs */}

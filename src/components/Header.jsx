@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { fbFirestore } from '../firebase/firestore'
 import { LMS_URL, CONTACT } from '../constants'
@@ -18,6 +18,34 @@ export default function Header() {
   const navigate = useNavigate()
   const location = useLocation()
 
+  // Lock/unlock body scroll for iOS when mobile nav is open
+  useEffect(() => {
+    if (mobileOpen) {
+      // Save scroll position
+      const scrollY = window.scrollY
+      document.body.style.overflow = 'hidden'
+      document.body.style.position = 'fixed'
+      document.body.style.top = `-${scrollY}px`
+      document.body.style.width = '100%'
+      document.body.classList.add('mobile-nav-open')
+    } else {
+      const scrollY = document.body.style.top
+      document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.width = ''
+      document.body.classList.remove('mobile-nav-open')
+      if (scrollY) window.scrollTo(0, parseInt(scrollY || '0') * -1)
+    }
+    return () => {
+      document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.width = ''
+      document.body.classList.remove('mobile-nav-open')
+    }
+  }, [mobileOpen])
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -31,6 +59,8 @@ export default function Header() {
 
   // Close mobile nav on route change
   useEffect(() => { setMobileOpen(false) }, [location.pathname])
+
+  const closeMobileNav = useCallback(() => setMobileOpen(false), [])
 
   const handleHashNav = (href) => {
     setMobileOpen(false)
@@ -147,9 +177,9 @@ export default function Header() {
 
       {/* Mobile Nav Overlay */}
       {mobileOpen && (
-        <div className="mobile-overlay" onClick={() => setMobileOpen(false)} />
+        <div className="mobile-overlay" onClick={closeMobileNav} aria-hidden="true" />
       )}
-      <nav className={`mobile-nav${mobileOpen ? ' open' : ''}`} aria-label="Mobile navigation" aria-hidden={!mobileOpen}>
+      <nav className={`mobile-nav${mobileOpen ? ' open' : ''}`} aria-label="Mobile navigation" aria-hidden={!mobileOpen} role="dialog">
         <div className="mobile-nav-header" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <img src="/nermai-logo.png" alt="Nermai IAS Academy Logo" style={{ height: '36px', width: 'auto' }} />
           <span style={{ fontWeight: 800, fontSize: '1rem', letterSpacing: '0.05em', lineHeight: 1.2 }}>
@@ -158,10 +188,11 @@ export default function Header() {
           </span>
           <button
             className="mobile-nav-close"
-            onClick={() => setMobileOpen(false)}
+            onClick={closeMobileNav}
             aria-label="Close navigation menu"
+            style={{ marginLeft: 'auto', minWidth: '44px', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
-            <i className="fa-solid fa-xmark" />
+            <i className="fa-solid fa-xmark" style={{ fontSize: '1.25rem' }} />
           </button>
         </div>
 
@@ -173,7 +204,7 @@ export default function Header() {
           }).map(item => {
             if (item.type === 'route') {
               return (
-                <Link key={item.href} to={item.href} className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
+                <Link key={item.href} to={item.href} className="mobile-nav-link" onClick={closeMobileNav}>
                   {item.label}
                 </Link>
               )
@@ -190,7 +221,7 @@ export default function Header() {
                 key={item.label}
                 href={item.href}
                 className="mobile-nav-link"
-                onClick={() => setMobileOpen(false)}
+                onClick={closeMobileNav}
               >
                 {item.label}
               </a>

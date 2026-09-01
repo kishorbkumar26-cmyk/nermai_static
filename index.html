@@ -2,19 +2,27 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#7B1B2E" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0" />
+    <meta name="theme-color" content="#7B1B2E" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#4A0E1C" media="(prefers-color-scheme: dark)" />
+
+    <!-- iOS Web App Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Nermai IAS" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
 
     <!-- SEO -->
     <title>Nermai IAS Academy — Tamil Nadu Government Exam Coaching</title>
-    <meta name="description" content="Nermai — Leading coaching center in Tamil Nadu for TNPSC, UPSC, TN Police, Group I/II/IV exams." />
-    <meta name="keywords" content="TNPSC, UPSC, Group 4, TN Police, Tamil Nadu exam coaching, Nermai, government job coaching" />
+    <meta name="description" content="Nermai IAS Academy — Leading coaching center in Puducherry for TNPSC, UPSC, TN Police, Group I/II/IV exams. Non-profit, committed to excellence." />
+    <meta name="keywords" content="TNPSC, UPSC, Group 4, TN Police, Tamil Nadu exam coaching, Nermai, government job coaching, Puducherry coaching" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://nermai.in/" />
 
     <!-- Open Graph -->
     <meta property="og:title" content="Nermai IAS Academy — Tamil Nadu Government Exam Coaching" />
-    <meta property="og:description" content="TNPSC, UPSC, TN Police Exam Coaching in Tamil Nadu." />
+    <meta property="og:description" content="TNPSC, UPSC, TN Police Exam Coaching in Puducherry, Tamil Nadu. Non-profit institution dedicated to empowering youth." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://nermai.in/" />
     <meta property="og:image" content="/nermai-logo.png" />
@@ -26,8 +34,11 @@
     <meta name="twitter:description" content="TNPSC, UPSC, TN Police Exam Coaching in Tamil Nadu." />
     <meta name="twitter:image" content="/og-image.png" />
 
-    <!-- Favicon -->
+    <!-- Favicon & Apple Touch Icon -->
     <link rel="icon" type="image/png" href="/nermai-logo.png" />
+    <link rel="apple-touch-icon" href="/nermai-logo.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/nermai-logo.png" />
+    <link rel="apple-touch-startup-image" href="/nermai-logo.png" />
 
     <!-- Google Fonts: Tiro Tamil (display, dual-script) + DM Sans (body) + JetBrains Mono (data) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -44,9 +55,15 @@
       "@type": "EducationalOrganization",
       "name": "Nermai IAS Academy",
       "url": "https://nermai.in",
-      "description": "TNPSC, UPSC, TN Police Exam Coaching in Tamil Nadu",
-      "areaServed": "Tamil Nadu, India",
-      "inLanguage": ["en"]
+      "description": "Nermai IAS Academy — leading non-profit coaching center in Puducherry for TNPSC, UPSC, TN Police, and Banking exams. Empowering youth from rural and economically weaker sections.",
+      "areaServed": ["Tamil Nadu", "Puducherry", "India"],
+      "inLanguage": ["en", "ta"],
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Puducherry",
+        "addressRegion": "Puducherry",
+        "addressCountry": "IN"
+      }
     }
     </script>
   </head>

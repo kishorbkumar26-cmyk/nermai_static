@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { fbFirestore } from '../../firebase/firestore'
 import { driveStorage } from '../../services/driveStorage'
+import AdminImageUpload from './AdminImageUpload'
 
 function FileDropZone({ onUpload, uploading, progress }) {
   const [drag, setDrag] = useState(false)
@@ -71,26 +72,15 @@ export default function ResultsGallerySection({ toast }) {
     } catch (e) { toast.error(e.message) }
   }
 
-  const handleFileUpload = async (file) => {
+  const handleAddImage = async () => {
+    if (!urlInput.trim()) { toast.error('Please upload an image or enter an image URL first.'); return }
     if (!uploadCat) { toast.error('Please select a category first.'); return }
-    setUploading(true); setProgress(0)
     try {
-      const url = await driveStorage.uploadImage(file, { onProgress: p => setProgress(Math.round(p)) })
-      await fbFirestore.addGalleryImage({ url, caption: uploadCaption || file.name, category: uploadCat, storageType: 'drive' })
-      setImages(await fbFirestore.getGallery())
-      setUploadCaption('')
-      toast.success('Image uploaded!')
-    } catch (e) { toast.error(e.message) }
-    finally { setUploading(false); setProgress(0) }
-  }
-
-  const handleUrlAdd = async () => {
-    if (!urlInput.trim() || !uploadCat) { toast.error('Enter a URL and select a category.'); return }
-    try {
-      await fbFirestore.addGalleryImage({ url: urlInput.trim(), caption: uploadCaption || '', category: uploadCat, storageType: 'url' })
+      await fbFirestore.addGalleryImage({ url: urlInput.trim(), caption: uploadCaption || '', category: uploadCat, storageType: urlInput.includes('drive.google.com') ? 'drive' : 'url' })
       setImages(await fbFirestore.getGallery())
       setUrlInput(''); setUploadCaption('')
-      toast.success('Image added!')
+      toast.success('Image added to results gallery!')
+      setActiveTab('gallery')
     } catch (e) { toast.error(e.message) }
   }
 
@@ -186,22 +176,33 @@ export default function ResultsGallerySection({ toast }) {
               <input className="ap-input" value={uploadCaption} onChange={e => setUploadCaption(e.target.value)} placeholder="e.g. Rank 1 — Kavitha S., UPSC 2024" />
             </div>
 
-            <div style={{ fontWeight: 600, fontSize: '0.82rem', marginBottom: '0.5rem', color: 'var(--gray-600)' }}>📁 Upload from Device</div>
-            <FileDropZone onUpload={handleFileUpload} uploading={uploading} progress={progress} />
-
-            <div style={{ margin: '1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--gray-300)' }}>
-              <div style={{ flex: 1, height: 1, background: 'var(--gray-200)' }} />
-              <span style={{ fontSize: '0.75rem' }}>OR</span>
-              <div style={{ flex: 1, height: 1, background: 'var(--gray-200)' }} />
+            {/* Dimension guide */}
+            <div className="ap-hero-dim-guide" style={{ marginBottom: '1.25rem' }}>
+              <div className="ap-hero-dim-badge ap-hero-dim-badge--desk" style={{ width: '100%', background: 'rgba(123,27,46,0.06)', border: '1px solid rgba(123,27,46,0.2)' }}>
+                <i className="fa-solid fa-ruler-combined" style={{ color: 'var(--maroon)' }}></i>
+                <div>
+                  <div className="ap-hero-dim-label">📸 Recommended Results Image Dimensions</div>
+                  <div className="ap-hero-dim-size">Portrait or Standard Document • Recommended: <strong>1200 × 1600 px</strong> or A4 (3:4 ratio)</div>
+                  <div className="ap-hero-dim-hint">Clear marksheet, rank poster, certificate, or testimonial banner • JPG, PNG, WebP</div>
+                </div>
+              </div>
             </div>
 
-            <div style={{ fontWeight: 600, fontSize: '0.82rem', marginBottom: '0.5rem', color: 'var(--gray-600)' }}>🔗 Add by URL (Google Drive or web image)</div>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <input className="ap-input" style={{ flex: 1 }} value={urlInput} onChange={e => setUrlInput(e.target.value)} placeholder="https://drive.google.com/... or https://example.com/img.jpg" />
-              <button className="ap-btn ap-btn-primary" onClick={handleUrlAdd} style={{ whiteSpace: 'nowrap' }}>
-                <i className="fa-solid fa-plus" /> Add
-              </button>
-            </div>
+            <AdminImageUpload
+              label="Result / Certificate / Marksheet Photo"
+              value={urlInput}
+              onChange={val => setUrlInput(val)}
+              subFolderName="nermai-results"
+              maxWidth={1600}
+              aspectRatio="auto"
+              hint="1200 × 1600 px • Portrait / A4"
+              placeholder="Paste Google Drive share link, File ID or image URL..."
+              toast={toast}
+            />
+
+            <button className="ap-btn ap-btn-primary" onClick={handleAddImage} style={{ width: '100%', marginTop: '0.5rem', padding: '0.75rem', fontSize: '0.9rem', justifyContent: 'center' }}>
+              <i className="fa-solid fa-plus" /> Add Image to Results Gallery
+            </button>
           </div>
         </div>
       )}
