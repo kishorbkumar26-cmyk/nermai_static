@@ -5,6 +5,7 @@ import { getGoogleDriveCDNUrl } from '../utils/imageOptimizer'
 import HomeContentSection from './admin/HomeContentSection'
 import FooterContentSection from './admin/FooterContentSection'
 import AdminImageUpload from './admin/AdminImageUpload'
+import ResourceManager from './admin/ResourceManager'
 import ReactQuill from 'react-quill-new'
 import 'react-quill-new/dist/quill.snow.css'
 
@@ -227,7 +228,6 @@ function HeroSection({ toast }) {
           </div>
         </div>
 
-        {/* Slide metadata */}
         {/* Slide metadata */}
         <div style={{ marginTop: '1.25rem' }}>
           <div className="ap-form-row">
@@ -966,9 +966,35 @@ function DriveSection({ toast }) {
   const [convertedUrl, setConvertedUrl] = useState('')
   const [passcode, setPasscode] = useState('')
 
+  const [isTesting, setIsTesting] = useState(false)
+
   const handleSaveDrive = async () => {
     driveStorage.saveConfig(config)
     toast.success('Drive config saved!')
+  }
+
+  const handleTestConnection = async () => {
+    if (!config.appsScriptUrl) {
+      toast.error('Please enter the Apps Script URL first.')
+      return
+    }
+    setIsTesting(true)
+    try {
+      const res = await fetch(config.appsScriptUrl, {
+        method: 'POST',
+        body: JSON.stringify({ test: true, folderId: config.folderId })
+      })
+      const data = await res.json()
+      if (data.status === 'success') {
+        toast.success(data.message || 'Connection successful!')
+      } else {
+        toast.error(data.message || 'Connection failed.')
+      }
+    } catch (e) {
+      toast.error('Failed to connect: ' + e.message)
+    } finally {
+      setIsTesting(false)
+    }
   }
 
   const handleSavePasscode = async () => {
@@ -1013,9 +1039,15 @@ function DriveSection({ toast }) {
           <i className={`fa-solid ${config.appsScriptUrl ? 'fa-circle-check' : 'fa-triangle-exclamation'}`}></i>
           {config.appsScriptUrl ? 'Apps Script configured — uploads go to Google Drive' : 'No Apps Script URL — uploads stored as base64 in Firestore'}
         </div>
-        <button className="ap-btn ap-btn-primary" onClick={handleSaveDrive}>
-          <i className="fa-solid fa-floppy-disk"></i> Save Drive Config
-        </button>
+        <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+          <button className="ap-btn ap-btn-primary" onClick={handleSaveDrive}>
+            <i className="fa-solid fa-floppy-disk"></i> Save Drive Config
+          </button>
+          <button className="ap-btn ap-btn-outline" onClick={handleTestConnection} disabled={isTesting}>
+            <i className={`fa-solid ${isTesting ? 'fa-spinner fa-spin' : 'fa-network-wired'}`}></i> 
+            {isTesting ? ' Testing...' : ' Test Connection'}
+          </button>
+        </div>
       </div>
 
       {/* Drive URL Converter */}
@@ -1144,6 +1176,7 @@ const SECTIONS = [
   { id: 'homecontent',   label: 'Home Content', icon: 'fa-house' },
   { id: 'hero',          label: 'Hero Slides',  icon: 'fa-images' },
   { id: 'notices',       label: 'Notices',      icon: 'fa-bell' },
+  { id: 'resources',     label: 'Resources',    icon: 'fa-book-open' },
   { id: 'toppers',       label: 'Toppers',      icon: 'fa-trophy' },
   { id: 'testimonials',  label: 'Reviews',      icon: 'fa-quote-right' },
   { id: 'gallery',       label: 'Gallery',      icon: 'fa-images' },
@@ -1159,6 +1192,7 @@ export function AdminPanelContent({ activeSection, toast }) {
       {activeSection === 'homecontent'  && <HomeContentSection toast={toast} />}
       {activeSection === 'hero'         && <HeroSection toast={toast} />}
       {activeSection === 'notices'      && <NoticesSection toast={toast} />}
+      {activeSection === 'resources'    && <ResourceManager toast={toast} />}
       {activeSection === 'toppers'      && <ToppersSection toast={toast} />}
       {activeSection === 'testimonials' && <TestimonialsSection toast={toast} />}
       {activeSection === 'gallery'      && <GallerySection toast={toast} />}
@@ -1312,6 +1346,7 @@ export default function AdminPortal() {
               {activeSection === 'homecontent'  && <HomeContentSection toast={toast} />}
               {activeSection === 'hero'         && <HeroSection toast={toast} />}
               {activeSection === 'notices'      && <NoticesSection toast={toast} />}
+              {activeSection === 'resources'    && <ResourceManager toast={toast} />}
               {activeSection === 'toppers'      && <ToppersSection toast={toast} />}
               {activeSection === 'testimonials' && <TestimonialsSection toast={toast} />}
               {activeSection === 'gallery'      && <GallerySection toast={toast} />}

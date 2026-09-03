@@ -44,16 +44,13 @@
   position: relative;
   width: 100%;
   overflow: hidden;
-  border-bottom: 4px solid var(--n-ink);
-  /* Wider aspect ratio to reduce height (approx 16:4.5) */
-  aspect-ratio: 32 / 9;
-  max-height: 480px; /* Hard cap so it never goes taller */
+  height: calc(100svh - 36px); /* subtract ticker height */
+  max-height: none;
 }
 
 @media (max-width: 768px) {
   .hero-banner-container {
-    /* Switch to 3:4 portrait for mobile as per admin spec */
-    aspect-ratio: 3 / 4;
-    max-height: none; /* Let it breathe on mobile */
+    height: 100svh; /* On mobile, let it fill the whole screen */
   }
 }
+

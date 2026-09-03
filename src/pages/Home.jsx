@@ -5,16 +5,16 @@ import TopTicker from '../components/TopTicker'
 import StatsBar from '../components/StatsBar'
 import Courses from '../components/Courses'
 import WhyNermai from '../components/WhyNermai'
-import HowNermaiWorks from '../components/HowNermaiWorks'
 import WhatYouGet from '../components/WhatYouGet'
 import Results from '../components/Results'
 import Gallery from '../components/Gallery'
 import Testimonials from '../components/Testimonials'
 import ToppersWall from '../components/ToppersWall'
-import FAQ from '../components/FAQ'
 import OfficeLocations from '../components/OfficeLocations'
 import Footer from '../components/Footer'
 import EventsCalendar from '../components/EventsCalendar'
+import JourneySection from '../components/JourneySection'
+import ResourcesDesk from '../components/ResourcesDesk'
 import { LMS_URL } from '../constants'
 import { fbFirestore } from '../firebase/firestore'
 
@@ -74,9 +74,10 @@ function initReveal() {
 export default function Home() {
   const [about, setAbout] = useState(DEFAULT_ABOUT)
   const [ticker, setTicker] = useState(DEFAULT_TICKER)
+  const [journeySteps, setJourneySteps] = useState(undefined)
   const [visibility, setVisibility] = useState({
     stats: true, about: true, features: true, courses: true, steps: true,
-    results: true, gallery: true, testimonials: true, faq: true
+    results: true, gallery: true, testimonials: true
   })
 
   useEffect(() => {
@@ -84,6 +85,7 @@ export default function Home() {
       if (s.homeContent?.ticker) setTicker(s.homeContent.ticker)
       if (s.homeContent?.about) setAbout(ab => ({ ...DEFAULT_ABOUT, ...s.homeContent.about }))
       if (s.homeContent?.visibility) setVisibility(v => ({ ...v, ...s.homeContent.visibility }))
+      if (s.homeContent?.journeySteps) setJourneySteps(s.homeContent.journeySteps)
     })
   }, [])
 
@@ -181,8 +183,8 @@ export default function Home() {
         {/* ── WHY NERMAI ── */}
         <WhyNermai />
 
-        {/* ── HOW IT WORKS ── */}
-        {visibility.steps !== false && <HowNermaiWorks />}
+        {/* ── YOUR JOURNEY ── */}
+        {visibility.steps !== false && <JourneySection steps={journeySteps} />}
 
         {/* ── RESULTS ── */}
         {visibility.results !== false && <Results />}
@@ -195,9 +197,6 @@ export default function Home() {
 
         {/* ── TESTIMONIALS ── */}
         {visibility.testimonials !== false && <Testimonials />}
-
-        {/* ── FAQ ── */}
-        {visibility.faq !== false && <FAQ />}
 
         {/* ── FINAL CTA ── */}
         <section className="cta-final-section" id="enroll">

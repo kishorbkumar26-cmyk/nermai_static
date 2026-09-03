@@ -1,98 +1,176 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { fbFirestore } from '../firebase/firestore'
 import { driveStorage } from '../services/driveStorage'
-import { LMS_URL } from '../constants'
+import { ArrowRight, CheckCircle, BookOpen, FileText, UserCircle, Zap, Bookmark, Monitor, GraduationCap } from 'lucide-react'
+import './Courses.css'
 
-const DEFAULT_COURSES = [
-  { icon: '🏛️', name: 'UPSC Civil Service',  subname: 'IAS / IPS / IFS',                      desc: "India's most prestigious exam. Comprehensive coaching for Prelims, Mains & Interview.", tags: ['CIVIL SERVICES','IAS','IPS','IFS'],                         slug: 'upsc' },
-  { icon: '📋', name: 'TNPSC / Railways',    subname: 'GROUP I · II · IV · VAO',               desc: 'Complete preparation for Tamil Nadu Public Service Commission and Railway recruitment exams.', tags: ['GROUP I','GROUP II / IIA','GROUP IV','VAO'],             slug: 'tnpsc' },
-  { icon: '📁', name: 'UDC / LDC / VAO',     subname: 'CLERICAL & REVENUE SERVICES',           desc: 'Focused coaching for Upper Division Clerk, Lower Division Clerk and Village Administrative Officer.', tags: ['UDC','LDC','VAO'],                             slug: 'udc-ldc' },
-  { icon: '🏦', name: 'Banking',              subname: 'IBPS · SBI · RBI',                      desc: 'Structured coaching for IBPS PO, Clerk, SBI PO/Clerk, RBI Grade B and other banking exams.', tags: ['IBPS PO','IBPS CLERK','SBI PO','RBI GRADE B'],         slug: 'banking' },
-  { icon: '🌿', name: 'Puducherry Exam',      subname: 'UDC · LDC · DEPUTY TAHSILDAR · SI',    desc: 'Specialised coaching for Puducherry Government recruitment — Deputy Tahsildar, Sub-Inspector, UDC, LDC.', tags: ['DEPUTY TAHSILDAR','SUB-INSPECTOR','UDC','LDC'], slug: 'puducherry' },
-  { icon: '⚖️', name: 'SSC / PC / DT / SI',  subname: 'CENTRAL & STATE COMBINED',              desc: 'Coaching for SSC CGL, CHSL, Police Constable, Deputy Tahsildar and Sub-Inspector exams.', tags: ['SSC CGL','SSC CHSL','POLICE CONSTABLE','SUB-INSPECTOR'], slug: 'ssc' },
-]
+const ICON_MAP = {
+  CheckCircle, BookOpen, FileText, UserCircle, Zap, Bookmark, Monitor, GraduationCap
+}
 
-export default function Courses() {
-  const [courses, setCourses] = useState(DEFAULT_COURSES)
+export default function Courses({ hideHeader = false }) {
+  const [categories, setCategories] = useState([])
+  const [courses, setCourses] = useState([])
+  const [config, setConfig] = useState({
+    sectionHeading: 'Courses at NERMAI',
+    highlightedWord: 'NERMAI',
+    subHeading: 'Expert guidance for every stage of preparation'
+  })
+  const [activeCategory, setActiveCategory] = useState('all')
 
   useEffect(() => {
     fbFirestore.getSettings().then(s => {
-      if (s.homeContent?.courses?.length) {
-        const baseCourses = s.homeContent.courses
-        setCourses(baseCourses)
-        
-        // Fetch custom logos from course details to keep them synced
-        Promise.all(
-          baseCourses.map(c => 
-            fbFirestore.getCourseContent(c.slug)
-              .then(data => ({ slug: c.slug, data: data || null }))
-              .catch(() => ({ slug: c.slug, data: null }))
-          )
-        ).then(results => {
-          setCourses(prev => prev.map(c => {
-            const detail = results.find(r => r.slug === c.slug)?.data
-            if (detail && detail.iconType === 'url' && detail.iconUrl) {
-              return { ...c, imageUrl: driveStorage.formatImageUrl(detail.iconUrl) || detail.iconUrl }
-            }
-            if (detail && detail.iconType === 'emoji' && detail.icon) {
-              return { ...c, icon: detail.icon, imageUrl: '' }
-            }
-            return c
-          }))
-        })
+      if (s.homeContent) {
+        if (s.homeContent.courseCategories) setCategories(s.homeContent.courseCategories)
+        if (s.homeContent.courses) setCourses(s.homeContent.courses)
+        if (s.homeContent.coursesConfig) setConfig(s.homeContent.coursesConfig)
       }
     })
   }, [])
 
+  const filteredCourses = useMemo(() => {
+    let filtered = courses.filter(c => c.isActive !== false)
+    if (activeCategory !== 'all') {
+      filtered = filtered.filter(c => c.categoryId === activeCategory)
+    }
+    return filtered
+  }, [courses, activeCategory])
+
+  const renderIcon = (iconName) => {
+    const IconComponent = ICON_MAP[iconName] || CheckCircle
+    return <IconComponent size={16} className="new-course-feature-icon" />
+  }
+
+  const renderSectionTitle = () => {
+    const text = config.sectionHeading || 'Courses at NERMAI'
+    const word = config.highlightedWord || 'NERMAI'
+    if (!text.includes(word)) return text
+    const parts = text.split(word)
+    return (
+      <>
+        {parts[0]}<span style={{ color: 'var(--color-primary)' }}>{word}</span>{parts[1]}
+      </>
+    )
+  }
+
   return (
-    <section className="section" id="courses" style={{ backgroundColor: 'var(--cream)' }}>
+    <section className="section" id="courses" style={{ backgroundColor: 'var(--color-background, #FAF9F7)' }}>
       <div className="container">
-        <div className="section-header text-center" style={{ marginBottom: 'var(--space-12)' }}>
-          <span className="eyebrow">OUR COURSES</span>
-          <h2 className="section-title reveal">Renowned Coaching Institute for</h2>
-          <p className="section-desc reveal">
-            Renowned Coaching Institute for UPSC (Civil Services), Puducherry UDC, LDC, Sub-Inspector,
-            Deputy Tahsildar, TNPSC Group II and Other Competitive Examinations.
-          </p>
+        {!hideHeader && (
+          <div className="section-header text-center" style={{ marginBottom: '3rem' }}>
+            <span className="section-label" style={{ display: 'inline-block', marginBottom: '1rem', color: 'var(--color-primary, #A00001)', fontWeight: 600, letterSpacing: '0.1em', fontSize: '0.85rem' }}>OUR PROGRAMS</span>
+            <h2 className="display-large" style={{ marginBottom: '1rem' }}>
+              {renderSectionTitle()}
+            </h2>
+            <p className="section-subtitle" style={{ color: 'var(--color-muted, #777777)', maxWidth: '600px', margin: '0 auto' }}>
+              {config.subHeading || 'Expert guidance for every stage of preparation'}
+            </p>
+          </div>
+        )}
+
+        <div className="new-courses-tabs-wrapper">
+          <div className="new-courses-tabs">
+            <button
+              className={`new-courses-tab ${activeCategory === 'all' ? 'active' : ''}`}
+              onClick={() => setActiveCategory('all')}
+            >
+              All Courses
+            </button>
+            {categories.filter(c => c.isVisible && c.id !== 'all').map(cat => (
+              <button
+                key={cat.id}
+                className={`new-courses-tab ${activeCategory === cat.id ? 'active' : ''}`}
+                onClick={() => setActiveCategory(cat.id)}
+              >
+                {cat.shortName || cat.name}
+              </button>
+            ))}
+            {!categories.find(c => c.id === 'others') && courses.some(c => c.categoryId === 'others' && c.isActive !== false) && (
+              <button
+                className={`new-courses-tab ${activeCategory === 'others' ? 'active' : ''}`}
+                onClick={() => setActiveCategory('others')}
+              >
+                Others
+              </button>
+            )}
+          </div>
         </div>
 
-        <div className="courses-grid">
-          {courses.filter(c => c.visible !== false).map((course, i) => {
-            const formattedImageUrl = driveStorage.formatImageUrl(course.imageUrl) || course.imageUrl;
-            return (
-            <div key={i} className="course-card reveal" style={{ '--reveal-delay': `${i * 80}ms` }}>
-              <div className="course-card-num">{String(i + 1).padStart(2, '0')}</div>
-              {formattedImageUrl ? (
-                <img src={formattedImageUrl} alt={course.name} className="course-card-image" referrerPolicy="no-referrer" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
-              ) : null}
-              <div className="course-card-icon" style={{ display: formattedImageUrl ? 'none' : 'block' }}>{course.icon}</div>
-              <div className="course-card-body">
-                <div className="course-card-name">{course.name}</div>
-                <div className="course-card-subname">{course.subname}</div>
-                <p className="course-card-desc">{course.desc}</p>
-                <div className="course-card-tags">
-                  {(course.tags || []).map(tag => (
-                    <span key={tag} className="course-tag">{tag}</span>
-                  ))}
+        <div className="courses-grid-wrapper">
+          <div className="new-courses-grid">
+            {filteredCourses.map((course, i) => {
+              const coverImg = driveStorage.formatImageUrl(course.coverImageUrl)
+              const logoImg = driveStorage.formatImageUrl(course.logoUrl)
+              
+              return (
+                <div key={course.id || i} className="new-course-card reveal" style={{ '--reveal-delay': `${i * 100}ms` }}>
+                  
+                  {/* Cover Image */}
+                  <div className="new-course-image-wrapper">
+                    {logoImg && (
+                      <div className="new-course-logo-circle">
+                        <img src={logoImg} alt="Logo" />
+                      </div>
+                    )}
+                    {coverImg ? (
+                      <>
+                        <img src={coverImg} alt={course.title} className="new-course-image" loading="lazy" />
+                        <div className="new-course-image-overlay" />
+                      </>
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-secondary-bg)' }}>
+                        <span style={{ color: 'var(--color-muted)', opacity: 0.5 }}>No Image</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Body */}
+                  <div className="new-course-body">
+                    {course.badges && course.badges.length > 0 && (
+                      <div className="new-course-badges">
+                        {course.badges.join(' • ')}
+                      </div>
+                    )}
+                    <h3 className="new-course-title">{course.title}</h3>
+                    {course.shortDescription && (
+                      <p className="new-course-desc">{course.shortDescription}</p>
+                    )}
+                    
+                    {course.features && course.features.length > 0 && (
+                      <ul className="new-course-features">
+                        {course.features.map((feat, fIdx) => (
+                          <li key={fIdx} className="new-course-feature-item">
+                            {renderIcon(feat.icon)}
+                            <span>{feat.text}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="new-course-footer">
+                    <Link to={`/courses/${course.id || course.slug}`} className="new-course-enroll-btn">
+                      View Details <ArrowRight size={16} className="btn-arrow" />
+                    </Link>
+                  </div>
+
                 </div>
-              </div>
-              <div className="course-card-actions">
-                <Link to={`/courses/${course.slug}`} className="btn btn-outline course-card-details">
-                  View Details
-                </Link>
-                <a href={LMS_URL} className="btn btn-primary course-card-enroll" target="_blank" rel="noopener noreferrer">
-                  Enroll
-                </a>
-              </div>
+              )
+            })}
+          </div>
+
+          {filteredCourses.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--color-muted)' }}>
+              No courses found for this category.
             </div>
-            )
-          })}
+          )}
         </div>
 
-        <div style={{ textAlign: 'center', marginTop: 'var(--space-10)' }}>
-          <Link to="/courses" className="btn btn-outline btn-lg">
-            View All Courses <i className="fa-solid fa-arrow-right" style={{ marginLeft: '8px' }} />
+        <div style={{ textAlign: 'center', marginTop: '4rem' }}>
+          <Link to="/courses" className="btn btn-outline btn-lg" style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)' }}>
+            View All Courses <ArrowRight size={16} style={{ marginLeft: '8px' }} />
           </Link>
         </div>
       </div>

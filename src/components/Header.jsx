@@ -8,8 +8,10 @@ const NAV_ITEMS = [
   { label: 'Why Nermai', href: '/why-nermai', type: 'route' },
   { label: 'Courses',    href: '/courses',    type: 'route' },
   { label: 'Results',    href: '/#results',   type: 'hash'  },
+  { label: 'FAQ',        href: '/faq',        type: 'route' },
   { label: 'Contact Us', href: '/contact',    type: 'route' },
 ]
+
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false)

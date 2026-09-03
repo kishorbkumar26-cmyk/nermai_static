@@ -57,6 +57,53 @@ export const driveStorage = {
     }
   },
 
+  async processAndUploadFile(file, options = {}) {
+    const config = this.getConfig()
+    
+    // Convert to base64
+    const base64Data = await blobToBase64(file)
+    const cleanName = file.name || `file_${Date.now()}`
+
+    // 1. Try Google Apps Script Web App (actual Google Drive upload)
+    if (config.appsScriptUrl) {
+      try {
+        const rawSubFolder = options.subFolderName || ''
+        const subFolderName = rawSubFolder.replace(/[\\/:*?"<>|]/g, '').trim().slice(0, 80)
+
+        const response = await fetch(config.appsScriptUrl, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            filename: cleanName,
+            mimeType: file.type || 'application/octet-stream',
+            base64: base64Data,
+            folderId: config.folderId,
+            ...(subFolderName ? { subFolderName } : {})
+          })
+        })
+
+        if (response.ok) {
+          const resData = await response.json()
+          if (resData.status === 'success' && resData.fileId) {
+            return {
+              url: `https://drive.google.com/uc?export=view&id=${resData.fileId}`,
+              driveUrl: `https://drive.google.com/file/d/${resData.fileId}/view`,
+              fileId: resData.fileId,
+              storageType: 'google_drive'
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Apps Script file upload failed:', err)
+      }
+    }
+
+    // Fallback: local base64
+    const fallbackDataUrl = await fileToDataUrl(file)
+    return { url: fallbackDataUrl, storageType: 'local_base64' }
+  },
+
   async processAndUploadImage(file, options = {}) {
     const config = this.getConfig()
     let compressedBlob = null, dataUrl = null, reductionPct = 0
@@ -65,7 +112,8 @@ export const driveStorage = {
       try {
         const result = await compressImage(file, {
           maxWidth: options.maxWidth || config.maxWidth,
-          quality: options.quality || config.quality
+          quality: options.quality || config.quality,
+          mimeType: 'image/jpeg'
         })
         compressedBlob = result.blob
         dataUrl = result.dataUrl
@@ -85,13 +133,14 @@ export const driveStorage = {
         const rawSubFolder = options.subFolderName || ''
         const subFolderName = rawSubFolder.replace(/[\\/:*?"<>|]/g, '').trim().slice(0, 80)
 
+        const actualMimeType = dataUrl ? (dataUrl.split(';')[0].split(':')[1] || 'image/jpeg') : (file.type || 'image/jpeg')
         const response = await fetch(config.appsScriptUrl, {
           method: 'POST',
           mode: 'cors',
           headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify({
             filename: cleanName,
-            mimeType: 'image/jpeg',
+            mimeType: actualMimeType,
             base64: base64Data,
             folderId: config.folderId,
             ...(subFolderName ? { subFolderName } : {})
@@ -146,6 +195,51 @@ export const driveStorage = {
     if (dataUrl) return { url: dataUrl, storageType: 'local_base64', reductionPct }
     const fallbackDataUrl = await fileToDataUrl(file)
     return { url: fallbackDataUrl, storageType: 'local_base64', reductionPct }
+  },
+
+  async processAndUploadFile(file, options = {}) {
+    const config = this.getConfig()
+    const cleanName = (file.name || `file_${Date.now()}`).replace(/[\\/:*?"<>|]/g, '')
+
+    // 1. Google Apps Script Web App
+    if (config.appsScriptUrl) {
+      try {
+        const base64Data = await blobToBase64(file)
+        const rawSubFolder = options.subFolderName || ''
+        const subFolderName = rawSubFolder.replace(/[\\/:*?"<>|]/g, '').trim().slice(0, 80)
+
+        const response = await fetch(config.appsScriptUrl, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            filename: cleanName,
+            mimeType: file.type || 'application/octet-stream',
+            base64: base64Data,
+            folderId: config.folderId,
+            ...(subFolderName ? { subFolderName } : {})
+          })
+        })
+
+        if (response.ok) {
+          const resData = await response.json()
+          if (resData.status === 'success' && resData.fileId) {
+            return {
+              url: getGoogleDriveCDNUrl(resData.fileId),
+              driveUrl: `https://drive.google.com/file/d/${resData.fileId}/view`,
+              fileId: resData.fileId,
+              storageType: 'google_drive'
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Drive API failed for file upload:', err)
+      }
+    }
+
+    // 2. Fallback: upload as base64 (not recommended for large PDFs, but fallback)
+    const fallbackDataUrl = await fileToDataUrl(file)
+    return { url: fallbackDataUrl, storageType: 'local_base64' }
   },
 
   async uploadImage(file, options = {}) {

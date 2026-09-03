@@ -1,0 +1,405 @@
+/* ================================
+   JOURNEY SECTION
+================================ */
+
+.journey-section {
+  position: relative;
+  padding: 100px 20px;
+  background: #f7f6f3;
+  overflow: hidden;
+}
+
+/* ================================
+   HEADER
+================================ */
+
+.journey-header {
+  text-align: center;
+  margin-bottom: 80px;
+}
+
+.section-label {
+  display: inline-block;
+  position: relative;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: #b85a00;
+  margin-bottom: 18px;
+}
+
+.section-label::before {
+  content: "";
+  display: block;
+  width: 48px;
+  height: 1px;
+  background: #b85a00;
+  margin: 0 auto 20px;
+}
+
+.journey-header h2 {
+  margin: 0;
+  font-family: Georgia, serif;
+  font-size: clamp(38px, 5vw, 58px);
+  font-weight: 500;
+  color: #2c2927;
+  letter-spacing: -1px;
+}
+
+.journey-header p {
+  margin-top: 20px;
+  font-size: 17px;
+  letter-spacing: 0.5px;
+  color: #6d6863;
+}
+
+/* ================================
+   TIMELINE
+================================ */
+
+.journey-timeline {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+  padding-left: 30px;
+}
+
+/* STATIC LINE */
+.timeline-line {
+  position: absolute;
+  left: 55px;
+  top: 20px;
+  bottom: 20px;
+  width: 1px;
+  background: #d8d2ca;
+  overflow: hidden;
+}
+
+/* ANIMATED PROGRESS LINE */
+.timeline-progress {
+  width: 100%;
+  height: 0%;
+  background: linear-gradient(
+    to bottom,
+    #c85c00,
+    #6b2730,
+    #1d6b5c
+  );
+  transition: height 1.8s cubic-bezier(.22,.61,.36,1);
+}
+
+.journey-timeline.animate .timeline-progress {
+  height: 100%;
+}
+
+/* ================================
+   STEP
+================================ */
+
+.journey-step {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 38px;
+  min-height: 110px;
+  margin-bottom: 35px;
+  opacity: 0;
+  transform: translateY(35px);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s cubic-bezier(.22,.61,.36,1);
+}
+
+.journey-step.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ================================
+   NODE
+================================ */
+
+.step-node {
+  position: relative;
+  z-index: 2;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  background: #f7f6f3;
+  transition:
+    transform 0.4s ease,
+    background 0.4s ease,
+    border 0.4s ease;
+}
+
+/* STEP 01 */
+.step-orange .step-node {
+  background: #c65a00;
+  color: white;
+}
+
+/* STEP 02 */
+.step-outline .step-node {
+  border: 2px solid #c65a00;
+  color: #c65a00;
+}
+
+/* STEP 03 */
+.step-maroon .step-node {
+  background: #65272f;
+  color: white;
+}
+
+/* STEP 04 */
+.step-outline-dark .step-node {
+  border: 2px solid #8d857a;
+  color: #6c645b;
+}
+
+/* STEP 05 */
+.step-green .step-node {
+  background: #176a59;
+  color: white;
+}
+
+/* ================================
+   CONTENT
+================================ */
+
+.step-content {
+  position: relative;
+  padding: 8px 0;
+  transition:
+    transform 0.35s ease,
+    opacity 0.35s ease;
+}
+
+.step-content h3 {
+  margin: 0 0 10px;
+  font-size: clamp(22px, 3vw, 28px);
+  font-weight: 700;
+  color: #34312e;
+}
+
+.step-content p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.7;
+  color: #756f69;
+}
+
+/* ================================
+   HOVER INTERACTION
+================================ */
+
+.journey-step:hover .step-node {
+  transform: scale(1.12);
+}
+
+.journey-step:hover .step-content {
+  transform: translateX(8px);
+}
+
+.journey-step:hover .step-content h3 {
+  color: #b85a00;
+}
+
+/* ================================
+   SUBTLE ACTIVE PULSE
+================================ */
+
+.step-orange.active .step-node,
+.step-maroon.active .step-node,
+.step-green.active .step-node {
+  animation: subtlePulse 3s ease-in-out infinite;
+}
+
+@keyframes subtlePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* ================================
+   CURRENT HIGHLIGHT
+================================ */
+
+.journey-step.current .step-node {
+  transform: scale(1.12);
+}
+
+.journey-step.current .step-content h3 {
+  color: #b85a00;
+}
+
+.journey-step.current::after {
+  content: "";
+  position: absolute;
+  left: 25px;
+  top: 52px;
+  width: 1px;
+  height: 30px;
+  background: rgba(198, 90, 0, 0.3);
+}
+
+/* ================================
+   BUTTON
+================================ */
+
+.journey-action {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.journey-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-width: 190px;
+  padding: 18px 30px;
+  background: #c65a00;
+  color: white;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  overflow: hidden;
+  transition: transform 0.3s ease, background 0.3s ease;
+  border-radius: 4px;
+}
+
+.journey-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #9f4800;
+  transform: translateX(-100%);
+  transition: transform 0.4s ease;
+}
+
+.journey-btn span {
+  position: relative;
+  z-index: 1;
+}
+
+.journey-btn:hover::before {
+  transform: translateX(0);
+}
+
+.journey-btn:hover {
+  transform: translateY(-3px);
+}
+
+.btn-arrow {
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+.journey-btn:hover .btn-arrow {
+  transform: translateX(5px);
+}
+
+/* ================================
+   INITIAL REVEAL
+================================ */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(25px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ================================
+   MOBILE
+================================ */
+
+@media (max-width: 768px) {
+  .journey-section { padding: 70px 20px; }
+  .journey-header { margin-bottom: 55px; }
+  .journey-timeline { padding-left: 0; }
+  .timeline-line { left: 25px; }
+  .journey-step { gap: 25px; min-height: auto; margin-bottom: 42px; }
+  .step-node { width: 50px; height: 50px; }
+  .step-content h3 { font-size: 21px; }
+  .step-content p { font-size: 14px; }
+  .journey-step.current::after { left: 24px; top: 50px; }
+  
+  .journey-section.has-images .journey-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .journey-image-viewer {
+    position: relative;
+    top: 0;
+    margin-top: 2rem;
+  }
+}
+
+/* ================================
+   DYNAMIC LAYOUT
+================================ */
+
+.journey-section.has-images .journey-layout {
+  display: grid;
+  grid-template-columns: minmax(420px, 45%) 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.journey-section.has-images .journey-timeline-wrapper {
+  justify-self: start;
+  width: 100%;
+}
+
+.journey-section.no-images .journey-layout {
+  display: flex;
+  justify-content: center;
+}
+
+.journey-section.no-images .journey-timeline-wrapper {
+  max-width: 700px;
+  width: 100%;
+}
+
+/* ================================
+   IMAGE VIEWER
+================================ */
+
+.journey-image-viewer {
+  position: sticky;
+  top: 120px;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--surface-color, #f7f6f3);
+  border-radius: 2px;
+}
+
+.journey-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: translateX(12px) scale(0.98);
+  animation: journeyImageReveal 0.45s ease forwards;
+}
+
+@keyframes journeyImageReveal {
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+

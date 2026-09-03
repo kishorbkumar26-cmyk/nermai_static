@@ -35,16 +35,18 @@ export default function Testimonials() {
             style={{ transform: `translateX(calc(-${offset * (100 / 3 + 2)}%))` }}
           >
             {testimonials.map((t) => (
-              <div key={t.id} className="testimonial-card">
-                <div className="testimonial-quote-mark">"</div>
-                <blockquote className="testimonial-text">{t.quote}</blockquote>
-                <div className="testimonial-author">
-                  <div className="testimonial-avatar">
+              <div key={t.id} className="testimonial-card" style={{ border: 'none', boxShadow: 'none', background: 'transparent', padding: '0 1rem' }}>
+                <div style={{ fontSize: '6rem', color: 'rgba(123,27,46,0.1)', lineHeight: 0.8, fontFamily: 'var(--font-display)' }}>"</div>
+                <blockquote style={{ fontSize: 'clamp(1.1rem, 2vw, 1.35rem)', fontStyle: 'italic', lineHeight: 1.6, color: 'var(--ink)', marginBottom: '2rem' }}>
+                  {t.quote}
+                </blockquote>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'var(--maroon)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.2rem' }}>
                     {(t.name || 'A')[0].toUpperCase()}
                   </div>
                   <div>
-                    <div className="testimonial-name">{t.name}</div>
-                    <div className="testimonial-role">{t.role}</div>
+                    <div style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--ink)' }}>{t.name}</div>
+                    <div style={{ fontSize: '0.9rem', color: 'var(--gray-500)' }}>{t.role}</div>
                   </div>
                 </div>
               </div>

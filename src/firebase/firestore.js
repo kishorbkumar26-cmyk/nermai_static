@@ -448,6 +448,28 @@ export const fbFirestore = {
     } catch { return null }
   },
 
+  // ── RESOURCES ──
+  async getResources() {
+    try {
+      const snap = await getDocs(query(collection(db, 'resources')))
+      return snap.docs.map(d => ({id: d.id, ...d.data()}))
+    } catch { return [] }
+  },
+  onResourcesChanged(callback) { return onSnapshot(query(collection(db, 'resources')), snap => callback(snap.docs.map(d => ({id: d.id, ...d.data()}))), () => callback([])) },
+  async addResource(data) {
+    return await addDoc(collection(db, 'resources'), {
+      ...data,
+      createdAt: serverTimestamp()
+    })
+  },
+  async updateResource(id, data) {
+    await updateDoc(doc(db, 'resources', id), data)
+  },
+  async deleteResource(id) {
+    await deleteDoc(doc(db, 'resources', id))
+  },
+
+
   async saveCourseContent(slug, data) {
     await setDoc(courseContentDoc(slug), {
       ...data,
@@ -564,6 +586,7 @@ if (isDemo) {
   const testimonials = mockCol('testimonials', DEFAULT_TESTIMONIALS.map((t,i) => ({id:`def_${i}`, ...t})))
   const gallery = mockCol('gallery', [])
   const resultCats = mockCol('resultCats', [])
+  const resources = mockCol('resources', [])
 
   Object.assign(fbFirestore, {
     async getSettings() { return ls.get('settings', DEFAULT_SETTINGS) },
@@ -599,8 +622,14 @@ if (isDemo) {
     getGallery: gallery.get, onGalleryChanged: gallery.on, addGalleryImage: gallery.add, updateGalleryImage: gallery.update, deleteGalleryImage: gallery.del,
     async getGalleryByCategory(cat) {
       const all = await gallery.get()
-      return (!cat || cat === 'all') ? all : all.filter(img => img.category === cat)
+      return cat === 'all' ? all : all.filter(x => x.categoryId === cat)
     },
+    async getFaqs() {
+      // Returns empty by default so FaqPage uses DEFAULT_FAQS fallback
+      return []
+    },
+
+    getResources: resources.get, onResourcesChanged: resources.on, addResource: resources.add, updateResource: resources.update, deleteResource: resources.del,
 
     getResultCategories: resultCats.get, onResultCategoriesChanged: resultCats.on, updateResultCategory: resultCats.update, deleteResultCategory: resultCats.del,
     addResultCategory: async (data) => {

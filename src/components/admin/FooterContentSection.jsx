@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { fbFirestore } from '../../firebase/firestore'
 import AdminImageUpload from './AdminImageUpload'
+import AdminFileUpload from './AdminFileUpload'
 
 export default function FooterContentSection({ toast }) {
   const [footer, setFooter] = useState(null)
@@ -259,10 +260,15 @@ export default function FooterContentSection({ toast }) {
           placeholder="Paste Google Drive QR Code link, File ID or image URL..."
           toast={toast}
         />
-        <div className="ap-form-group">
-          <label className="ap-label">VCF File URL (Contact Card File)</label>
-          <input className="ap-input" value={footer.contactCard?.vcfUrl || ''} onChange={e => handleUpdate('contactCard', 'vcfUrl', e.target.value)} placeholder="/NERMAI_IAS_ACADEMY.vcf" />
-        </div>
+        <AdminFileUpload
+          label="VCF File (Contact Card)"
+          value={footer.contactCard?.vcfUrl || ''}
+          onChange={val => handleUpdate('contactCard', 'vcfUrl', val)}
+          subFolderName="nermai-vcf"
+          hint="Upload .vcf file"
+          placeholder="Paste Google Drive File ID or Web URL..."
+          toast={toast}
+        />
       </div>
 
       <div className="ap-card" style={{ marginTop: '2rem' }}>

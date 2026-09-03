@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { fbFirestore } from '../../firebase/firestore'
 import { driveStorage } from '../../services/driveStorage'
+import AdminImageUpload from './AdminImageUpload'
 
 /* ── tiny helpers ─────────────────────────────────────────────────────────── */
 function Field({ label, value, onChange, type = 'text', placeholder = '', options = [] }) {
@@ -172,50 +173,189 @@ function FeaturesEditor({ features, onChange }) {
   )
 }
 
-/* ── Courses Editor ──────────────────────────────────────────────────────── */
-function CoursesEditor({ courses, onChange }) {
-  const update = (i, key, val) => onChange(courses.map((c, idx) => idx === i ? { ...c, [key]: val } : c))
+/* ── Course Categories Editor ────────────────────────────────────────────── */
+function CourseCategoriesEditor({ categories = [], onChange }) {
+  const update = (i, key, val) => onChange(categories.map((c, idx) => idx === i ? { ...c, [key]: val } : c))
+  const add = () => onChange([...categories, { id: 'cat-' + Date.now(), name: '', shortName: '', iconUrl: '', isVisible: true }])
+  const remove = (i) => onChange(categories.filter((_, idx) => idx !== i))
+
   return (
     <div>
       <p style={{ fontSize: '0.82rem', color: 'var(--gray-400)', marginBottom: '1.25rem' }}>
-        Edit the 6 course cards shown on the homepage. Tags are comma-separated. Slug must be URL-safe (no spaces).
+        Manage the category filter tabs (e.g., UPSC, TNPSC) shown above the courses.
       </p>
-      {courses.map((course, i) => (
-        <div key={i} className="ap-card" style={{ marginBottom: '0.75rem', padding: '1rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+      {categories.map((cat, i) => (
+        <div key={cat.id || i} className="ap-card" style={{ marginBottom: '1rem', padding: '1.25rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--maroon)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '1.2rem' }}>{course.icon}</span> Course {i + 1}: {course.name}
+              <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--color-primary, var(--maroon))' }}>
+                Category {i + 1}
               </div>
-              <Toggle label="Visible" checked={course.visible !== false} onChange={v => update(i, 'visible', v)} />
+              <Toggle label="Visible" checked={cat.isVisible !== false} onChange={v => update(i, 'isVisible', v)} />
             </div>
-            {courses.length > 1 && (
+            {categories.length > 1 && (
               <button onClick={() => remove(i)} className="btn" style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #f87171', padding: '0.25rem 0.75rem', fontSize: '0.75rem', borderRadius: '4px' }}>
                 <i className="fa-solid fa-trash" style={{ marginRight: '6px' }} /> Delete
               </button>
             )}
           </div>
           <div className="ap-form-row">
-            <Field label="Emoji Icon" value={course.icon}    onChange={v => update(i, 'icon', v)} placeholder="🏛️" />
-            <Field label="URL Slug"   value={course.slug}    onChange={v => update(i, 'slug', v)} placeholder="upsc" />
+            <Field label="Full Name" value={cat.name} onChange={v => update(i, 'name', v)} placeholder="e.g. UPSC & Civil Services" />
+            <Field label="Short Name (Filter Label)" value={cat.shortName} onChange={v => update(i, 'shortName', v)} placeholder="e.g. UPSC" />
           </div>
-          <Field label="Image URL (Overrides Emoji)" value={course.imageUrl || ''} onChange={v => update(i, 'imageUrl', v)} placeholder="https://..." />
-          {course.imageUrl && (
-            <img src={driveStorage.formatImageUrl(course.imageUrl) || course.imageUrl} alt="preview" style={{ width: '100%', maxHeight: '120px', objectFit: 'contain', marginTop: '0.75rem', border: '1px solid var(--gray-200)', background: '#fff' }} onError={e => e.target.style.display='none'} />
-          )}
-          <div className="ap-form-row">
-            <Field label="Course Name" value={course.name}    onChange={v => update(i, 'name', v)} placeholder="UPSC Civil Service" />
-            <Field label="Sub Name"    value={course.subname} onChange={v => update(i, 'subname', v)} placeholder="IAS / IPS / IFS" />
+          <div style={{ width: '100%', maxWidth: '300px', marginTop: '0.5rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, fontSize: '0.8rem', color: 'var(--gray-700)' }}>
+              Category Icon (Circle)
+            </label>
+            <AdminImageUpload
+              value={cat.iconUrl}
+              onChange={(url) => update(i, 'iconUrl', url)}
+              subFolderName="categories"
+              hint="Recommended: 120x120px (1:1 Ratio)"
+              aspectRatio="1/1"
+              previewHeight={80}
+            />
           </div>
-          <Field label="Description" value={course.desc} onChange={v => update(i, 'desc', v)} type="textarea" />
-          <Field
-            label="Tags (comma-separated)"
-            value={(course.tags || []).join(', ')}
-            onChange={v => update(i, 'tags', v.split(',').map(t => t.trim()).filter(Boolean))}
-            placeholder="IAS, IPS, IFS"
-          />
         </div>
       ))}
+      <button onClick={add} className="btn" style={{ marginTop: '0.5rem', width: '100%', justifyContent: 'center', background: 'var(--gray-100)', color: 'var(--gray-700)', border: '1px dashed var(--gray-300)' }}>
+        <i className="fa-solid fa-plus" style={{ marginRight: '8px' }} /> Add Category
+      </button>
+    </div>
+  )
+}
+
+/* ── Courses Editor ──────────────────────────────────────────────────────── */
+function CoursesEditor({ courses = [], config = {}, categories = [], onChangeCourses, onChangeConfig, onChangeCategories }) {
+  const update = (i, key, val) => onChangeCourses(courses.map((c, idx) => idx === i ? { ...c, [key]: val } : c))
+  const add = () => onChangeCourses([...courses, { id: 'course-' + Date.now(), title: '', categoryId: 'all', coverImageUrl: '', logoUrl: '', badges: [], shortDescription: '', features: [], price: '', priceLabel: 'Course Price', isActive: true }])
+  const remove = (i) => onChangeCourses(courses.filter((_, idx) => idx !== i))
+  const [showCats, setShowCats] = React.useState(false)
+
+  const updateConfig = (key, val) => onChangeConfig({ ...config, [key]: val })
+  const updateCat = (i, key, val) => onChangeCategories(categories.map((c, idx) => idx === i ? { ...c, [key]: val } : c))
+  const addCat = () => onChangeCategories([...categories, { id: 'cat-' + Date.now(), name: '', shortName: '', iconUrl: '', isVisible: true }])
+  const removeCat = (i) => onChangeCategories(categories.filter((_, idx) => idx !== i))
+
+  const updateFeature = (courseIdx, featIdx, key, val) => {
+    const nextFeatures = [...(courses[courseIdx].features || [])]
+    nextFeatures[featIdx] = { ...nextFeatures[featIdx], [key]: val }
+    update(courseIdx, 'features', nextFeatures)
+  }
+  const addFeature = (courseIdx) => {
+    const nextFeatures = [...(courses[courseIdx].features || []), { text: '', icon: 'CheckCircle' }]
+    update(courseIdx, 'features', nextFeatures)
+  }
+  const removeFeature = (courseIdx, featIdx) => {
+    const nextFeatures = (courses[courseIdx].features || []).filter((_, idx) => idx !== featIdx)
+    update(courseIdx, 'features', nextFeatures)
+  }
+
+  return (
+    <div>
+      <div className="ap-card" style={{ marginBottom: '2rem', padding: '1.5rem', background: 'var(--gray-50)' }}>
+        <div style={{ fontWeight: 700, marginBottom: '1rem', color: 'var(--color-primary)' }}>Courses Section Header</div>
+        <div className="ap-form-row">
+          <Field label="Section Heading" value={config.sectionHeading} onChange={v => updateConfig('sectionHeading', v)} placeholder="Courses at NERMAI" />
+          <Field label="Highlighted Word" value={config.highlightedWord} onChange={v => updateConfig('highlightedWord', v)} placeholder="NERMAI" />
+        </div>
+        <Field label="Sub Heading" value={config.subHeading} onChange={v => updateConfig('subHeading', v)} placeholder="Expert guidance for every stage of preparation" />
+      </div>
+
+      <p style={{ fontSize: '0.82rem', color: 'var(--gray-400)', marginBottom: '1.25rem' }}>
+        Manage the individual course cards. Assign them to categories to make the filtering work.
+      </p>
+      {courses.map((course, i) => (
+        <div key={course.id || i} className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.5rem', borderLeft: '4px solid var(--color-primary, var(--maroon))' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--gray-200)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--color-primary, var(--maroon))' }}>
+                Course: {course.title || `Item ${i + 1}`}
+              </div>
+              <Toggle label="Active" checked={course.isActive !== false} onChange={v => update(i, 'isActive', v)} />
+            </div>
+            <button onClick={() => remove(i)} className="btn" style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #f87171', padding: '0.25rem 0.75rem', fontSize: '0.75rem', borderRadius: '4px' }}>
+              <i className="fa-solid fa-trash" style={{ marginRight: '6px' }} /> Delete Course
+            </button>
+          </div>
+
+          <div className="ap-form-row">
+            <Field label="Course Title" value={course.title} onChange={v => update(i, 'title', v)} placeholder="e.g. UPSC Offline Course" />
+            <Field 
+              label="Category" 
+              type="select" 
+              value={course.categoryId || 'all'} 
+              onChange={v => update(i, 'categoryId', v)} 
+              options={[ 
+                { value: 'all', label: 'All Courses (Default)' }, 
+                ...categories.map(c => ({ value: c.id, label: c.name || c.shortName })),
+                ...(categories.some(c => c.id === 'others') ? [] : [{ value: 'others', label: 'Other Courses' }])
+              ]} 
+            />
+          </div>
+
+          <div className="ap-form-row" style={{ marginTop: '1rem' }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, fontSize: '0.8rem', color: 'var(--gray-700)' }}>
+                Cover Image (Top Banner)
+              </label>
+              <AdminImageUpload value={course.coverImageUrl} onChange={(url) => update(i, 'coverImageUrl', url)} subFolderName="courses" hint="16:9 Ratio (e.g. 800x450px)" aspectRatio="16/9" previewHeight={120} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, fontSize: '0.8rem', color: 'var(--gray-700)' }}>
+                Inset Logo (Optional Circle)
+              </label>
+              <AdminImageUpload value={course.logoUrl} onChange={(url) => update(i, 'logoUrl', url)} subFolderName="courses" hint="1:1 Ratio (e.g. 150x150px)" aspectRatio="1/1" previewHeight={120} />
+            </div>
+          </div>
+
+          <div style={{ marginTop: '1rem' }}>
+            <Field
+              label="Badges (comma-separated, e.g. UPSC, OFFLINE, TAMIL)"
+              value={(course.badges || []).join(', ')}
+              onChange={v => update(i, 'badges', v.split(',').map(t => t.trim()).filter(Boolean))}
+            />
+            <Field label="Short Description (160-220 chars)" value={course.shortDescription} onChange={v => update(i, 'shortDescription', v)} type="textarea" placeholder="Comprehensive preparation..." />
+          </div>
+
+          <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'var(--gray-50)', borderRadius: '8px', border: '1px solid var(--gray-200)' }}>
+            <div style={{ fontWeight: 700, marginBottom: '1rem', fontSize: '0.85rem' }}>Features List (Max 5 recommended)</div>
+            {(course.features || []).map((feat, fIdx) => (
+              <div key={fIdx} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'flex-start' }}>
+                <div style={{ width: '140px' }}>
+                  <select className="ap-input" value={feat.icon || 'CheckCircle'} onChange={e => updateFeature(i, fIdx, 'icon', e.target.value)}>
+                    <option value="CheckCircle">Check (Default)</option>
+                    <option value="BookOpen">Book</option>
+                    <option value="FileText">Document</option>
+                    <option value="UserCircle">Mentor</option>
+                    <option value="Zap">Zap/Speed</option>
+                    <option value="Bookmark">Bookmark</option>
+                    <option value="Monitor">Monitor</option>
+                    <option value="GraduationCap">Graduation</option>
+                  </select>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <input className="ap-input" value={feat.text} onChange={e => updateFeature(i, fIdx, 'text', e.target.value)} placeholder="Feature text..." />
+                </div>
+                <button onClick={() => removeFeature(i, fIdx)} className="btn" style={{ padding: '0.5rem', color: '#dc2626', background: 'none' }} title="Remove Feature">
+                  <i className="fa-solid fa-xmark" />
+                </button>
+              </div>
+            ))}
+            <button onClick={() => addFeature(i)} className="btn" style={{ marginTop: '0.5rem', fontSize: '0.8rem', padding: '0.4rem 0.75rem', background: 'var(--white)', border: '1px solid var(--gray-300)' }}>
+              <i className="fa-solid fa-plus" style={{ marginRight: '6px' }} /> Add Feature
+            </button>
+          </div>
+
+          <div className="ap-form-row" style={{ marginTop: '1.5rem' }}>
+            <Field label="Price (e.g. ₹ 25,000)" value={course.price} onChange={v => update(i, 'price', v)} placeholder="₹ 25,000" />
+            <Field label="Price Label" value={course.priceLabel} onChange={v => update(i, 'priceLabel', v)} placeholder="Course Price" />
+          </div>
+        </div>
+      ))}
+      <button onClick={add} className="btn" style={{ marginTop: '0.5rem', width: '100%', justifyContent: 'center', background: 'var(--gray-100)', color: 'var(--gray-700)', border: '1px dashed var(--gray-300)', padding: '1rem' }}>
+        <i className="fa-solid fa-plus" style={{ marginRight: '8px' }} /> Add Course
+      </button>
     </div>
   )
 }
@@ -301,25 +441,22 @@ function EventsEditor({ events = [], onChange }) {
   )
 }
 
-/* ── Steps Editor ────────────────────────────────────────────────────────── */
-function StepsEditor({ steps, onChange }) {
+/* ── Journey Steps Editor ────────────────────────────────────────────────── */
+function JourneyStepsEditor({ steps = [], onChange }) {
   const update = (i, key, val) => onChange(steps.map((s, idx) => idx === i ? { ...s, [key]: val } : s))
-  const add = () => onChange([...steps, { num: String(steps.length + 1).padStart(2, '0'), title: '', desc: '', visible: true }])
+  const add = () => onChange([...steps, { id: Date.now(), title: '', description: '', imageUrl: '' }])
   const remove = (i) => onChange(steps.filter((_, idx) => idx !== i))
 
   return (
     <div>
       <p style={{ fontSize: '0.82rem', color: 'var(--gray-400)', marginBottom: '1.25rem' }}>
-        Edit the "How Nermai Works" journey steps (shown with numbered circles and connecting line).
+        Edit the "Your Journey with Nermai" flow diagram steps. You can upload an image for each step which will be shown on hover.
       </p>
       {steps.map((step, i) => (
-        <div key={i} className="ap-card" style={{ marginBottom: '0.75rem', padding: '1rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--maroon)' }}>
-                Step {i + 1}
-              </div>
-              <Toggle label="Visible" checked={step.visible !== false} onChange={v => update(i, 'visible', v)} />
+        <div key={step.id || i} className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--gray-200)' }}>
+            <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--maroon)' }}>
+              Flow Step {i + 1}
             </div>
             {steps.length > 1 && (
               <button onClick={() => remove(i)} className="btn" style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #f87171', padding: '0.25rem 0.75rem', fontSize: '0.75rem', borderRadius: '4px' }}>
@@ -328,15 +465,31 @@ function StepsEditor({ steps, onChange }) {
             )}
           </div>
           <div className="ap-form-row">
-            <Field label="Step Number" value={step.num}   onChange={v => update(i, 'num', v)} placeholder="01" />
-            <Field label="Title"       value={step.title} onChange={v => update(i, 'title', v)} placeholder="Select your goal..." />
+            <div style={{ flex: 1 }}>
+              <Field label="Title" value={step.title} onChange={v => update(i, 'title', v)} placeholder="e.g. உங்கள் இலக்கை தேர்வு செய்யுங்கள்" />
+              <Field label="Description" value={step.description} onChange={v => update(i, 'description', v)} type="textarea" placeholder="e.g. Choose from TNPSC, UPSC..." />
+            </div>
+            <div style={{ width: '320px', flexShrink: 0 }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, fontSize: '0.8rem', color: 'var(--gray-700)' }}>
+                Step Image (Hover Reveal)
+              </label>
+              <AdminImageUpload
+                value={step.imageUrl || ''}
+                onChange={(url) => update(i, 'imageUrl', url)}
+                subFolderName="journey_steps"
+                hint="Recommended: 800x600px (Desktop/Mobile). 4:3 Ratio."
+                aspectRatio="4/3"
+                previewHeight={180}
+              />
+            </div>
           </div>
-          <Field label="Description" value={step.desc} onChange={v => update(i, 'desc', v)} type="textarea" />
         </div>
       ))}
-      <button onClick={add} className="btn" style={{ marginTop: '0.5rem', width: '100%', justifyContent: 'center', background: 'var(--gray-100)', color: 'var(--gray-700)', border: '1px dashed var(--gray-300)' }}>
-        <i className="fa-solid fa-plus" style={{ marginRight: '8px' }} /> Add Step
-      </button>
+      {steps.length < 5 && (
+        <button onClick={add} className="btn" style={{ marginTop: '0.5rem', width: '100%', justifyContent: 'center', background: 'var(--gray-100)', color: 'var(--gray-700)', border: '1px dashed var(--gray-300)' }}>
+          <i className="fa-solid fa-plus" style={{ marginRight: '8px' }} /> Add Step
+        </button>
+      )}
     </div>
   )
 }
@@ -411,7 +564,7 @@ const TABS = [
   { id: 'courses',    icon: 'fa-book-bookmark', label: 'Courses' },
   { id: 'events',     icon: 'fa-calendar-days', label: 'Events' },
   { id: 'about',      icon: 'fa-address-card',  label: 'About' },
-  { id: 'steps',      icon: 'fa-stairs',        label: 'How It Works' }
+  { id: 'journeySteps', icon: 'fa-stairs',      label: 'Your Journey' }
 ]
 
 const DEFAULTS = {
@@ -434,13 +587,128 @@ const DEFAULTS = {
     { icon: 'fa-regular fa-calendar-check', title: 'Class Schedule',    desc: 'Flexible batch timings.' },
     { icon: 'fa-solid fa-user-tie',       title: 'Academic Guidance',   desc: 'One-on-one mentoring sessions.' },
   ],
+  courseCategories: [
+    { id: 'all', name: 'All Courses', shortName: 'ALL', iconUrl: '', isVisible: true },
+    { id: 'upsc', name: 'UPSC & Civil Services', shortName: 'UPSC', iconUrl: '', isVisible: true },
+    { id: 'tnpsc', name: 'TNPSC & State Exams', shortName: 'TNPSC', iconUrl: '', isVisible: true },
+    { id: 'banking', name: 'Banking Exams', shortName: 'Banking', iconUrl: '', isVisible: true },
+    { id: 'ssc', name: 'SSC & Central Govt.', shortName: 'SSC', iconUrl: '', isVisible: true },
+    { id: 'others', name: 'Other Courses', shortName: 'Others', iconUrl: '', isVisible: true },
+  ],
+  coursesConfig: {
+    sectionHeading: 'Courses in NERMAI IAS Puducherry',
+    highlightedWord: 'NERMAI IAS Puducherry',
+    subHeading: 'Get expert coaching for Bank, Insurance, SSC and Railways exams at the best coaching institute in Puducherry from expert faculty and regular mentor sessions'
+  },
   courses: [
-    { icon: '🏛️', name: 'UPSC Civil Service',  subname: 'IAS / IPS / IFS',               desc: "India's most prestigious exam.", tags: ['CIVIL SERVICES','IAS','IPS','IFS'],           slug: 'upsc' },
-    { icon: '📋', name: 'TNPSC / Railways',    subname: 'GROUP I · II · IV · VAO',         desc: 'Tamil Nadu Public Service Commission.', tags: ['GROUP I','GROUP II / IIA','GROUP IV','VAO'], slug: 'tnpsc' },
-    { icon: '📁', name: 'UDC / LDC / VAO',     subname: 'CLERICAL & REVENUE SERVICES',     desc: 'Upper Division Clerk, LDC, VAO.', tags: ['UDC','LDC','VAO'],                            slug: 'udc-ldc' },
-    { icon: '🏦', name: 'Banking',              subname: 'IBPS · SBI · RBI',                desc: 'Banking exams coaching.', tags: ['IBPS PO','IBPS CLERK','SBI PO','RBI GRADE B'],     slug: 'banking' },
-    { icon: '🌿', name: 'Puducherry Exam',      subname: 'UDC · LDC · DT · SI',             desc: 'Puducherry Government recruitment.', tags: ['DEPUTY TAHSILDAR','SUB-INSPECTOR','UDC','LDC'], slug: 'puducherry' },
-    { icon: '⚖️', name: 'SSC / PC / DT / SI',  subname: 'CENTRAL & STATE COMBINED',        desc: 'SSC CGL, CHSL, Police exams.', tags: ['SSC CGL','SSC CHSL','POLICE CONSTABLE','SUB-INSPECTOR'], slug: 'ssc' },
+    {
+      id: 'bank-offline',
+      title: 'Bank Offline Course',
+      categoryId: 'banking',
+      coverImageUrl: '',
+      logoUrl: '',
+      badges: ['BANK', 'OFFLINE', 'TAMIL'],
+      shortDescription: 'Prepare for major Bank/Insurance exams for all stages of exam from our expert faculty & mentors',
+      features: [
+        { text: '1000+ hours offline coaching', icon: 'Monitor' },
+        { text: '100+ Prelims/Mains mock tests', icon: 'CheckCircle' },
+        { text: '5+ Bank Preparatory Books', icon: 'BookOpen' },
+        { text: 'Regular mentor sessions', icon: 'GraduationCap' }
+      ],
+      price: '₹ 24,000',
+      priceLabel: 'Course Price',
+      isActive: true,
+    },
+    {
+      id: 'ssc-offline',
+      title: 'SSC Offline Course',
+      categoryId: 'ssc',
+      coverImageUrl: '',
+      logoUrl: '',
+      badges: ['SSC', 'OFFLINE', 'TAMIL'],
+      shortDescription: 'Prepare for major SSC & Central Govt. exams for all stages of exam from our expert faculty & mentors',
+      features: [
+        { text: '1000+ hours offline coaching', icon: 'Monitor' },
+        { text: '100+ Prelims/Mains mock tests', icon: 'CheckCircle' },
+        { text: '5+ Bank Preparatory Books', icon: 'BookOpen' },
+        { text: 'Regular mentor sessions', icon: 'GraduationCap' }
+      ],
+      price: '₹ 25,000',
+      priceLabel: 'Course Price',
+      isActive: true,
+    },
+    {
+      id: 'railways-offline',
+      title: 'Railways Offline Course',
+      categoryId: 'all',
+      coverImageUrl: '',
+      logoUrl: '',
+      badges: ['RAILWAYS', 'OFFLINE', 'TAMIL'],
+      shortDescription: 'Prepare for major Railways & State Govt. exams for all stages of exam from our expert faculty & mentors',
+      features: [
+        { text: '1000+ hours offline coaching', icon: 'Monitor' },
+        { text: '30+ RRB exam full mock tests', icon: 'CheckCircle' },
+        { text: 'RRB exam study materials', icon: 'BookOpen' },
+        { text: 'Regular mentor sessions', icon: 'GraduationCap' }
+      ],
+      price: '₹ 23,000',
+      priceLabel: 'Course Price',
+      isActive: true,
+    },
+    {
+      id: 'tnpsc-offline',
+      title: 'TNPSC Offline Course',
+      categoryId: 'tnpsc',
+      coverImageUrl: '',
+      logoUrl: '',
+      badges: ['TNPSC', 'OFFLINE', 'TAMIL'],
+      shortDescription: 'Complete preparation for Tamil Nadu Public Service Commission exams.',
+      features: [
+        { text: '800+ hours offline coaching', icon: 'Monitor' },
+        { text: 'Weekly mock tests', icon: 'CheckCircle' },
+        { text: 'Tamil medium materials', icon: 'BookOpen' },
+        { text: 'Regular mentor sessions', icon: 'GraduationCap' }
+      ],
+      price: '₹ 20,000',
+      priceLabel: 'Course Price',
+      isActive: true,
+    },
+    {
+      id: 'tnusrb-offline',
+      title: 'TNUSRB SI/PC Offline Course',
+      categoryId: 'tnpsc',
+      coverImageUrl: '',
+      logoUrl: '',
+      badges: ['TNUSRB SI PC', 'OFFLINE', 'TAMIL'],
+      shortDescription: 'Prepare for major Police & State Govt. exams for all stages of exam from our expert faculty & mentors',
+      features: [
+        { text: '800+ hours offline coaching', icon: 'Monitor' },
+        { text: 'Weekly mock tests', icon: 'CheckCircle' },
+        { text: 'Study materials', icon: 'BookOpen' },
+        { text: 'Regular mentor sessions', icon: 'GraduationCap' }
+      ],
+      price: '₹ 18,000',
+      priceLabel: 'Course Price',
+      isActive: true,
+    },
+    {
+      id: 'tntet-hybrid',
+      title: 'TNTET Online Hybrid Coaching Course',
+      categoryId: 'all',
+      coverImageUrl: '',
+      logoUrl: '',
+      badges: ['TN TET', 'HYBRID', 'TAMIL'],
+      shortDescription: 'Prepare for TNTET exams for all stages of exam from our expert faculty & mentors',
+      features: [
+        { text: '500+ hours coaching', icon: 'Monitor' },
+        { text: 'Weekly mock tests', icon: 'CheckCircle' },
+        { text: 'Study materials', icon: 'BookOpen' },
+        { text: 'Regular mentor sessions', icon: 'GraduationCap' }
+      ],
+      price: '₹ 15,000',
+      priceLabel: 'Course Price',
+      isActive: true,
+    }
   ],
   about: {
     eyebrow: 'About Nermai', title: 'Introduction to Nermai IAS',
@@ -449,12 +717,12 @@ const DEFAULTS = {
     imageUrl: '', imageLabel: '187+ RESULTS · 2022–25',
     badges: [{ num: '187+', label: 'Results' }, { num: '14+', label: 'Years' }, { num: '2400+', label: 'Students' }]
   },
-  steps: [
-    { num: '01', title: 'Choose Your Goal', desc: 'Choose from TNPSC, UPSC, Police or Banking.' },
-    { num: '02', title: 'Choose Your Course',        desc: 'Find the right batch and course structure.' },
-    { num: '03', title: 'Join Class Platform',                    desc: 'Redirect to our LMS portal.' },
-    { num: '04', title: 'Training + Tests',                   desc: 'Classes, mock tests, progress tracking.' },
-    { num: '05', title: 'Achieve Your Goal',                    desc: 'Clear the exam and become a Government Officer.' },
+  journeySteps: [
+    { id: 1, title: 'உங்கள் இலக்கை தேர்வு செய்யுங்கள்', description: 'Choose from TNPSC, UPSC, Police or Banking on our Website.', imageUrl: '' },
+    { id: 2, title: 'பயிற்சியை தேர்வு செய்யுங்கள்', description: 'Find the right batch and course structure for your needs.', imageUrl: '' },
+    { id: 3, title: 'Join Class Platform', description: 'Redirect to our dedicated learning management portal.', imageUrl: '' },
+    { id: 4, title: 'பயிற்சி + தேர்வுகள்', description: 'Attend classes, take mock tests, and track your progress.', imageUrl: '' },
+    { id: 5, title: 'இலக்கை அடையுங்கள்', description: 'Clear the exam and become a Government Officer.', imageUrl: '' },
   ]
 }
 
@@ -473,9 +741,11 @@ export default function HomeContentSection({ toast }) {
           events:     s.homeContent.events     || prev.events,
           stats:      s.homeContent.stats      || prev.stats,
           features:   s.homeContent.features   || prev.features,
+          courseCategories: s.homeContent.courseCategories || prev.courseCategories,
+          coursesConfig: s.homeContent.coursesConfig || prev.coursesConfig,
           courses:    s.homeContent.courses    || prev.courses,
           about:      { ...prev.about, ...s.homeContent.about },
-          steps:      s.homeContent.steps      || prev.steps,
+          journeySteps: s.homeContent.journeySteps || prev.journeySteps,
         }))
       }
       setLoading(false)
@@ -532,10 +802,11 @@ export default function HomeContentSection({ toast }) {
       {activeTab === 'ticker'   && <TickerEditor   ticker={content.ticker}       onChange={v => setContent(c => ({ ...c, ticker: v }))} />}
       {activeTab === 'stats'    && <StatsEditor    stats={content.stats}         onChange={v => setContent(c => ({ ...c, stats: v }))} />}
       {activeTab === 'features' && <FeaturesEditor features={content.features}   onChange={v => setContent(c => ({ ...c, features: v }))} />}
-      {activeTab === 'courses'  && <CoursesEditor  courses={content.courses}     onChange={v => setContent(c => ({ ...c, courses: v }))} />}
+      {activeTab === 'courseCategories' && <CourseCategoriesEditor categories={content.courseCategories} onChange={v => setContent(c => ({ ...c, courseCategories: v }))} />}
+      {activeTab === 'courses'  && <CoursesEditor  courses={content.courses} config={content.coursesConfig} categories={content.courseCategories} onChangeCourses={v => setContent(c => ({ ...c, courses: v }))} onChangeConfig={v => setContent(c => ({ ...c, coursesConfig: v }))} onChangeCategories={v => setContent(c => ({ ...c, courseCategories: v }))} />}
       {activeTab === 'events'   && <EventsEditor   events={content.events}       onChange={v => setContent(c => ({ ...c, events: v }))} />}
       {activeTab === 'about'    && <AboutEditor    about={content.about}         onChange={v => setContent(c => ({ ...c, about: v }))} />}
-      {activeTab === 'steps'    && <StepsEditor    steps={content.steps}         onChange={v => setContent(c => ({ ...c, steps: v }))} />}
+      {activeTab === 'journeySteps' && <JourneyStepsEditor steps={content.journeySteps} onChange={v => setContent(c => ({ ...c, journeySteps: v }))} />}
 
       {/* Save button */}
       <div style={{ position: 'sticky', bottom: '1rem', zIndex: 10, marginTop: '1.5rem' }}>

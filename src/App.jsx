@@ -9,6 +9,7 @@ import ContactPage from './pages/ContactPage'
 import AdminPage from './pages/AdminPage'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminPortal from './components/AdminPortal'
+import FaqPage from './pages/FaqPage'
 
 function VisibilityGuard({ pageKey, children }) {
   const [loading, setLoading] = useState(true)
@@ -36,6 +37,7 @@ export default function App() {
         <Route path="/"              element={<Home />} />
         <Route path="/why-nermai"    element={<WhyNermaiPage />} />
         <Route path="/contact"       element={<ContactPage />} />
+        <Route path="/faq"           element={<FaqPage />} />
 
         {/* ── Protected pages (controlled via admin Site Visibility) ── */}
         <Route 
@@ -55,8 +57,7 @@ export default function App() {
         <Route path="*" element={<Home />} />
       </Routes>
 
-      {/* Floating admin panel — available on all public pages */}
-      <AdminPortal />
+
     </BrowserRouter>
   )
 }

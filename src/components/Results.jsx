@@ -49,7 +49,7 @@ function ImageCard({ img }) {
   const [err, setErr] = useState(false)
   if (err) return null
   return (
-    <div className="results-img-card reveal" style={{ position: 'relative', overflow: 'hidden', border: '2px solid var(--ink)', aspectRatio: '4/3', background: 'var(--gray-100)' }}>
+    <div className="results-img-card reveal" style={{ position: 'relative', overflow: 'hidden', aspectRatio: '4/3', background: 'var(--gray-100)', borderRadius: '4px' }}>
       <img
         src={img.url}
         alt={img.caption || 'Result'}

@@ -5,6 +5,7 @@ import CourseContentSection from '../components/admin/CourseContentSection'
 import ResultsGallerySection from '../components/admin/ResultsGallerySection'
 import FooterContentSection from '../components/admin/FooterContentSection'
 import OfficeLocationsSection from '../components/admin/OfficeLocationsSection'
+import FaqAdminSection from '../components/admin/FaqAdminSection'
 import { fbFirestore } from '../firebase/firestore'
 
 /* ─── Toast ─────────────────────────────────────────────────────────────── */
@@ -21,9 +22,11 @@ function useToast() {
 /* ─── All Sections ───────────────────────────────────────────────────────── */
 const SECTIONS = [
   { id: 'homecontent',  label: 'Home Content',   icon: 'fa-solid fa-house',                group: 'Content' },
+  { id: 'resources',    label: 'Resources Desk', icon: 'fa-solid fa-book-open',            group: 'Content' },
   { id: 'footer',       label: 'Footer Editor',  icon: 'fa-solid fa-shoe-prints',          group: 'Content' },
   { id: 'officeLocs',   label: 'Office Locations',icon: 'fa-solid fa-map-location-dot',    group: 'Content' },
   { id: 'courses',      label: 'Course Pages',   icon: 'fa-solid fa-graduation-cap',       group: 'Content' },
+  { id: 'faq',          label: 'FAQ Manager',    icon: 'fa-solid fa-circle-question',      group: 'Content' },
   { id: 'results',      label: 'Results Gallery',icon: 'fa-solid fa-images',               group: 'Content' },
   { id: 'hero',         label: 'Hero Slides',    icon: 'fa-solid fa-film',                 group: 'Media' },
   { id: 'gallery',      label: 'Gallery',        icon: 'fa-solid fa-camera',               group: 'Media' },
@@ -286,6 +289,7 @@ export default function AdminDashboard() {
         <div className="dash-content">
           {/* Custom sections */}
           {active === 'courses'  && <CourseContentSection toast={toast} />}
+          {active === 'faq'      && <FaqAdminSection toast={toast} />}
           {active === 'results'  && <ResultsGallerySection toast={toast} />}
           {active === 'footer'   && <FooterContentSection toast={toast} />}
           {active === 'officeLocs' && <OfficeLocationsSection toast={toast} />}
@@ -293,7 +297,7 @@ export default function AdminDashboard() {
           {active === 'settings' && <SettingsSection toast={toast} />}
 
           {/* Reused from AdminPortal (via named export) */}
-          {!['courses', 'results', 'footer', 'officeLocs', 'siteVisibility', 'settings'].includes(active) && (
+          {!['courses', 'faq', 'results', 'footer', 'officeLocs', 'siteVisibility', 'settings'].includes(active) && (
             <AdminPanelContent activeSection={active} toast={toast} />
           )}
         </div>

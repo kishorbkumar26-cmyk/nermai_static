@@ -5,12 +5,12 @@ import ReactQuill from 'react-quill-new'
 import 'react-quill-new/dist/quill.snow.css'
 
 const DEFAULT_COURSES = [
-  { slug: 'upsc',       name: 'UPSC Civil Service',  icon: '🏛️', iconType: 'emoji' },
-  { slug: 'tnpsc',      name: 'TNPSC / Railways',    icon: '📋', iconType: 'emoji' },
-  { slug: 'udc-ldc',    name: 'UDC / LDC / VAO',     icon: '📁', iconType: 'emoji' },
-  { slug: 'banking',    name: 'Banking',              icon: '🏦', iconType: 'emoji' },
-  { slug: 'puducherry', name: 'Puducherry Exam',      icon: '🌿', iconType: 'emoji' },
-  { slug: 'ssc',        name: 'SSC / PC / DT / SI',  icon: '⚖️', iconType: 'emoji' },
+  { id: 'bank-offline', title: 'Bank Offline Course' },
+  { id: 'ssc-offline', title: 'SSC Offline Course' },
+  { id: 'railways-offline', title: 'Railways Offline Course' },
+  { id: 'tnpsc-offline', title: 'TNPSC Offline Course' },
+  { id: 'tnusrb-offline', title: 'TNUSRB SI/PC Offline Course' },
+  { id: 'tntet-hybrid', title: 'TNTET Online Hybrid Coaching Course' },
 ]
 
 const EMPTY_CONTENT = {
@@ -84,16 +84,13 @@ export default function CourseContentSection({ toast }) {
   const [saving, setSaving] = useState(false)
   const [docStatus, setDocStatus] = useState('new') // 'new' | 'draft' | 'published'
 
-  // Load course list from homeContent.courses
+  // Load course list from settings
   useEffect(() => {
     fbFirestore.getSettings().then(s => {
-      if (s.homeContent?.courses?.length) {
-        setCourseList(s.homeContent.courses.map(c => ({
-          slug: c.slug,
-          name: c.name,
-          icon: c.icon,
-          iconType: c.iconType || 'emoji',
-        })))
+      const courses = s.homeContent?.courses || DEFAULT_COURSES
+      setCourseList(courses)
+      if (courses.length > 0) {
+        setSelectedSlug(courses[0].id || courses[0].slug)
       }
     })
   }, [])
@@ -102,7 +99,7 @@ export default function CourseContentSection({ toast }) {
   useEffect(() => {
     if (!selectedSlug) return
     setLoading(true)
-    const cObj = courseList.find(c => c.slug === selectedSlug)
+    const cObj = courseList.find(c => (c.id || c.slug) === selectedSlug) || {}
     fbFirestore.getCourseContent(selectedSlug).then(data => {
       if (data) {
         setDocStatus(data.isLive ? 'published' : 'draft')
@@ -130,7 +127,7 @@ export default function CourseContentSection({ toast }) {
     try {
       await fbFirestore.saveCourseContent(selectedSlug, content)
       setDocStatus(content.isLive ? 'published' : 'draft')
-      toast.success(`"${content.name || selectedSlug}" content saved!`)
+      toast.success(`"${content.title || content.name || selectedSlug}" content saved!`)
     } catch (e) {
       toast.error(e.message)
     } finally {
@@ -155,9 +152,13 @@ export default function CourseContentSection({ toast }) {
             onChange={e => setSelectedSlug(e.target.value)}
             style={{ width: '100%' }}
           >
-            {courseList.map(c => (
-              <option key={c.slug} value={c.slug}>{c.icon} {c.name}</option>
-            ))}
+            {courseList.map(c => {
+              const id = c.id || c.slug
+              const displayTitle = c.title || c.name || id
+              return (
+                <option key={id} value={id}>{displayTitle}</option>
+              )
+            })}
           </select>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingTop: '1.25rem' }}>
@@ -286,6 +287,16 @@ export default function CourseContentSection({ toast }) {
               placeholder="IAS, IPS, IFS, CIVIL SERVICES"
             />
             <Field label="CTA Button Text" value={content.ctaText} onChange={v => update('ctaText', v)} placeholder="Enroll Now" />
+          </div>
+
+          {/* Full Page Content */}
+          <div className="ap-card" style={{ marginBottom: '1rem', padding: '1rem' }}>
+            <div style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.75rem', color: 'var(--maroon)' }}>🔗 Enroll CTA (Floating Button)</div>
+            <div className="ap-form-row">
+              <Field label="Button Label" value={content.ctaText} onChange={v => update('ctaText', v)} placeholder="Enroll Now" />
+              <Field label="Button URL (external link or /path)" value={content.ctaLink} onChange={v => update('ctaLink', v)} placeholder="https://yourplatform.com/enroll" />
+            </div>
+            <p style={{ fontSize: '0.78rem', color: 'var(--gray-400)', margin: '0.5rem 0 0' }}>This button floats at the bottom-right of the course detail page when visitors scroll. Leave URL blank to use the default LMS link.</p>
           </div>
 
           {/* Full Page Content */}

@@ -87,37 +87,7 @@ export default function Footer() {
       {/* Main footer grid */}
       <div className="footer-main">
         <div className="container">
-          {f.contactCard && (f.contactCard.heading || f.contactCard.qrImage) && (
-            <div className="footer-contact-card" style={{ 
-              backgroundColor: '#eef2ee', 
-              padding: '2rem', 
-              borderRadius: '8px', 
-              marginBottom: '3rem',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1.5rem',
-              color: '#333'
-            }}>
-              <h4 style={{ fontSize: '1.1rem', fontWeight: 500, margin: 0, textAlign: 'center' }}>
-                {f.contactCard.heading}
-              </h4>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', alignItems: 'center', justifyContent: 'center' }}>
-                {f.contactCard.qrImage && (
-                  <div style={{ flexShrink: 0, background: '#fff', padding: '10px', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                    <img src={f.contactCard.qrImage} alt="QR Code" style={{ width: '150px', height: '150px', objectFit: 'contain' }} />
-                  </div>
-                )}
-                <div style={{ maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'flex-start' }}>
-                  <a href={f.contactCard.vcfUrl || '#'} download className="btn btn-primary" style={{ backgroundColor: '#222', color: '#fff', border: 'none', padding: '0.8rem 1.5rem' }}>
-                    Download .vcf
-                  </a>
-                  <p style={{ fontSize: '0.9rem', lineHeight: '1.5', color: '#555', margin: 0 }}>
-                    {f.contactCard.desc}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
+
 
           <div className="footer-grid">
 
@@ -207,6 +177,26 @@ export default function Footer() {
                 </ul>
               </div>
             </div>
+            {/* Contact QR Code Column */}
+            {f.contactCard && (f.contactCard.heading || f.contactCard.qrImage) && (
+              <div className="footer-col" style={{ alignItems: 'flex-start' }}>
+                <div className="footer-col-title" style={{ marginBottom: '1.25rem', lineHeight: '1.4' }}>
+                  {f.contactCard.heading}
+                </div>
+                {f.contactCard.qrImage && (
+                  <div style={{ background: '#fff', padding: '10px', borderRadius: '10px', display: 'inline-block', marginBottom: '1rem' }}>
+                    <img src={f.contactCard.qrImage} alt="QR Code" style={{ width: '130px', height: '130px', objectFit: 'contain', display: 'block' }} />
+                  </div>
+                )}
+                <p style={{ fontSize: '0.85rem', lineHeight: '1.6', color: 'rgba(255,255,255,0.65)', marginBottom: '1.25rem' }}>
+                  {f.contactCard.desc}
+                </p>
+                <a href={f.contactCard.vcfUrl || '#'} download className="btn btn-primary" style={{ padding: '0.65rem 1.25rem', borderRadius: '100px', fontSize: '0.85rem' }}>
+                  <i className="fa-solid fa-address-book" style={{ marginRight: '6px' }} />
+                  Save Contact
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </div>
