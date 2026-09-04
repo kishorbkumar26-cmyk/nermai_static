@@ -92,7 +92,7 @@ export default function Header() {
                 <Phone size={13} style={{ color: '#F5D061' }} /> {CONTACT.phones[0]}
               </a>
               <div className="top-bar-divider" />
-              <a href={`mailto:${CONTACT.email}`} className="top-bar-item">
+              <a href={`mailto:${CONTACT.email}`} className="top-bar-item top-bar-email">
                 <Mail size={13} style={{ color: '#F5D061' }} /> {CONTACT.email}
               </a>
             </div>

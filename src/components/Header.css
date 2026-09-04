@@ -519,13 +519,100 @@
   .header-hamburger { display: flex !important; }
 }
 
-@media (max-width: 640px) {
-  .top-bar-right { display: none; }
-  .brand-name { font-size: 1.15rem; }
+@media (max-width: 768px) {
+  .top-bar-strip {
+    padding: 0.3rem 0;
+  }
+
+  .top-bar-inner {
+    justify-content: center;
+  }
+
+  .top-bar-left {
+    justify-content: center;
+    gap: 0.4rem 1rem;
+    flex-wrap: wrap;
+    font-size: 0.73rem;
+  }
+
+  .top-bar-divider {
+    display: none;
+  }
+
+  .top-bar-item {
+    font-size: 0.73rem;
+    gap: 5px;
+    white-space: nowrap;
+  }
+
+  .main-nav-strip {
+    padding: 0.45rem 0;
+  }
+
+  .brand-group {
+    gap: 0.5rem;
+  }
+
+  .brand-logo-img, .brand-emblem {
+    width: 38px;
+    height: 38px;
+  }
+
+  .brand-name {
+    font-size: 1.05rem;
+    letter-spacing: 0.03em;
+  }
+
+  .brand-sub {
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    margin-top: 1px;
+  }
+
+  .nav-actions-right {
+    gap: 0.35rem;
+  }
+
+  .action-circle-btn, .action-wa-circle {
+    width: 34px;
+    height: 34px;
+  }
+
   .enroll-gold-btn {
-    padding: 0.5rem 0.85rem;
-    font-size: 0.75rem;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.72rem;
     gap: 4px;
+    white-space: nowrap;
+    border-radius: 30px;
+  }
+
+  .header-hamburger {
+    width: 36px;
+    height: 36px;
+    padding: 7px 6px;
   }
 }
+
+@media (max-width: 520px) {
+  /* On phone screens, hide email so location + phone fit on ONE single clean line */
+  .top-bar-email {
+    display: none !important;
+  }
+  
+  .top-bar-right {
+    display: none !important;
+  }
+
+  /* Compact enroll text on tiny screens */
+  .enroll-gold-btn {
+    padding: 0.4rem 0.65rem;
+    font-size: 0.7rem;
+  }
+
+  /* Hide search circle button on small phone screens to prevent action overcrowding */
+  .action-circle-btn {
+    display: none;
+  }
+}
+
 
