@@ -184,6 +184,18 @@ export default function ToppersWall() {
   const [activeIndex, setActiveIndex] = useState(0)
   const [selectedStory, setSelectedStory] = useState(null)
   const [isHovered, setIsHovered] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const [touchStart, setTouchStart] = useState(null)
+  const [touchEnd, setTouchEnd] = useState(null)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   useEffect(() => {
     const unsub = fbFirestore.onToppersChanged(items => {
@@ -224,19 +236,42 @@ export default function ToppersWall() {
     setActiveIndex(prev => (prev - 1 + currentList.length) % currentList.length)
   }
 
+  const minSwipeDistance = 40
+  const handleTouchStart = (e) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+    const distance = touchStart - touchEnd
+    if (distance > minSwipeDistance) {
+      handleNext()
+    } else if (distance < -minSwipeDistance) {
+      handlePrev()
+    }
+  }
+
   // Get visible cards centered around activeIndex
   const getVisibleCards = () => {
     const len = currentList.length
     if (len === 0) return []
+    const safeActive = activeIndex % len
+
+    // On mobile view (< 768px), display ONLY 1 card (single card view with sliding)
+    if (isMobile) {
+      return [{ topper: currentList[safeActive], idx: safeActive, position: 'center' }]
+    }
+
     if (len === 1) return [{ topper: currentList[0], idx: 0, position: 'center' }]
     if (len === 2) {
-      const active = activeIndex % len
       return [
-        { topper: currentList[active], idx: active, position: 'center' },
-        { topper: currentList[(active + 1) % len], idx: (active + 1) % len, position: 'right' }
+        { topper: currentList[safeActive], idx: safeActive, position: 'center' },
+        { topper: currentList[(safeActive + 1) % len], idx: (safeActive + 1) % len, position: 'right' }
       ]
     }
-    const safeActive = activeIndex % len
     const prevIdx = (safeActive - 1 + len) % len
     const nextIdx = (safeActive + 1) % len
     return [
@@ -247,6 +282,7 @@ export default function ToppersWall() {
   }
 
   const activeCategoryLabel = categoriesList.find(c => c.id === activeCategory)?.label || activeCategory
+
 
   return (
     <section className="toppers-section" id="success-stories">
@@ -361,6 +397,9 @@ export default function ToppersWall() {
             className="toppers-carousel-wrapper"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
             {currentList.length > 0 ? (
               <>
@@ -456,17 +495,19 @@ export default function ToppersWall() {
         </div>
 
         {/* Carousel Dots */}
-        {currentList.length > 0 && (
+        {currentList.length > 1 && (
           <div className="toppers-dots">
             {currentList.map((_, i) => (
               <span
                 key={i}
-                className={`toppers-dot ${i === activeIndex ? 'active' : ''}`}
+                className={`toppers-dot ${i === (activeIndex % currentList.length) ? 'active' : ''}`}
                 onClick={() => setActiveIndex(i)}
+                aria-label={`Go to slide ${i + 1}`}
               />
             ))}
           </div>
         )}
+
 
         {/* Bottom Feature Bar */}
         <div className="toppers-bottom-bar" style={{ marginTop: '1.75rem' }}>

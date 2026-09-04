@@ -43,8 +43,6 @@ export default function Testimonials() {
   const items = testimonials
   const total = items.length
   const maxOffset = Math.max(0, total - perView)
-
-  // Clamp current offset so track never scrolls into blank space
   const currentOffset = Math.min(activeIdx, maxOffset)
 
   const handlePrev = () => {
@@ -55,10 +53,106 @@ export default function Testimonials() {
     setActiveIdx(prev => (prev >= maxOffset ? 0 : prev + 1))
   }
 
+  const renderCard = (t, idx, highlighted) => {
+    const avatarUrl = t.imageUrl || t.avatar || t.photo
+      ? driveStorage.formatImageUrl(t.imageUrl || t.avatar || t.photo)
+      : null
+
+    return (
+      <div
+        key={t.id || idx}
+        className={`testimonial-card-item ${highlighted ? 'active-highlight' : ''}`}
+        onClick={() => setActiveIdx(idx)}
+      >
+        <div className="card-top-quote">"</div>
+        <p className="card-quote-text">{t.quote || t.text || t.content}</p>
+        <div className="card-author-row">
+          {avatarUrl ? (
+            <img src={avatarUrl} alt={t.name} className="card-avatar-img" />
+          ) : (
+            <div className="card-avatar-fallback">
+              {(t.name || 'A')[0].toUpperCase()}
+            </div>
+          )}
+          <div className="card-author-meta">
+            <h4 className="card-author-name">{t.name}</h4>
+            <span className="card-author-role">{t.role || t.exam || t.designation || 'Nermai Student'}</span>
+          </div>
+        </div>
+        <div className="card-bg-close-quote" aria-hidden="true">"</div>
+      </div>
+    )
+  }
+
+  // ── Mobile (perView === 1): Simple single-card display ───────────────────
+  if (perView === 1) {
+    const currentItem = items[currentOffset]
+    return (
+      <section className="testimonials-section-wrap" id="testimonials" aria-label="Student Reviews">
+        <div className="container" style={{ maxWidth: '1480px' }}>
+
+          {/* Section Header */}
+          <div className="testimonials-header-box">
+            <div className="testimonials-top-tag">
+              <span className="tag-line" />
+              <span className="tag-text">STUDENT REVIEWS</span>
+              <span className="tag-line" />
+            </div>
+            <h2 className="testimonials-main-title">Hear What They Say</h2>
+            <p className="testimonials-subtitle">Honest feedback from successful Nermai students.</p>
+          </div>
+
+          {/* Single Card */}
+          <div className="testimonials-mobile-single">
+            {currentItem && renderCard(currentItem, currentOffset, true)}
+
+            {/* Mobile Arrow Controls */}
+            {total > 1 && (
+              <div className="testimonials-mobile-controls">
+                <button
+                  className="testimonials-nav-arrow arrow-left"
+                  onClick={handlePrev}
+                  aria-label="Previous Review"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+
+                <div className="testimonials-dots-group">
+                  {items.map((_, i) => (
+                    <button
+                      key={i}
+                      className={`testimonial-dot ${i === currentOffset ? 'active' : ''}`}
+                      onClick={() => setActiveIdx(i)}
+                      aria-label={`Go to slide ${i + 1}`}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  className="testimonials-nav-arrow arrow-right"
+                  onClick={handleNext}
+                  aria-label="Next Review"
+                >
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="testimonials-bottom-tagline" style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+            THOUSANDS OF DREAMS. A STRONGER INDIA.
+          </div>
+
+        </div>
+      </section>
+    )
+  }
+
+  // ── Desktop / Tablet (perView >= 2): Full track carousel ─────────────────
   return (
     <section className="testimonials-section-wrap" id="testimonials" aria-label="Student Reviews">
       <div className="container" style={{ maxWidth: '1480px' }}>
-        
+
         {/* Section Header */}
         <div className="testimonials-header-box">
           <div className="testimonials-top-tag">
@@ -72,10 +166,10 @@ export default function Testimonials() {
 
         {/* Content Row with Left Accent, Center Cards Track, Right Accent */}
         <div className="testimonials-content-grid">
-          
+
           {/* Far Left Decorative Element */}
           <div className="testimonials-accent-left" aria-hidden="true">
-            <div className="giant-quote-mark">“</div>
+            <div className="giant-quote-mark">"</div>
             <div className="left-handwriting">
               <span>Same Dedication.</span>
               <span className="sub">A Brighter Tomorrow.</span>
@@ -88,10 +182,10 @@ export default function Testimonials() {
 
           {/* Center Carousel Slider */}
           <div className="testimonials-carousel-box">
-            
-            {/* Left Arrow Circle */}
-            <button 
-              className="testimonials-nav-arrow arrow-left" 
+
+            {/* Left Arrow */}
+            <button
+              className="testimonials-nav-arrow arrow-left"
               onClick={handlePrev}
               disabled={maxOffset === 0}
               aria-label="Previous Review"
@@ -101,66 +195,22 @@ export default function Testimonials() {
 
             {/* Viewport for Cards */}
             <div className="testimonials-cards-viewport">
-              <div 
+              <div
                 className="testimonials-cards-track"
                 style={{
-                  transform: perView === 1 
-                    ? `translateX(-${currentOffset * 100}%)`
-                    : `translateX(calc(-${currentOffset} * ((100% - ${(perView - 1) * 1.25}rem) / ${perView} + 1.25rem)))`,
+                  transform: `translateX(calc(-${currentOffset} * ((100% - ${(perView - 1) * 1.25}rem) / ${perView} + 1.25rem)))`,
                   transition: 'transform 0.45s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               >
-                {items.map((t, idx) => {
-                  const isHighlighted = idx === activeIdx
-                  const avatarUrl = t.imageUrl || t.avatar || t.photo ? driveStorage.formatImageUrl(t.imageUrl || t.avatar || t.photo) : null
-
-                  return (
-                    <div 
-                      key={t.id || idx} 
-                      className={`testimonial-card-item ${isHighlighted ? 'active-highlight' : ''}`}
-                      style={{
-                        flex: perView === 1 
-                          ? '0 0 100%' 
-                          : `0 0 calc((100% - ${(perView - 1) * 1.25}rem) / ${perView})`
-                      }}
-                      onClick={() => setActiveIdx(idx)}
-                    >
-                      {/* Opening Quote */}
-                      <div className="card-top-quote">“</div>
-
-                      {/* Quote Text */}
-                      <p className="card-quote-text">{t.quote || t.text || t.content}</p>
-
-                      {/* Author Meta */}
-                      <div className="card-author-row">
-                        {avatarUrl ? (
-                          <img 
-                            src={avatarUrl} 
-                            alt={t.name} 
-                            className="card-avatar-img"
-                          />
-                        ) : (
-                          <div className="card-avatar-fallback">
-                            {(t.name || 'A')[0].toUpperCase()}
-                          </div>
-                        )}
-                        <div className="card-author-meta">
-                          <h4 className="card-author-name">{t.name}</h4>
-                          <span className="card-author-role">{t.role || t.exam || t.designation || 'Nermai Student'}</span>
-                        </div>
-                      </div>
-
-                      {/* Translucent Background Closing Quote */}
-                      <div className="card-bg-close-quote" aria-hidden="true">”</div>
-                    </div>
-                  )
-                })}
+                {items.map((t, idx) =>
+                  renderCard(t, idx, idx === activeIdx)
+                )}
               </div>
             </div>
 
-            {/* Right Arrow Circle */}
-            <button 
-              className="testimonials-nav-arrow arrow-right" 
+            {/* Right Arrow */}
+            <button
+              className="testimonials-nav-arrow arrow-right"
               onClick={handleNext}
               disabled={maxOffset === 0}
               aria-label="Next Review"
@@ -183,24 +233,19 @@ export default function Testimonials() {
 
         {/* Footer Bar: Dots & Tagline */}
         <div className="testimonials-footer-bar">
-          
-          {/* Pagination Dots */}
           <div className="testimonials-dots-group">
             {Array.from({ length: maxOffset + 1 }).map((_, i) => (
-              <button 
-                key={i} 
+              <button
+                key={i}
                 className={`testimonial-dot ${i === currentOffset ? 'active' : ''}`}
                 onClick={() => setActiveIdx(i)}
                 aria-label={`Go to slide ${i + 1}`}
               />
             ))}
           </div>
-
-          {/* Right Bottom Tagline */}
           <div className="testimonials-bottom-tagline">
             THOUSANDS OF DREAMS. A STRONGER INDIA.
           </div>
-
         </div>
 
       </div>

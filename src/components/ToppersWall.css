@@ -577,3 +577,33 @@
   color: #1A1008;
 }
 
+/* ── Mobile Responsive Overrides ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .toppers-carousel-wrapper {
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .toppers-arrow-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .toppers-cards-container {
+    grid-template-columns: 1fr !important;
+    width: 100%;
+  }
+
+  .toppers-card {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .toppers-dots {
+    margin-top: 1.2rem;
+  }
+}
+
+
