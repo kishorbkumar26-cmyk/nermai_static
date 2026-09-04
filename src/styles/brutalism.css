@@ -1,42 +1,46 @@
-/* src/styles/brutalism.css */
+/* src/styles/brutalism.css — Minimalist Curved Design System */
 .brut-box {
-  background-color: var(--n-cream);
-  border: 2px solid var(--n-ink);
-  box-shadow: 6px 6px 0px var(--n-maroon);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background-color: var(--n-cream, var(--cream));
+  border: 1px solid var(--gray-200);
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .brut-box:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 8px 8px 0px var(--n-maroon);
+  transform: translateY(-2px);
+  border-color: var(--maroon);
+  box-shadow: 0 8px 24px rgba(123, 27, 46, 0.1);
 }
 
 .brut-box-pressed:active {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0px var(--n-maroon);
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .brut-panel {
-  background-color: var(--n-white);
-  border: 3px solid var(--n-ink);
-  box-shadow: 8px 8px 0px var(--n-saffron);
+  background-color: var(--n-white, var(--white));
+  border: 1px solid var(--gray-200);
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
 }
 
 /* Typography styles */
 .brut-title {
-  font-family: var(--n-font-display);
+  font-family: var(--n-font-display, var(--font-display));
   text-transform: uppercase;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.05em;
-  color: var(--n-ink);
+  color: var(--n-ink, var(--ink));
 }
 
 .brut-label {
-  font-family: var(--n-font-mono);
+  font-family: var(--n-font-body, var(--font-body));
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   font-size: 0.85rem;
-  font-weight: 700;
+  font-weight: 600;
+  border-radius: 20px;
 }
 
 /* Hero Carousel Aspect Ratio — Commercial Banner */
@@ -53,4 +57,5 @@
     height: 100svh; /* On mobile, let it fill the whole screen */
   }
 }
+
 
