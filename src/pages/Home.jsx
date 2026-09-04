@@ -106,6 +106,9 @@ export default function Home() {
         {/* ── HERO: Full-Width Cinematic Banners ── */}
         <Hero />
 
+        {/* ── STATS BAR ── */}
+        {visibility.stats !== false && <StatsBar />}
+
         {/* ── ABOUT + INTRO ── */}
         {visibility.about !== false && (
           <section className="section about-intro-section" id="about">
@@ -128,46 +131,42 @@ export default function Home() {
                     Our Story <i className="fa-solid fa-arrow-right" style={{ marginLeft: '8px' }} />
                   </a>
                   
-                  {/* Image and Badges Group */}
-                  <div className="about-img-group" style={{ marginTop: '3rem', width: '100%', maxWidth: '500px' }}>
-                    <div className="about-img-frame">
-                      {about.imageUrl && (
+                  {/* Optional Image Frame */}
+                  {about.imageUrl && (
+                    <div className="about-img-group" style={{ marginTop: '2rem', width: '100%', maxWidth: '500px' }}>
+                      <div className="about-img-frame">
                         <img
                           src={about.imageUrl}
                           alt={about.imageLabel || 'Nermai IAS Academy Results'}
                           style={{ width: '100%', display: 'block', objectFit: 'cover' }}
                           onError={e => { e.currentTarget.style.display = 'none' }}
                         />
-                      )}
-                      <div className="about-img-label">{about.imageLabel}</div>
+                        <div className="about-img-label">{about.imageLabel}</div>
+                      </div>
                     </div>
-                    
-                    <div className="about-badges-row">
-                      {(about.badges || []).map((b, i) => (
-                        <div key={i} className="about-badge-v2">
-                          <span className="about-badge-num">{b.num}</span>
-                          <span className="about-badge-label">{b.label}</span>
-                        </div>
-                      ))}
-                    </div>
+                  )}
+                </div>
+
+                {/* Right Column: Events Calendar + Yellow Stat Badges */}
+                <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', justifyContent: 'flex-start' }}>
+                  {visibility.events !== false && <EventsCalendar />}
+
+                  {/* Yellow Stat Badges moved below Upcoming Events */}
+                  <div className="about-badges-row" style={{ marginTop: 0 }}>
+                    {(about.badges || []).map((b, i) => (
+                      <div key={i} className="about-badge-v2">
+                        <span className="about-badge-num">{b.num}</span>
+                        <span className="about-badge-label">{b.label}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                {/* Right: Events Calendar */}
-                {visibility.events !== false && (
-                  <div className="reveal">
-                    <EventsCalendar />
-                  </div>
-                )}
                 
               </div>
             </div>
           </section>
         )}
-
-        {/* ── STATS BAR (Moved below Upcoming Events) ── */}
-        {visibility.stats !== false && <StatsBar />}
-
 
         {/* ── WHAT YOU GET (Features) ── */}
         {visibility.features !== false && <WhatYouGet />}
