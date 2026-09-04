@@ -355,8 +355,31 @@
     padding: 3.5rem 1rem 3rem 1rem;
   }
 
+  .testimonials-cards-track {
+    gap: 0 !important;
+  }
+
   .testimonial-card-item {
-    flex: 0 0 100%;
+    flex: 0 0 100% !important;
+  }
+
+  .testimonials-carousel-box {
+    position: relative;
+  }
+
+  .testimonials-nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+  }
+
+  .testimonials-nav-arrow.arrow-left {
+    left: -5px;
+  }
+
+  .testimonials-nav-arrow.arrow-right {
+    right: -5px;
   }
 
   .testimonials-bottom-tagline {
@@ -372,3 +395,4 @@
     gap: 1rem;
   }
 }
+

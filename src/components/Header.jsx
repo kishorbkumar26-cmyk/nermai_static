@@ -39,12 +39,7 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('')
   const [tickerData, setTickerData] = useState({
     visible: true,
-    items: [
-      { text: 'Admission opened for UDC/LDC 2026', link: '/courses' },
-      { text: 'TNPSC Group II – New Batch from 15 Sep 2026', link: '/courses' },
-      { text: 'UPSC Foundation Batch – Limited Seats', link: '/courses' },
-      { text: 'Free Daily Current Affairs PDF Available', link: '/contact' }
-    ]
+    items: []
   })
 
   const navigate = useNavigate()

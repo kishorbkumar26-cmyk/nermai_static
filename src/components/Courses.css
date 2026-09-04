@@ -460,18 +460,43 @@
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .replicated-courses-section {
     padding: 3.5rem 1rem 3rem 1rem;
   }
 
+  .replicated-cards-track {
+    gap: 0 !important;
+  }
+
   .replicated-course-card {
-    flex: 0 0 100%;
+    flex: 0 0 100% !important;
   }
 
   .replicated-filter-pills-row {
     justify-content: flex-start;
     overflow-x: auto;
     padding-bottom: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .replicated-carousel-wrapper {
+    position: relative;
+  }
+
+  .replicated-nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+  }
+
+  .replicated-nav-arrow.arrow-left {
+    left: -5px;
+  }
+
+  .replicated-nav-arrow.arrow-right {
+    right: -5px;
   }
 }
+
