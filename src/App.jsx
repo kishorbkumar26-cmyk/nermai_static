@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { fbFirestore } from './firebase/firestore'
+import { WHATSAPP_NUMBER } from './constants'
 import Home from './pages/Home'
 import WhyNermaiPage from './pages/WhyNermaiPage'
 import CoursesPage from './pages/CoursesPage'
@@ -29,24 +30,77 @@ function VisibilityGuard({ pageKey, children }) {
   return children
 }
 
+function FloatingButtons() {
+  const waLink = `https://wa.me/${WHATSAPP_NUMBER}`
+  return (
+    <div className="floating-btns">
+      {/* WhatsApp */}
+      <a
+        href={waLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Chat on WhatsApp"
+        title="Chat on WhatsApp"
+        style={{
+          width: 50, height: 50, borderRadius: '50%',
+          background: '#25D366',
+          color: '#fff',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '1.45rem',
+          textDecoration: 'none',
+          border: '2px solid rgba(255,255,255,0.3)',
+          transition: 'transform 0.2s',
+        }}
+        onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
+        onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+      >
+        <i className="fa-brands fa-whatsapp" />
+      </a>
+
+      {/* Info / FAQ */}
+      <a
+        href="/contact#faq"
+        aria-label="FAQs &amp; Help"
+        title="FAQs &amp; Help"
+        style={{
+          width: 50, height: 50, borderRadius: '50%',
+          background: 'var(--maroon, #7b1b2e)',
+          color: '#fff',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '1.35rem',
+          textDecoration: 'none',
+          border: '2px solid rgba(255,255,255,0.2)',
+          transition: 'transform 0.2s',
+        }}
+        onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
+        onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+      >
+        <i className="fa-solid fa-circle-info" />
+      </a>
+    </div>
+  )
+}
+
 export default function App() {
   return (
     <BrowserRouter>
+      <FloatingButtons />
       <Routes>
         {/* ── Public pages ── */}
         <Route path="/"              element={<Home />} />
         <Route path="/why-nermai"    element={<WhyNermaiPage />} />
         <Route path="/contact"       element={<ContactPage />} />
-        <Route path="/faq"           element={<FaqPage />} />
+        {/* FAQ integrated into Contact page */}
+        <Route path="/faq"           element={<Navigate to="/contact#faq" replace />} />
 
         {/* ── Protected pages (controlled via admin Site Visibility) ── */}
-        <Route 
-          path="/courses" 
-          element={<VisibilityGuard pageKey="courses"><CoursesPage /></VisibilityGuard>} 
+        <Route
+          path="/courses"
+          element={<VisibilityGuard pageKey="courses"><CoursesPage /></VisibilityGuard>}
         />
-        <Route 
-          path="/courses/:slug" 
-          element={<VisibilityGuard pageKey="courses"><CourseDetailPage /></VisibilityGuard>} 
+        <Route
+          path="/courses/:slug"
+          element={<VisibilityGuard pageKey="courses"><CourseDetailPage /></VisibilityGuard>}
         />
 
         {/* ── Admin pages ── */}
@@ -61,3 +115,4 @@ export default function App() {
     </BrowserRouter>
   )
 }
+

@@ -184,8 +184,9 @@ export default function Footer() {
                   {f.contactCard.heading}
                 </div>
                 {f.contactCard.qrImage && (
-                  <div style={{ background: '#fff', padding: '10px', borderRadius: '10px', display: 'inline-block', marginBottom: '1rem' }}>
+                  <div style={{ background: '#fff', padding: '10px', borderRadius: '10px', display: 'inline-block', marginBottom: '1rem', textAlign: 'center' }}>
                     <img src={f.contactCard.qrImage} alt="QR Code" style={{ width: '130px', height: '130px', objectFit: 'contain', display: 'block' }} />
+                    <p style={{ margin: '6px 0 0', fontSize: '0.72rem', color: 'var(--gray-500)', fontWeight: 600, letterSpacing: '0.03em' }}>Scan to Save Contact</p>
                   </div>
                 )}
                 <p style={{ fontSize: '0.85rem', lineHeight: '1.6', color: 'rgba(255,255,255,0.65)', marginBottom: '1.25rem' }}>

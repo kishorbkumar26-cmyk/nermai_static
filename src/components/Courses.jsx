@@ -30,7 +30,7 @@ export default function Courses({ hideHeader = false }) {
   }, [])
 
   const filteredCourses = useMemo(() => {
-    let filtered = courses.filter(c => c.isActive !== false)
+    let filtered = courses.filter(c => c.isActive !== false) // treat undefined as active
     if (activeCategory !== 'all') {
       filtered = filtered.filter(c => c.categoryId === activeCategory)
     }
@@ -106,13 +106,8 @@ export default function Courses({ hideHeader = false }) {
               return (
                 <div key={course.id || i} className="new-course-card reveal" style={{ '--reveal-delay': `${i * 100}ms` }}>
                   
-                  {/* Cover Image */}
+                  {/* Cover Image — no logo overlay */}
                   <div className="new-course-image-wrapper">
-                    {logoImg && (
-                      <div className="new-course-logo-circle">
-                        <img src={logoImg} alt="Logo" />
-                      </div>
-                    )}
                     {coverImg ? (
                       <>
                         <img src={coverImg} alt={course.title} className="new-course-image" loading="lazy" />

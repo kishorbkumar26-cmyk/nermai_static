@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { AnimatePresence } from 'framer-motion';
 import BannerSlide from './BannerSlide';
 import BannerIndicators from './BannerIndicators';
 import { fbFirestore } from '../../firebase/firestore';
@@ -7,13 +6,12 @@ import { driveStorage } from '../../services/driveStorage';
 
 import HeroCinematicDefault from './HeroCinematicDefault';
 
-export default function Hero({ autoPlayInterval = 8000 }) {
+export default function Hero({ autoPlayInterval = 6000 }) {
   const [banners, setBanners] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const unsub = fbFirestore.onHeroSlidesChanged(items => {
-      // Map the admin slides into the format our BannerSlide expects
       const formattedBanners = items.map(item => {
         const desktopUrl = driveStorage.formatImageUrl(item.urlDesktop || item.url);
         const mobileUrl = driveStorage.formatImageUrl(item.urlMobile || item.urlDesktop || item.url);
@@ -21,8 +19,7 @@ export default function Hero({ autoPlayInterval = 8000 }) {
           id: item.id,
           bgImage: desktopUrl || mobileUrl,
           bgImageMobile: mobileUrl || desktopUrl,
-          scene: item.scene || 'none', // Default to none if not configured in admin yet
-          ctaLink: item.ctaLink // For clicking the banner if we want to add that
+          ctaLink: item.ctaLink
         };
       });
       setBanners(formattedBanners);
@@ -43,14 +40,13 @@ export default function Hero({ autoPlayInterval = 8000 }) {
   }
 
   return (
-    <section className="hero-banner-container" style={{ position: 'relative' }}>
-      <AnimatePresence mode="wait">
-        <BannerSlide 
-          key={banners[currentIndex].id} 
-          banner={banners[currentIndex]} 
-          isActive={true} 
-        />
-      </AnimatePresence>
+    <section className="hero-banner-container" style={{ position: 'relative', overflow: 'hidden' }}>
+      {/* Only render the active slide — BannerSlide animates in via CSS */}
+      <BannerSlide
+        key={currentIndex}
+        banner={banners[currentIndex]}
+        isActive={true}
+      />
 
       <button
         className="hero-arrow hero-arrow--prev"
@@ -68,11 +64,12 @@ export default function Hero({ autoPlayInterval = 8000 }) {
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
       </button>
 
-      <BannerIndicators 
-        total={banners.length} 
-        current={currentIndex} 
-        onChange={setCurrentIndex} 
+      <BannerIndicators
+        total={banners.length}
+        current={currentIndex}
+        onChange={setCurrentIndex}
       />
     </section>
   );
 }
+

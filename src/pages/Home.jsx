@@ -128,11 +128,6 @@ export default function Home() {
                   <p className="about-para">{about.para1}</p>
                   <p className="about-para">{about.para2}</p>
                   
-                  <div className="about-stamp">
-                    <div className="stamp-text">NERMAI</div>
-                    <div className="stamp-sub">IAS ACADEMY</div>
-                    <div className="stamp-meta">PUDUCHERRY · INDIA · EST. 2011</div>
-                  </div>
                   <a href="/why-nermai" className="btn btn-outline about-cta-btn">
                     Our Story <i className="fa-solid fa-arrow-right" style={{ marginLeft: '8px' }} />
                   </a>

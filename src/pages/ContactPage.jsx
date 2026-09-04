@@ -4,15 +4,64 @@ import Footer from '../components/Footer'
 import { useReveal } from '../hooks/useReveal'
 import { CONTACT, LMS_URL } from '../constants'
 
+const FAQ_ITEMS = [
+  { q: 'What exams does Nermai IAS Academy coach for?', a: 'We provide coaching for UPSC Civil Services (IAS/IPS/IFS), TNPSC Group I, II, IV & VAO, TN Police, Banking (IBPS/SBI/RBI), Puducherry Government Exams (UDC, LDC, Deputy Tahsildar, Sub-Inspector), SSC, and more.' },
+  { q: 'Are classes available in Tamil medium?', a: 'Yes. Nermai IAS Academy is one of very few institutes that offers comprehensive Tamil-medium coaching for civil services and government exam preparation.' },
+  { q: 'Are online classes available?', a: 'Yes. We offer both offline classes at our Puducherry centre and live/recorded online classes through our digital platform.' },
+  { q: 'How do I enroll?', a: 'You can contact us directly via phone, WhatsApp, or email. You can also visit our centre at No. 156/3, Nanbargal Nagar, Oulgaret, Puducherry – 605 010.' },
+  { q: 'Is Nermai IAS Academy a commercial institution?', a: 'No. Nermai IAS Academy is a non-profit initiative run by volunteers of Nermai Trust and Nermai Samuga Iyakkam. Our sole mission is to empower youth from rural and economically weaker backgrounds.' },
+  { q: 'What is the fee structure?', a: 'Our fees are among the most affordable in the region because we operate on a non-profit model. Please contact us directly for the latest batch fees and admission details.' },
+  { q: 'Do you provide study materials?', a: 'Yes. Students receive comprehensive study materials, question banks, previous year papers, and access to our online resource library.' },
+  { q: 'How can I access free study resources?', a: 'Free current affairs PDFs, previous year question papers, and study notes are available in our Free Learning Resources section on the homepage.' },
+]
+
+function FaqAccordion() {
+  const [open, setOpen] = useState(null)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+      {FAQ_ITEMS.map((item, i) => (
+        <div key={i} style={{ border: '1px solid var(--gray-200)', borderRadius: '8px', overflow: 'hidden' }}>
+          <button
+            onClick={() => setOpen(open === i ? null : i)}
+            style={{
+              width: '100%', textAlign: 'left', padding: '1rem 1.25rem',
+              background: open === i ? 'var(--cream)' : 'var(--white)',
+              border: 'none', cursor: 'pointer',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              fontWeight: 600, fontSize: '0.95rem', color: 'var(--ink)',
+              gap: '1rem',
+            }}
+          >
+            <span>{item.q}</span>
+            <i className={`fa-solid fa-chevron-${open === i ? 'up' : 'down'}`} style={{ flexShrink: 0, color: 'var(--maroon)', fontSize: '0.8rem' }} />
+          </button>
+          {open === i && (
+            <div style={{ padding: '0.75rem 1.25rem 1rem', fontSize: '0.92rem', color: 'var(--gray-600)', lineHeight: 1.7, borderTop: '1px solid var(--gray-100)' }}>
+              {item.a}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export default function ContactPage() {
-  useEffect(() => { window.scrollTo(0, 0) }, [])
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    // If navigated to #faq, scroll to it after render
+    if (window.location.hash === '#faq') {
+      setTimeout(() => {
+        document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' })
+      }, 300)
+    }
+  }, [])
   useReveal()
   const [sent, setSent] = useState(false)
   const [form, setForm] = useState({ name: '', phone: '', email: '', subject: '', message: '' })
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    // Compose mailto — will open email client until a server-side form is wired
     const body = encodeURIComponent(
       `Name: ${form.name}\nPhone: ${form.phone}\nEmail: ${form.email}\n\n${form.message}`
     )
@@ -232,6 +281,17 @@ export default function ContactPage() {
             Get Directions
           </a>
         </div>
+
+        {/* ── FAQ Section ── */}
+        <section id="faq" className="section" style={{ backgroundColor: 'var(--white)' }}>
+          <div className="container-narrow">
+            <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+              <span className="eyebrow" style={{ display: 'block', marginBottom: '1rem' }}>FREQUENTLY ASKED QUESTIONS</span>
+              <h2 className="section-title">Everything you need to know about Nermai IAS Academy</h2>
+            </div>
+            <FaqAccordion />
+          </div>
+        </section>
 
       </main>
       <Footer />
