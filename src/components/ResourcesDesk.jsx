@@ -32,96 +32,192 @@ export default function ResourcesDesk({ isWidget = false }) {
   const Wrapper = isWidget ? 'div' : 'section'
 
   return (
-    <Wrapper className={!isWidget ? "resource-desk-section" : ""} style={{ background: 'var(--ink)', color: 'var(--cream)', padding: isWidget ? '3rem 2rem' : '6rem 1.5rem', fontFamily: 'var(--font-mono)', borderRadius: isWidget ? 'var(--radius-lg)' : '0' }}>
+    <Wrapper
+      className={!isWidget ? "resource-desk-section" : "resource-desk-widget"}
+      style={{
+        background: isWidget ? 'var(--white)' : 'var(--cream)',
+        color: 'var(--ink)',
+        padding: isWidget ? '2rem' : '5rem 1.5rem',
+        borderRadius: isWidget ? '16px' : '0',
+        border: isWidget ? '1px solid var(--gray-200)' : 'none',
+        boxShadow: isWidget ? '0 10px 30px rgba(26, 16, 8, 0.04)' : 'none',
+        fontFamily: 'var(--font-body)'
+      }}
+    >
       <div className={!isWidget ? "container-narrow" : ""}>
         
         {/* Header */}
-        <div style={{ marginBottom: '3rem' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '1rem', color: 'var(--cream)' }}>
+        <div style={{ marginBottom: '2rem' }}>
+          <span style={{ 
+            fontSize: '0.75rem', 
+            fontWeight: 700, 
+            letterSpacing: '0.12em', 
+            color: 'var(--maroon)', 
+            textTransform: 'uppercase', 
+            display: 'block', 
+            marginBottom: '0.3rem' 
+          }}>
             FREE LEARNING RESOURCES
+          </span>
+          <h2 style={{ 
+            fontFamily: 'var(--font-display)', 
+            fontSize: isWidget ? '1.5rem' : '2.25rem', 
+            fontWeight: 700, 
+            color: 'var(--ink)', 
+            margin: '0 0 0.75rem',
+            lineHeight: 1.2
+          }}>
+            Study Notes & Question Banks
           </h2>
-          <div style={{ width: '280px', height: '2px', background: 'var(--cream)' }} />
+          <div style={{ 
+            width: '50px', 
+            height: '3px', 
+            background: 'linear-gradient(90deg, var(--maroon) 0%, var(--saffron) 100%)',
+            borderRadius: '2px' 
+          }} />
         </div>
 
         {/* Tabs */}
         {categories.length > 1 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '4rem' }}>
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setActiveTab(cat)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: activeTab === cat ? 'var(--saffron)' : 'var(--gray-400)',
-                  fontWeight: activeTab === cat ? 700 : 400,
-                  fontSize: '0.9rem',
-                  letterSpacing: '0.05em',
-                  cursor: 'pointer',
-                  padding: '0.5rem',
-                  transition: 'color 0.2s'
-                }}
-              >
-                [ {cat} ]
-              </button>
-            ))}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.75rem' }}>
+            {categories.map(cat => {
+              const isActive = activeTab === cat
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setActiveTab(cat)}
+                  style={{
+                    background: isActive ? 'var(--maroon)' : 'var(--gray-100)',
+                    color: isActive ? 'var(--white)' : 'var(--gray-700)',
+                    border: isActive ? '1px solid var(--maroon)' : '1px solid var(--gray-200)',
+                    fontWeight: isActive ? 600 : 500,
+                    fontSize: '0.85rem',
+                    letterSpacing: '0.02em',
+                    cursor: 'pointer',
+                    padding: '0.4rem 1rem',
+                    borderRadius: '20px',
+                    boxShadow: isActive ? '0 2px 8px rgba(123, 27, 46, 0.2)' : 'none',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  {cat}
+                </button>
+              )
+            })}
           </div>
         )}
 
         {/* List */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           {filtered.map(res => (
             <div 
               key={res.id} 
-              className="resource-card-terminal reveal"
+              className="resource-card-item reveal"
               style={{
-                border: '1px solid var(--gray-600)',
-                padding: '1.5rem',
+                background: 'var(--surface)',
+                border: '1px solid var(--gray-200)',
+                borderRadius: '12px',
+                padding: '1.25rem 1.5rem',
                 position: 'relative',
-                transition: 'all 0.3s ease',
-                display: 'block'
+                transition: 'all 0.25s ease',
+                display: 'block',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)'
               }}
             >
-              {/* Corner markers */}
-              <div className="terminal-corner tl" style={{ position: 'absolute', top: -1, left: -1, width: 8, height: 8, borderTop: '2px solid var(--saffron)', borderLeft: '2px solid var(--saffron)' }} />
-              <div className="terminal-corner tr" style={{ position: 'absolute', top: -1, right: -1, width: 8, height: 8, borderTop: '2px solid var(--saffron)', borderRight: '2px solid var(--saffron)' }} />
-              <div className="terminal-corner bl" style={{ position: 'absolute', bottom: -1, left: -1, width: 8, height: 8, borderBottom: '2px solid var(--saffron)', borderLeft: '2px solid var(--saffron)' }} />
-              <div className="terminal-corner br" style={{ position: 'absolute', bottom: -1, right: -1, width: 8, height: 8, borderBottom: '2px solid var(--saffron)', borderRight: '2px solid var(--saffron)' }} />
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+                {/* Accent Line */}
+                <div style={{ 
+                  width: '4px', 
+                  borderRadius: '4px', 
+                  background: res.isFeatured ? 'var(--saffron)' : 'var(--maroon)', 
+                  alignSelf: 'stretch',
+                  flexShrink: 0 
+                }} />
+                
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.3rem' }}>
+                    <h3 style={{ 
+                      fontSize: res.isFeatured ? '1.2rem' : '1.05rem', 
+                      fontWeight: 700, 
+                      margin: 0, 
+                      color: 'var(--ink)', 
+                      letterSpacing: '-0.01em',
+                      lineHeight: 1.3
+                    }}>
+                      {res.title}
+                    </h3>
+                    {res.isFeatured && (
+                      <span style={{ 
+                        background: 'rgba(230, 92, 0, 0.1)', 
+                        color: 'var(--saffron-dark)', 
+                        fontSize: '0.7rem', 
+                        fontWeight: 700, 
+                        padding: '0.15rem 0.5rem', 
+                        borderRadius: '4px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em'
+                      }}>
+                        Featured
+                      </span>
+                    )}
+                  </div>
 
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <div style={{ width: '2px', background: 'var(--gray-600)', alignSelf: 'stretch' }} className="terminal-vertical-line" />
-                <div style={{ flex: 1, paddingLeft: '0.5rem' }}>
-                  <h3 style={{ fontSize: res.isFeatured ? '1.5rem' : '1.1rem', fontWeight: 700, margin: '0 0 0.5rem', color: 'var(--saffron)', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
-                    {res.title}
-                  </h3>
-                  <p style={{ fontSize: '0.95rem', color: 'var(--gray-300)', marginBottom: '2rem', lineHeight: 1.6 }}>
-                    {res.description}
-                  </p>
+                  {res.description && (
+                    <p style={{ fontSize: '0.9rem', color: 'var(--gray-600)', marginBottom: '1rem', lineHeight: 1.5 }}>
+                      {res.description}
+                    </p>
+                  )}
                   
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', color: 'var(--gray-400)', fontSize: '0.85rem' }}>
-                      <span>[ {res.format || 'PDF'} ]</span>
-                      {res.sizeBytes && <span>[ {(res.sizeBytes / 1024 / 1024).toFixed(1)} MB ]</span>}
-                      {res.date && <span>[ {new Date(res.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()} ]</span>}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginTop: '0.5rem' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
+                      <span style={{ 
+                        background: 'rgba(123, 27, 46, 0.08)', 
+                        color: 'var(--maroon)', 
+                        fontSize: '0.75rem', 
+                        fontWeight: 700, 
+                        padding: '0.2rem 0.6rem', 
+                        borderRadius: '6px', 
+                        letterSpacing: '0.05em',
+                        fontFamily: 'var(--font-mono)'
+                      }}>
+                        {res.format || 'PDF'}
+                      </span>
+                      {res.sizeBytes && (
+                        <span style={{ color: 'var(--gray-500)', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                          <i className="fa-solid fa-file" style={{ fontSize: '0.75rem', color: 'var(--gray-400)' }} />
+                          {(res.sizeBytes / 1024 / 1024).toFixed(1)} MB
+                        </span>
+                      )}
+                      {res.date && (
+                        <span style={{ color: 'var(--gray-500)', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                          <i className="fa-regular fa-calendar" style={{ fontSize: '0.75rem', color: 'var(--gray-400)' }} />
+                          {new Date(res.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        </span>
+                      )}
                     </div>
+
                     <a 
                       href={res.url} 
                       target="_blank" 
                       rel="noreferrer"
-                      className="terminal-download-btn"
+                      className="resource-view-btn"
                       style={{
-                        color: 'var(--cream)',
+                        background: 'var(--maroon)',
+                        color: 'var(--white)',
                         textDecoration: 'none',
-                        fontWeight: 700,
-                        fontSize: '0.9rem',
-                        letterSpacing: '0.05em',
-                        display: 'flex',
+                        fontWeight: 600,
+                        fontSize: '0.85rem',
+                        letterSpacing: '0.02em',
+                        padding: '0.45rem 1.1rem',
+                        borderRadius: '8px',
+                        display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '0.5rem',
-                        transition: 'color 0.2s'
+                        gap: '0.4rem',
+                        transition: 'all 0.2s ease',
+                        boxShadow: '0 2px 6px rgba(123, 27, 46, 0.15)'
                       }}
                     >
-                      VIEW <i className="fa-solid fa-arrow-right" />
+                      VIEW <i className="fa-solid fa-arrow-right" style={{ fontSize: '0.75rem' }} />
                     </a>
                   </div>
                 </div>
@@ -129,7 +225,7 @@ export default function ResourcesDesk({ isWidget = false }) {
             </div>
           ))}
           {filtered.length === 0 && (
-            <div style={{ color: 'var(--gray-500)', fontStyle: 'italic' }}>
+            <div style={{ color: 'var(--gray-500)', fontStyle: 'italic', padding: '1rem 0' }}>
               No resources available in this category.
             </div>
           )}
@@ -139,3 +235,4 @@ export default function ResourcesDesk({ isWidget = false }) {
     </Wrapper>
   )
 }
+
