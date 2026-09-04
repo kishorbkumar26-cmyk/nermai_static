@@ -106,9 +106,6 @@ export default function Home() {
         {/* ── HERO: Full-Width Cinematic Banners ── */}
         <Hero />
 
-        {/* ── STATS BAR ── */}
-        {visibility.stats !== false && <StatsBar />}
-
         {/* ── ABOUT + INTRO ── */}
         {visibility.about !== false && (
           <section className="section about-intro-section" id="about">
@@ -167,6 +164,10 @@ export default function Home() {
             </div>
           </section>
         )}
+
+        {/* ── STATS BAR (Moved below Upcoming Events) ── */}
+        {visibility.stats !== false && <StatsBar />}
+
 
         {/* ── WHAT YOU GET (Features) ── */}
         {visibility.features !== false && <WhatYouGet />}
