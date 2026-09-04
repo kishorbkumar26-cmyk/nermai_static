@@ -94,7 +94,7 @@ export default function Footer() {
             {/* About */}
             <div className="footer-col">
               <div className="footer-col-brand">
-                <div className="header-logo-mark" style={{ width: 40, height: 40, fontSize: '1.1rem' }}>ந</div>
+                <img src="/nermai-logo.png" alt="Nermai IAS Academy Logo" style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover' }} />
                 <span className="footer-brand-name">NERMAI IAS ACADEMY</span>
               </div>
               <p className="footer-brand-desc">{f.brand.desc}</p>
@@ -179,22 +179,34 @@ export default function Footer() {
             </div>
             {/* Contact QR Code Column */}
             {f.contactCard && (f.contactCard.heading || f.contactCard.qrImage) && (
-              <div className="footer-col" style={{ alignItems: 'flex-start' }}>
-                <div className="footer-col-title" style={{ marginBottom: '1.25rem', lineHeight: '1.4' }}>
-                  {f.contactCard.heading}
-                </div>
-                {f.contactCard.qrImage && (
-                  <div style={{ background: '#fff', padding: '10px', borderRadius: '10px', display: 'inline-block', marginBottom: '1rem', textAlign: 'center' }}>
-                    <img src={f.contactCard.qrImage} alt="QR Code" style={{ width: '130px', height: '130px', objectFit: 'contain', display: 'block' }} />
-                    <p style={{ margin: '6px 0 0', fontSize: '0.72rem', color: 'var(--gray-500)', fontWeight: 600, letterSpacing: '0.03em' }}>Scan to Save Contact</p>
+              <div className="footer-col footer-qr-col">
+                {f.contactCard.heading && (
+                  <div className="footer-col-title footer-qr-heading">
+                    {f.contactCard.heading}
                   </div>
                 )}
-                <p style={{ fontSize: '0.85rem', lineHeight: '1.6', color: 'rgba(255,255,255,0.65)', marginBottom: '1.25rem' }}>
-                  {f.contactCard.desc}
-                </p>
-                <a href={f.contactCard.vcfUrl || '#'} download className="btn btn-primary" style={{ padding: '0.65rem 1.25rem', borderRadius: '100px', fontSize: '0.85rem' }}>
-                  <i className="fa-solid fa-address-book" style={{ marginRight: '6px' }} />
-                  Save Contact
+                {f.contactCard.qrImage && (
+                  <div className="footer-qr-card">
+                    <img
+                      src={f.contactCard.qrImage}
+                      alt="QR Code - Scan to Save Contact"
+                      className="footer-qr-img"
+                    />
+                    <p className="footer-qr-caption">Scan to Save Contact</p>
+                  </div>
+                )}
+                {f.contactCard.desc && (
+                  <p className="footer-qr-desc">
+                    {f.contactCard.desc}
+                  </p>
+                )}
+                <a
+                  href={f.contactCard.vcfUrl || '#'}
+                  download
+                  className="footer-save-contact-btn"
+                >
+                  <i className="fa-solid fa-address-book" />
+                  <span>SAVE CONTACT</span>
                 </a>
               </div>
             )}

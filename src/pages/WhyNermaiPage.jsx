@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useReveal } from '../hooks/useReveal'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+import WhyNermaiShowcase from '../components/WhyNermaiShowcase'
 import { LMS_URL } from '../constants'
 
 const FEATURES = [
@@ -142,29 +143,8 @@ export default function WhyNermaiPage() {
           </div>
         </section>
 
-        {/* Features grid */}
-        <section className="section" style={{ backgroundColor: 'var(--surface)' }} id="features">
-          <div className="container">
-            <div className="section-header reveal" style={{ textAlign: 'center', marginBottom: 'var(--space-16)' }}>
-              <span className="eyebrow">OUR FEATURES</span>
-              <h2 className="section-title">What Makes Nermai Different</h2>
-              <p className="section-desc">
-                Every aspect of our academy is designed around one purpose — your success.
-              </p>
-            </div>
-            <div className="why-features-grid">
-              {FEATURES.map((f, i) => (
-                <div key={f.title} className="why-feature-card reveal" style={{ '--reveal-delay': `${i * 50}ms` }}>
-                  <div className="why-feature-icon">
-                    <i className={`fa-solid ${f.icon}`} />
-                  </div>
-                  <h3 className="why-feature-title">{f.title}</h3>
-                  <p className="why-feature-desc">{f.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* Features Showcase matching design mockup */}
+        <WhyNermaiShowcase />
 
         {/* CTA */}
         <section className="section" style={{ backgroundColor: 'var(--maroon-deep)', textAlign: 'center' }}>

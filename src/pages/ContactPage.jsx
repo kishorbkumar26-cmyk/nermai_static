@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+import OfficeLocations from '../components/OfficeLocations'
 import { useReveal } from '../hooks/useReveal'
 import { CONTACT, LMS_URL } from '../constants'
 
@@ -263,24 +264,8 @@ export default function ContactPage() {
           </div>
         </section>
 
-        {/* Map placeholder */}
-        <div className="contact-map-placeholder">
-          <i className="fa-solid fa-map-location-dot" style={{ fontSize: '2rem', marginBottom: '0.75rem', color: 'var(--maroon)' }} />
-          <div style={{ fontWeight: 600 }}>Nermai IAS Academy, Puducherry</div>
-          <div style={{ fontSize: '0.875rem', color: 'var(--gray-500)', marginTop: '0.25rem' }}>
-            No. 156/3, Nanbargal Nagar, Oulgaret, Puducherry – 605 010
-          </div>
-          <a
-            href="https://maps.google.com/?q=Nanbargal+Nagar+Oulgaret+Puducherry"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-outline"
-            style={{ marginTop: '1rem', fontSize: '0.875rem' }}
-          >
-            <i className="fa-solid fa-directions" style={{ marginRight: '6px' }} />
-            Get Directions
-          </a>
-        </div>
+        {/* Office Locations */}
+        <OfficeLocations />
 
         {/* ── FAQ Section ── */}
         <section id="faq" className="section" style={{ backgroundColor: 'var(--white)' }}>

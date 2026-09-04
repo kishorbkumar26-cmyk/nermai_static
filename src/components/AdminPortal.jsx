@@ -661,7 +661,7 @@ function ToppersSection({ toast }) {
               const isHidden = t.visible === false
               const isBeingEdited = editingId === t.id
               return (
-                <div key={t.id} className="ap-item" style={{ opacity: isHidden ? 0.6 : 1, border: isBeingEdited ? '2px solid var(--saffron)' : '1px solid var(--gray-100)', background: isBeingEdited ? 'rgba(230, 92, 0, 0.04)' : undefined }}>
+                <div key={t.id} className="ap-item" style={{ opacity: isHidden ? 0.6 : 1, border: isBeingEdited ? '2px solid var(--saffron)' : '1px solid var(--gray-100)', background: isBeingEdited ? 'rgba(212, 175, 55, 0.06)' : undefined }}>
                   {photoUrl ? (
                     <img src={photoUrl} alt={t.name} className="ap-item-thumb" style={{ borderRadius: '50%', width: 44, height: 44 }} onError={e => { e.target.style.display = 'none' }} />
                   ) : (

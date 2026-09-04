@@ -8,11 +8,11 @@ export default function About() {
           <div className="about-content reveal">
             <span className="eyebrow">ABOUT NERMAI</span>
             <h2 className="section-title" style={{ textAlign: 'left', marginBottom: 'var(--space-6)' }}>
-              அரசு வேலைத் தேர்வுகளுக்கான<br />
-              <span style={{ color: 'var(--saffron)' }}>நம்பிக்கையான வழிகாட்டி</span>
+              Empowering Aspirants with<br />
+              <span style={{ color: 'var(--maroon)' }}>Trusted Guidance & Excellence</span>
             </h2>
             <p className="section-desc" style={{ textAlign: 'left', marginLeft: 0, marginBottom: 'var(--space-4)' }}>
-              அரசு வேலைத் தேர்வுகளுக்குத் தயாராகும் மாணவர்களுக்கு தரமான, அணுகக்கூடிய மற்றும் தேர்வு நோக்கமுடைய பயிற்சியை வழங்கும் நோக்கத்துடன் நேர்மை IAS Academy செயல்படுகிறது.
+              Nermai IAS Academy is committed to providing high-quality, accessible, and exam-focused mentorship for students preparing for competitive government examinations.
             </p>
             <p className="section-desc" style={{ textAlign: 'left', marginLeft: 0, marginBottom: 'var(--space-8)' }}>
               We are a team of dedicated subject experts and experienced civil servants committed to providing affordable, result-oriented education. Whether you are preparing for UPSC, TNPSC, TN Police, or Banking exams, we provide the structured guidance needed to achieve certain victory.

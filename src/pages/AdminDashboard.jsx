@@ -178,7 +178,7 @@ function Sidebar({ active, onSelect, onLogout }) {
   return (
     <aside className="dash-sidebar">
       <div className="dash-sidebar-logo">
-        <div className="dash-sidebar-badge">ந</div>
+        <img src="/nermai-logo.png" alt="Nermai Logo" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
         <div>
           <div className="dash-sidebar-name">NERMAI IAS</div>
           <div className="dash-sidebar-sub">Master Admin Dashboard</div>

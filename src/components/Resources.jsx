@@ -82,7 +82,7 @@ export default function Resources() {
             >
               <div className="resource-icon" style={{ 
                 width: '48px', height: '48px', flexShrink: 0, 
-                backgroundColor: 'rgba(230,92,0,0.1)', color: 'var(--saffron)', 
+                backgroundColor: 'rgba(212,175,55,0.12)', color: 'var(--saffron)', 
                 display: 'flex', alignItems: 'center', justifyContent: 'center', 
                 borderRadius: 'var(--radius)', fontSize: '1.25rem' 
               }}>

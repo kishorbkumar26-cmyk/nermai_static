@@ -2,23 +2,23 @@ import { useState } from 'react'
 
 const EXAM_DATA = {
   'TNPSC': [
-    { icon: '🏛️', title: 'Group I', sub: 'Deputy Collector', desc: 'IAS/IPS-நிலையிலான தமிழ்நாடு அரசு பதவிகளுக்கான முதல்நிலை தேர்வு. Mains + Interview.', batches: '2 batches open' },
-    { icon: '⚖️', title: 'Group II', sub: 'Revenue Officer', desc: 'Revenue Officer, Sub-Registrar, Commercial Tax Inspector போன்ற பதவிகள். Direct Recruitment.', batches: '3 batches open' },
-    { icon: '📋', title: 'Group IV', sub: 'Junior Assistant', desc: 'வாலியாஸ், Typist, Steno-Typist, Junior Assistant பதவிகள். அதிக வேலைவாய்ப்பு.', batches: '5 batches open' },
-    { icon: '🧑‍💼', title: 'CCSE', sub: 'Combined Civil Services', desc: 'Group I, II, IIA, IV அனைத்தையும் உள்ளடக்கிய கூட்டு தேர்வு. Comprehensive preparation.', batches: '2 batches open' }
+    { icon: '🏛️', title: 'Group I', sub: 'Deputy Collector', desc: 'Premier Tamil Nadu state civil services examination. Prelims, Mains & Interview preparation.', batches: '2 batches open' },
+    { icon: '⚖️', title: 'Group II', sub: 'Revenue Officer', desc: 'Revenue Officer, Sub-Registrar, Commercial Tax Inspector posts. Direct Recruitment & Mains.', batches: '3 batches open' },
+    { icon: '📋', title: 'Group IV', sub: 'Junior Assistant', desc: 'VAO, Typist, Steno-Typist, Junior Assistant posts. High vacancy career entry point.', batches: '5 batches open' },
+    { icon: '🧑‍💼', title: 'CCSE', sub: 'Combined Civil Services', desc: 'Combined exam covering Group I, II, IIA & IV. Comprehensive structured syllabus coverage.', batches: '2 batches open' }
   ],
   'UPSC': [
-    { icon: '🇮🇳', title: 'CSE Prelims', sub: 'Civil Services', desc: 'IAS, IPS, IFS மற்றும் மத்திய அரசு சேவைகளுக்கான ஆரம்ப தேர்வு. GS + CSAT.', batches: '2 batches open' },
-    { icon: '📚', title: 'CSE Mains', sub: 'Written Exam', desc: 'தமிழ் மொழி வழியில் GS Papers I-IV, Essay, Optional Subject preparation.', batches: '1 batch open' },
-    { icon: '🎤', title: 'Interview', sub: 'Personality Test', desc: 'Mock interview, current affairs briefing, personality development training.', batches: 'Rolling' }
+    { icon: '🇮🇳', title: 'CSE Prelims', sub: 'Civil Services', desc: 'Preliminary exam for IAS, IPS, IFS & Central Civil Services. Comprehensive GS & CSAT modules.', batches: '2 batches open' },
+    { icon: '📚', title: 'CSE Mains', sub: 'Written Exam', desc: 'Comprehensive GS Papers I-IV, Essay writing, and Optional Subject mentoring.', batches: '1 batch open' },
+    { icon: '🎤', title: 'Interview', sub: 'Personality Test', desc: 'Mock interview panels, current affairs briefing & personality development sessions.', batches: 'Rolling' }
   ],
   'TN Police': [
-    { icon: '👮', title: 'Constable', sub: 'TN Police', desc: 'உடல் தகுதி + Written Exam. GK, Tamil, Maths, Science coverage.', batches: '4 batches open' },
-    { icon: '🌟', title: 'Sub Inspector', sub: 'SI Exam', desc: 'Sub Inspector of Police தேர்வுக்கான intensive preparation with Physical Training guidance.', batches: '2 batches open' }
+    { icon: '👮', title: 'Constable', sub: 'TN Police', desc: 'Physical fitness guidance & written exam prep covering GK, General Science, Maths & Reasoning.', batches: '4 batches open' },
+    { icon: '🌟', title: 'Sub Inspector', sub: 'SI Exam', desc: 'Sub Inspector of Police exam intensive preparation with physical test mentorship.', batches: '2 batches open' }
   ],
   'Banking': [
-    { icon: '🏦', title: 'IBPS PO/Clerk', sub: 'Bank Exams', desc: 'Quantitative Aptitude, Reasoning, English, GK preparation. Daily mock tests.', batches: '3 batches open' },
-    { icon: '💳', title: 'SBI Exams', sub: 'State Bank', desc: 'SBI PO, SBI Clerk, SBI SO — all-in-one banking exam preparation module.', batches: '2 batches open' }
+    { icon: '🏦', title: 'IBPS PO/Clerk', sub: 'Bank Exams', desc: 'Quantitative Aptitude, Reasoning, English & Banking Awareness. Daily mock test practice.', batches: '3 batches open' },
+    { icon: '💳', title: 'SBI Exams', sub: 'State Bank', desc: 'SBI PO, SBI Clerk & SBI SO — complete all-in-one banking exam preparation program.', batches: '2 batches open' }
   ]
 }
 

@@ -11,6 +11,7 @@ import AdminPage from './pages/AdminPage'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminPortal from './components/AdminPortal'
 import FaqPage from './pages/FaqPage'
+import LiveBackground from './components/LiveBackground'
 
 function VisibilityGuard({ pageKey, children }) {
   const [loading, setLoading] = useState(true)
@@ -33,7 +34,7 @@ function VisibilityGuard({ pageKey, children }) {
 function FloatingButtons() {
   const waLink = `https://wa.me/${WHATSAPP_NUMBER}`
   return (
-    <div className="floating-btns">
+    <div className="floating-btns" style={{ zIndex: 9999 }}>
       {/* WhatsApp */}
       <a
         href={waLink}
@@ -42,17 +43,24 @@ function FloatingButtons() {
         aria-label="Chat on WhatsApp"
         title="Chat on WhatsApp"
         style={{
-          width: 50, height: 50, borderRadius: '50%',
-          background: '#25D366',
+          width: 52, height: 52, borderRadius: '50%',
+          background: 'linear-gradient(135deg, #25D366, #128C7E)',
           color: '#fff',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '1.45rem',
+          fontSize: '1.5rem',
           textDecoration: 'none',
-          border: '2px solid rgba(255,255,255,0.3)',
-          transition: 'transform 0.2s',
+          border: '2px solid var(--gold, #D4AF37)',
+          boxShadow: '0 8px 24px rgba(37, 211, 102, 0.4), 0 0 15px rgba(212, 175, 55, 0.4)',
+          transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
-        onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
-        onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+        onMouseEnter={e => {
+          e.currentTarget.style.transform = 'scale(1.15) translateY(-3px)'
+          e.currentTarget.style.boxShadow = '0 12px 30px rgba(37, 211, 102, 0.6), 0 0 22px rgba(212, 175, 55, 0.6)'
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.transform = 'scale(1)'
+          e.currentTarget.style.boxShadow = '0 8px 24px rgba(37, 211, 102, 0.4), 0 0 15px rgba(212, 175, 55, 0.4)'
+        }}
       >
         <i className="fa-brands fa-whatsapp" />
       </a>
@@ -63,17 +71,24 @@ function FloatingButtons() {
         aria-label="FAQs &amp; Help"
         title="FAQs &amp; Help"
         style={{
-          width: 50, height: 50, borderRadius: '50%',
-          background: 'var(--maroon, #7b1b2e)',
-          color: '#fff',
+          width: 52, height: 52, borderRadius: '50%',
+          background: 'linear-gradient(135deg, var(--maroon, #7B1B2E), var(--maroon-deep, #4A0E1C))',
+          color: 'var(--gold-light, #F5D061)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '1.35rem',
+          fontSize: '1.4rem',
           textDecoration: 'none',
-          border: '2px solid rgba(255,255,255,0.2)',
-          transition: 'transform 0.2s',
+          border: '2px solid var(--gold, #D4AF37)',
+          boxShadow: '0 8px 24px rgba(123, 27, 46, 0.4), 0 0 15px rgba(212, 175, 55, 0.4)',
+          transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
-        onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
-        onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+        onMouseEnter={e => {
+          e.currentTarget.style.transform = 'scale(1.15) translateY(-3px)'
+          e.currentTarget.style.boxShadow = '0 12px 30px rgba(123, 27, 46, 0.6), 0 0 22px rgba(212, 175, 55, 0.6)'
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.transform = 'scale(1)'
+          e.currentTarget.style.boxShadow = '0 8px 24px rgba(123, 27, 46, 0.4), 0 0 15px rgba(212, 175, 55, 0.4)'
+        }}
       >
         <i className="fa-solid fa-circle-info" />
       </a>
@@ -84,6 +99,7 @@ function FloatingButtons() {
 export default function App() {
   return (
     <BrowserRouter>
+      <LiveBackground />
       <FloatingButtons />
       <Routes>
         {/* ── Public pages ── */}

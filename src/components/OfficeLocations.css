@@ -1,0 +1,533 @@
+/* ── Office Locations — Replicated Design & Multi-Location Grid/Sidebar System ── */
+
+.ol-section-wrapper {
+  position: relative;
+  background-color: #FAF7F2;
+  padding: 5rem 0 4rem;
+  overflow: hidden;
+  font-family: var(--font-sans, 'DM Sans', sans-serif);
+}
+
+/* Translucent Map Pin Watermark on top-left background */
+.ol-bg-pin-watermark {
+  position: absolute;
+  top: 10px;
+  left: -40px;
+  width: 220px;
+  height: 220px;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ol-container {
+  position: relative;
+  z-index: 1;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ── Section Header ── */
+.ol-header {
+  text-align: center;
+  position: relative;
+  margin-bottom: 2.5rem;
+  max-width: 780px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ol-eyebrow-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.825rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #C85A17;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.ol-eyebrow-line {
+  display: inline-block;
+  width: 32px;
+  height: 1.5px;
+  background-color: #C85A17;
+  opacity: 0.6;
+}
+
+.ol-main-title {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 2.75rem;
+  font-weight: 700;
+  color: #1F1614;
+  line-height: 1.15;
+  margin: 0 0 1rem;
+  letter-spacing: -0.01em;
+}
+
+.ol-subtitle {
+  font-size: 1.05rem;
+  color: #5A524D;
+  line-height: 1.6;
+  margin: 0 auto;
+  max-width: 680px;
+}
+
+/* ── Handwritten Cursive Accents ── */
+.ol-script-accent-left {
+  position: absolute;
+  top: -15px;
+  left: 0;
+  transform: rotate(-6deg);
+  font-family: 'Caveat', cursive;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #8C766B;
+  line-height: 1.25;
+  text-align: left;
+  pointer-events: none;
+}
+
+.ol-script-accent-left::after {
+  content: '';
+  display: block;
+  width: 90%;
+  height: 2px;
+  background: radial-gradient(circle, #8C766B 0%, transparent 100%);
+  margin-top: 2px;
+  border-radius: 2px;
+}
+
+.ol-script-accent-right {
+  position: absolute;
+  top: -20px;
+  right: 0;
+  transform: rotate(5deg);
+  font-family: 'Caveat', cursive;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #8B1E2D;
+  line-height: 1.25;
+  text-align: right;
+  pointer-events: none;
+}
+
+.ol-script-accent-right::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 2.5px;
+  background: radial-gradient(circle, #8B1E2D 0%, transparent 100%);
+  margin-top: 2px;
+  border-radius: 2px;
+}
+
+/* ── Multi-Location Selector Bar / Tabs (for >1 locations) ── */
+.ol-location-selector-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.ol-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1.25rem;
+  background-color: #FFFFFF;
+  border: 1.5px solid #E5DEC9;
+  border-radius: 50px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #4A0E1C;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+
+.ol-tab-btn:hover {
+  border-color: #7B1B2E;
+  color: #7B1B2E;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(123, 27, 46, 0.08);
+}
+
+.ol-tab-btn.active {
+  background-color: #7B1B2E;
+  color: #FFFFFF;
+  border-color: #7B1B2E;
+  box-shadow: 0 4px 16px rgba(123, 27, 46, 0.25);
+}
+
+.ol-tab-btn.active .ol-tab-icon {
+  color: #F5D061;
+}
+
+.ol-tab-icon {
+  font-size: 0.95rem;
+  color: #C85A17;
+  transition: color 0.2s ease;
+}
+
+/* ── Main Split Location Card Box ── */
+.ol-main-card {
+  background: #FFFFFF;
+  border: 1.5px solid #EFE7DA;
+  border-radius: 24px;
+  box-shadow: 0 16px 48px rgba(74, 14, 28, 0.05), 0 4px 12px rgba(0,0,0,0.02);
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 2rem;
+  align-items: stretch;
+  position: relative;
+}
+
+/* ── Left Map Container ── */
+.ol-map-container {
+  position: relative;
+  width: 100%;
+  min-height: 480px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid #EAE3D5;
+  background-color: #EFECE6;
+}
+
+.ol-map-iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 480px;
+  border: 0;
+  display: block;
+}
+
+/* ── Right Content Details ── */
+.ol-details-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.5rem 0.5rem 0.5rem 0;
+}
+
+.ol-details-top {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.ol-tagline-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.ol-tagline-icon {
+  width: 32px;
+  height: 32px;
+  background-color: rgba(123, 27, 46, 0.08);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7B1B2E;
+  font-size: 1rem;
+}
+
+.ol-tagline-text {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #C85A17;
+  text-transform: uppercase;
+}
+
+.ol-office-name {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #1F1614;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.ol-address-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  font-size: 0.975rem;
+  color: #4A4440;
+  line-height: 1.6;
+}
+
+.ol-address-pin-icon {
+  color: #C85A17;
+  font-size: 1.15rem;
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+/* ── 3 Quick Contact Pill Cards Grid ── */
+.ol-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin: 0.25rem 0;
+}
+
+.ol-contact-pill {
+  background-color: #FDFBF7;
+  border: 1px solid #F3EBDD;
+  border-radius: 14px;
+  padding: 1rem 0.6rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.ol-contact-pill:hover {
+  transform: translateY(-2px);
+  border-color: #E8D9C0;
+}
+
+.ol-pill-icon-circle {
+  width: 32px;
+  height: 32px;
+  background-color: rgba(123, 27, 46, 0.07);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7B1B2E;
+  font-size: 0.875rem;
+  margin-bottom: 0.15rem;
+}
+
+.ol-pill-value {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1F1614;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.ol-pill-label {
+  font-size: 0.75rem;
+  color: #7A726C;
+}
+
+/* ── Get Directions CTA Button ── */
+.ol-directions-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background-color: #7B1B2E;
+  color: #FFFFFF;
+  border-radius: 12px;
+  font-size: 0.975rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 16px rgba(123, 27, 46, 0.2);
+}
+
+.ol-directions-cta:hover {
+  background-color: #5D1221;
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(123, 27, 46, 0.3);
+}
+
+.ol-directions-cta .cta-arrow {
+  font-size: 0.9rem;
+  transition: transform 0.2s ease;
+}
+
+.ol-directions-cta:hover .cta-arrow {
+  transform: translateX(4px);
+}
+
+/* ── Quote Banner Box at bottom right ── */
+.ol-quote-box {
+  background: linear-gradient(135deg, #FFFDF9 0%, #F9F3EA 100%);
+  border: 1px solid #EBE0D0;
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.ol-quote-content {
+  position: relative;
+  z-index: 1;
+  max-width: 78%;
+}
+
+.ol-quote-icon {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 2.5rem;
+  color: #C85A17;
+  line-height: 0.8;
+  display: block;
+  margin-bottom: 0.25rem;
+  opacity: 0.85;
+}
+
+.ol-quote-text {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: #5A4D45;
+  line-height: 1.45;
+  margin: 0 0 0.5rem;
+}
+
+.ol-quote-underline {
+  width: 40px;
+  height: 2px;
+  background-color: #C85A17;
+  border-radius: 2px;
+}
+
+/* Watermark SVG line-art illustration of historic building/dome on the right */
+.ol-quote-building-watermark {
+  position: absolute;
+  right: -10px;
+  bottom: -15px;
+  width: 140px;
+  height: 120px;
+  opacity: 0.28;
+  pointer-events: none;
+}
+
+/* ── Bottom Features Highlight Bar ── */
+.ol-features-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) 1.2fr;
+  gap: 1.5rem;
+  align-items: center;
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+}
+
+.ol-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.ol-feature-icon-circle {
+  width: 48px;
+  height: 48px;
+  background-color: #F7EFE3;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #C85A17;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.ol-feature-text-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.ol-feature-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1F1614;
+}
+
+.ol-feature-desc {
+  font-size: 0.825rem;
+  color: #6E6660;
+  line-height: 1.4;
+}
+
+.ol-motto-wrap {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-left: 1rem;
+  border-left: 2px solid #E5DEC9;
+}
+
+.ol-motto-text {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: #8C7B70;
+  text-transform: uppercase;
+  line-height: 1.5;
+}
+
+/* ── Responsive Styles ── */
+@media (max-width: 1100px) {
+  .ol-main-card {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .ol-map-container {
+    min-height: 380px;
+  }
+  .ol-details-container {
+    padding: 0;
+  }
+  .ol-features-bar {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+  .ol-motto-wrap {
+    grid-column: span 2;
+    border-left: none;
+    border-top: 1px solid #E5DEC9;
+    padding-left: 0;
+    padding-top: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .ol-section-wrapper {
+    padding: 3.5rem 0 3rem;
+  }
+  .ol-script-accent-left,
+  .ol-script-accent-right {
+    display: none; /* Hide handwritten floating accents on small mobile screens to prevent overlap */
+  }
+  .ol-main-title {
+    font-size: 2rem;
+  }
+  .ol-contact-grid {
+    grid-template-columns: 1fr;
+  }
+  .ol-map-container {
+    min-height: 300px;
+  }
+  .ol-features-bar {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .ol-motto-wrap {
+    grid-column: span 1;
+  }
+}

@@ -118,7 +118,7 @@ export default function AdminFileUpload({
         style={{
           border: '2px dashed var(--gray-300)', borderRadius: '6px',
           padding: '0', textAlign: 'center',
-          backgroundColor: dragOver ? 'rgba(230,92,0,0.05)' : 'var(--white)',
+          backgroundColor: dragOver ? 'rgba(212,175,55,0.08)' : 'var(--white)',
           transition: 'all 0.2s ease', position: 'relative', overflow: 'hidden'
         }}
         onDragOver={e => { e.preventDefault(); setDragOver(true) }}

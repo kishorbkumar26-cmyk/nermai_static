@@ -1,79 +1,208 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { fbFirestore } from '../firebase/firestore'
+import { driveStorage } from '../services/driveStorage'
+import './Testimonials.css'
 
 export default function Testimonials() {
   const [testimonials, setTestimonials] = useState([])
-  const [offset, setOffset] = useState(0)
-  const trackRef = useRef(null)
+  const [activeIdx, setActiveIdx] = useState(0)
+  const [perView, setPerView] = useState(3)
 
   useEffect(() => {
-    const unsub = fbFirestore.onTestimonialsChanged(items => setTestimonials(items))
-    return () => unsub()
+    const unsub = fbFirestore.onTestimonialsChanged(items => {
+      if (items && items.length > 0) {
+        setTestimonials(items)
+      } else {
+        fbFirestore.getTestimonials().then(res => setTestimonials(res || []))
+      }
+    })
+    return () => unsub && unsub()
   }, [])
 
-  const perView = typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : window.innerWidth < 1024 ? 2 : 3
-  const maxOffset = Math.max(0, testimonials.length - perView)
+  // Handle responsive perView calculation
+  useEffect(() => {
+    const updatePerView = () => {
+      if (window.innerWidth < 768) {
+        setPerView(1)
+      } else if (window.innerWidth < 1200) {
+        setPerView(2)
+      } else {
+        setPerView(3)
+      }
+    }
+    updatePerView()
+    window.addEventListener('resize', updatePerView)
+    return () => window.removeEventListener('resize', updatePerView)
+  }, [])
 
-  const prev = () => setOffset(o => Math.max(0, o - 1))
-  const next = () => setOffset(o => Math.min(maxOffset, o + 1))
+  if (!testimonials || testimonials.length === 0) {
+    return null
+  }
+
+  const items = testimonials
+  const total = items.length
+  const maxOffset = Math.max(0, total - perView)
+
+  // Clamp current offset so track never scrolls into blank space
+  const currentOffset = Math.min(activeIdx, maxOffset)
+
+  const handlePrev = () => {
+    setActiveIdx(prev => (prev === 0 ? maxOffset : prev - 1))
+  }
+
+  const handleNext = () => {
+    setActiveIdx(prev => (prev >= maxOffset ? 0 : prev + 1))
+  }
 
   return (
-    <section className="testimonials-section section" id="testimonials">
-      <div className="container">
-        <div className="section-header">
-          <span className="eyebrow">💬 Student Reviews</span>
-          <h2 className="section-title">Hear What They Say</h2>
-          <p className="section-desc">
-            Honest feedback from successful Nermai students.
-          </p>
+    <section className="testimonials-section-wrap" id="testimonials" aria-label="Student Reviews">
+      <div className="container" style={{ maxWidth: '1480px' }}>
+        
+        {/* Section Header */}
+        <div className="testimonials-header-box">
+          <div className="testimonials-top-tag">
+            <span className="tag-line" />
+            <span className="tag-text">STUDENT REVIEWS</span>
+            <span className="tag-line" />
+          </div>
+          <h2 className="testimonials-main-title">Hear What They Say</h2>
+          <p className="testimonials-subtitle">Honest feedback from successful Nermai students.</p>
         </div>
 
-        <div className="testimonials-carousel" style={{ overflow: 'hidden' }}>
-          <div
-            className="testimonials-track"
-            ref={trackRef}
-            style={{ transform: `translateX(calc(-${offset * (100 / 3 + 2)}%))` }}
-          >
-            {testimonials.map((t) => (
-              <div key={t.id} className="testimonial-card" style={{ border: 'none', boxShadow: 'none', background: 'transparent', padding: '0 1rem' }}>
-                <div style={{ fontSize: '6rem', color: 'rgba(123,27,46,0.1)', lineHeight: 0.8, fontFamily: 'var(--font-display)' }}>"</div>
-                <blockquote style={{ fontSize: 'clamp(1.1rem, 2vw, 1.35rem)', fontStyle: 'italic', lineHeight: 1.6, color: 'var(--ink)', marginBottom: '2rem' }}>
-                  {t.quote}
-                </blockquote>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'var(--maroon)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '1.2rem' }}>
-                    {(t.name || 'A')[0].toUpperCase()}
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--ink)' }}>{t.name}</div>
-                    <div style={{ fontSize: '0.9rem', color: 'var(--gray-500)' }}>{t.role}</div>
-                  </div>
-                </div>
+        {/* Content Row with Left Accent, Center Cards Track, Right Accent */}
+        <div className="testimonials-content-grid">
+          
+          {/* Far Left Decorative Element */}
+          <div className="testimonials-accent-left" aria-hidden="true">
+            <div className="giant-quote-mark">“</div>
+            <div className="left-handwriting">
+              <span>Same Dedication.</span>
+              <span className="sub">A Brighter Tomorrow.</span>
+            </div>
+            <svg className="left-dome-svg" viewBox="0 0 100 60" fill="none" stroke="#C85A17" strokeWidth="1">
+              <path d="M20 55 V35 L50 15 L80 35 V55 H20 Z M50 15 V5 M35 35 H65 M40 55 V42 H60 V55" opacity="0.3" />
+              <circle cx="50" cy="25" r="5" stroke="#C85A17" opacity="0.3" />
+            </svg>
+          </div>
+
+          {/* Center Carousel Slider */}
+          <div className="testimonials-carousel-box">
+            
+            {/* Left Arrow Circle */}
+            <button 
+              className="testimonials-nav-arrow arrow-left" 
+              onClick={handlePrev}
+              disabled={maxOffset === 0}
+              aria-label="Previous Review"
+            >
+              <ChevronLeft size={20} />
+            </button>
+
+            {/* Viewport for Cards */}
+            <div className="testimonials-cards-viewport">
+              <div 
+                className="testimonials-cards-track"
+                style={{
+                  transform: perView === 1 
+                    ? `translateX(-${currentOffset * 100}%)`
+                    : `translateX(calc(-${currentOffset} * ((100% - ${(perView - 1) * 1.25}rem) / ${perView} + 1.25rem)))`,
+                  transition: 'transform 0.45s cubic-bezier(0.16, 1, 0.3, 1)'
+                }}
+              >
+                {items.map((t, idx) => {
+                  const isHighlighted = idx === activeIdx
+                  const avatarUrl = t.imageUrl || t.avatar || t.photo ? driveStorage.formatImageUrl(t.imageUrl || t.avatar || t.photo) : null
+
+                  return (
+                    <div 
+                      key={t.id || idx} 
+                      className={`testimonial-card-item ${isHighlighted ? 'active-highlight' : ''}`}
+                      style={{
+                        flex: perView === 1 
+                          ? '0 0 100%' 
+                          : `0 0 calc((100% - ${(perView - 1) * 1.25}rem) / ${perView})`
+                      }}
+                      onClick={() => setActiveIdx(idx)}
+                    >
+                      {/* Opening Quote */}
+                      <div className="card-top-quote">“</div>
+
+                      {/* Quote Text */}
+                      <p className="card-quote-text">{t.quote || t.text || t.content}</p>
+
+                      {/* Author Meta */}
+                      <div className="card-author-row">
+                        {avatarUrl ? (
+                          <img 
+                            src={avatarUrl} 
+                            alt={t.name} 
+                            className="card-avatar-img"
+                          />
+                        ) : (
+                          <div className="card-avatar-fallback">
+                            {(t.name || 'A')[0].toUpperCase()}
+                          </div>
+                        )}
+                        <div className="card-author-meta">
+                          <h4 className="card-author-name">{t.name}</h4>
+                          <span className="card-author-role">{t.role || t.exam || t.designation || 'Nermai Student'}</span>
+                        </div>
+                      </div>
+
+                      {/* Translucent Background Closing Quote */}
+                      <div className="card-bg-close-quote" aria-hidden="true">”</div>
+                    </div>
+                  )
+                })}
               </div>
+            </div>
+
+            {/* Right Arrow Circle */}
+            <button 
+              className="testimonials-nav-arrow arrow-right" 
+              onClick={handleNext}
+              disabled={maxOffset === 0}
+              aria-label="Next Review"
+            >
+              <ChevronRight size={20} />
+            </button>
+
+          </div>
+
+          {/* Far Right Tilted Script Accent */}
+          <div className="testimonials-accent-right" aria-hidden="true">
+            <div className="right-script-box">
+              <span>Real Aspirants</span>
+              <span>Real Stories</span>
+              <span className="accent-underline">Real Success</span>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Footer Bar: Dots & Tagline */}
+        <div className="testimonials-footer-bar">
+          
+          {/* Pagination Dots */}
+          <div className="testimonials-dots-group">
+            {Array.from({ length: maxOffset + 1 }).map((_, i) => (
+              <button 
+                key={i} 
+                className={`testimonial-dot ${i === currentOffset ? 'active' : ''}`}
+                onClick={() => setActiveIdx(i)}
+                aria-label={`Go to slide ${i + 1}`}
+              />
             ))}
           </div>
+
+          {/* Right Bottom Tagline */}
+          <div className="testimonials-bottom-tagline">
+            THOUSANDS OF DREAMS. A STRONGER INDIA.
+          </div>
+
         </div>
 
-        {testimonials.length > 3 && (
-          <div className="testimonials-controls">
-            <button
-              className="testimonials-btn"
-              onClick={prev}
-              disabled={offset === 0}
-              aria-label="Previous"
-            >
-              <i className="fa-solid fa-chevron-left"></i>
-            </button>
-            <button
-              className="testimonials-btn"
-              onClick={next}
-              disabled={offset >= maxOffset}
-              aria-label="Next"
-            >
-              <i className="fa-solid fa-chevron-right"></i>
-            </button>
-          </div>
-        )}
       </div>
     </section>
   )

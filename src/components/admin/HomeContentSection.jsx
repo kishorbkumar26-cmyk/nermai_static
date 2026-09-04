@@ -466,7 +466,7 @@ function JourneyStepsEditor({ steps = [], onChange }) {
           </div>
           <div className="ap-form-row">
             <div style={{ flex: 1 }}>
-              <Field label="Title" value={step.title} onChange={v => update(i, 'title', v)} placeholder="e.g. உங்கள் இலக்கை தேர்வு செய்யுங்கள்" />
+              <Field label="Title" value={step.title} onChange={v => update(i, 'title', v)} placeholder="e.g. Choose Your Goal" />
               <Field label="Description" value={step.description} onChange={v => update(i, 'description', v)} type="textarea" placeholder="e.g. Choose from TNPSC, UPSC..." />
             </div>
             <div style={{ width: '320px', flexShrink: 0 }}>
@@ -718,11 +718,11 @@ const DEFAULTS = {
     badges: [{ num: '187+', label: 'Results' }, { num: '14+', label: 'Years' }, { num: '2400+', label: 'Students' }]
   },
   journeySteps: [
-    { id: 1, title: 'உங்கள் இலக்கை தேர்வு செய்யுங்கள்', description: 'Choose from TNPSC, UPSC, Police or Banking on our Website.', imageUrl: '' },
-    { id: 2, title: 'பயிற்சியை தேர்வு செய்யுங்கள்', description: 'Find the right batch and course structure for your needs.', imageUrl: '' },
-    { id: 3, title: 'Join Class Platform', description: 'Redirect to our dedicated learning management portal.', imageUrl: '' },
-    { id: 4, title: 'பயிற்சி + தேர்வுகள்', description: 'Attend classes, take mock tests, and track your progress.', imageUrl: '' },
-    { id: 5, title: 'இலக்கை அடையுங்கள்', description: 'Clear the exam and become a Government Officer.', imageUrl: '' },
+    { id: 1, title: 'Choose Your Goal', description: 'Select the competitive examination you want to prepare for.', imageUrl: '' },
+    { id: 2, title: 'Find Your Course', description: 'Explore the right batch, programme and learning structure for your needs.', imageUrl: '' },
+    { id: 3, title: 'Begin Your Learning', description: 'Join classes and access structured study resources.', imageUrl: '' },
+    { id: 4, title: 'Practice & Progress', description: 'Attend tests, evaluate performance and improve continuously.', imageUrl: '' },
+    { id: 5, title: 'Achieve Your Goal', description: 'Complete your preparation journey with confidence and become a successful government officer.', imageUrl: '' },
   ]
 }
 

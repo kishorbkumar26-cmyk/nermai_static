@@ -101,7 +101,6 @@ export default function Home() {
 
       <div id="top" />
       <Header activePath="/" />
-      <TopTicker ticker={ticker} />
 
       <main>
         {/* ── HERO: Full-Width Cinematic Banners ── */}
@@ -200,7 +199,7 @@ export default function Home() {
             <div className="cta-final-inner reveal">
               <div className="cta-final-stamp-wrap" aria-hidden="true">
                 <div className="cta-final-stamp">
-                  <span>ந</span>
+                  <img src="/nermai-logo.png" alt="Nermai Logo" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                 </div>
               </div>
               <span className="eyebrow cta-eyebrow">BEGIN YOUR JOURNEY</span>

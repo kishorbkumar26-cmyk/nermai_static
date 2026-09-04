@@ -8,9 +8,9 @@
 /* ── CSS Variables ─────────────────────────────────────────────────────────── */
 :root {
   /* Palette */
-  --saffron:       #E65C00;
-  --saffron-light: #FF7A2F;
-  --saffron-dark:  #B84A00;
+  --saffron:       #D4AF37;
+  --saffron-light: #F5D061;
+  --saffron-dark:  #996515;
   --maroon:        #7B1B2E;
   --maroon-deep:   #4A0E1C;
   --maroon-light:  #9E2840;
@@ -18,8 +18,10 @@
   --cream-dark:    #F5E9D4;
   --ink:           #1A1008;
   --ink-light:     #3D2B1A;
-  --gold:          #C9910A;
-  --gold-light:    #E8AA1C;
+  --gold:          #D4AF37;
+  --gold-light:    #F5D061;
+  --gold-dark:     #996515;
+  --gold-leaf:     #E5C158;
   --white:         #FFFFFF;
   --surface:       #FFFBF5;
 
@@ -80,7 +82,7 @@
   --shadow:      0 4px 16px rgba(26,16,8,0.1), 0 2px 6px rgba(26,16,8,0.06);
   --shadow-md:   0 8px 32px rgba(26,16,8,0.12), 0 4px 12px rgba(26,16,8,0.08);
   --shadow-lg:   0 20px 60px rgba(26,16,8,0.15), 0 8px 24px rgba(26,16,8,0.1);
-  --shadow-glow: 0 0 40px rgba(230,92,0,0.25);
+  --shadow-glow: 0 0 40px rgba(212,175,55,0.25);
 
   /* Transitions */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -196,12 +198,12 @@ ul, ol { list-style: none; }
 .btn-primary {
   background: var(--saffron);
   color: var(--white);
-  box-shadow: 0 4px 20px rgba(230,92,0,0.35);
+  box-shadow: 0 4px 20px rgba(212,175,55,0.35);
 }
 .btn-primary:hover {
   background: var(--saffron-dark);
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(230,92,0,0.45);
+  box-shadow: 0 8px 28px rgba(212,175,55,0.45);
 }
 
 .btn-maroon {
@@ -254,9 +256,8 @@ ul, ol { list-style: none; }
   font-weight: 700;
   letter-spacing: 0.06em;
 }
-.badge-saffron { background: rgba(230,92,0,0.12); color: var(--saffron-dark); }
+.badge-saffron, .badge-gold { background: rgba(212,175,55,0.15); color: var(--gold-dark); }
 .badge-maroon  { background: rgba(123,27,46,0.12); color: var(--maroon); }
-.badge-gold    { background: rgba(201,145,10,0.15); color: #8A6200; }
 .badge-green   { background: rgba(16,185,129,0.12); color: #047857; }
 .badge-red     { background: rgba(220,38,38,0.12);  color: #b91c1c; }
 
@@ -270,7 +271,7 @@ ul, ol { list-style: none; }
   background: rgba(253,246,236,0.92);
   backdrop-filter: blur(20px) saturate(1.4);
   -webkit-backdrop-filter: blur(20px) saturate(1.4);
-  border-bottom: 1px solid rgba(230,92,0,0.12);
+  border-bottom: 1px solid rgba(212,175,55,0.18);
   transition: box-shadow var(--duration-base) var(--ease-out);
 }
 .site-header.scrolled { box-shadow: 0 4px 20px rgba(26,16,8,0.1); }
@@ -294,7 +295,7 @@ ul, ol { list-style: none; }
   border-radius: var(--radius);
   display: flex; align-items: center; justify-content: center;
   color: var(--white); font-family: var(--font-display); font-size: 1.2rem;
-  box-shadow: 0 4px 12px rgba(230,92,0,0.35);
+  box-shadow: 0 4px 12px rgba(212,175,55,0.35);
 }
 .header-logo-text { display: flex; flex-direction: column; line-height: 1.15; }
 .header-logo-name {
@@ -5255,4 +5256,126 @@ html {
   border-radius: 4px;
   border-left: 2px solid var(--saffron, #e65c00);
 }
+
+/* ── Footer Contact QR Code Card (Enlarged Web & Mobile Responsive) ─────── */
+.footer-qr-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.footer-qr-heading {
+  font-family: var(--font-display, 'DM Sans', sans-serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #F5D061;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 1.25rem;
+  border-bottom: 2px solid #7B1B2E;
+  padding-bottom: 0.5rem;
+  width: 100%;
+}
+
+.footer-qr-card {
+  background: #FFFFFF;
+  padding: 18px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  max-width: 260px;
+  width: 100%;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.footer-qr-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
+}
+
+.footer-qr-img {
+  width: 220px;
+  height: 220px;
+  max-width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  display: block;
+  border-radius: 8px;
+}
+
+.footer-qr-caption {
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+  color: #5A4D45;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.footer-qr-desc {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 1.25rem;
+  max-width: 260px;
+}
+
+.footer-save-contact-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  background: linear-gradient(135deg, #D4AF37 0%, #C89D27 100%);
+  color: #1F1614;
+  padding: 0.85rem 1.6rem;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 260px;
+  width: 100%;
+}
+
+.footer-save-contact-btn:hover {
+  background: linear-gradient(135deg, #F5D061 0%, #D4AF37 100%);
+  color: #1F1614;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.45);
+}
+
+/* ── Cross-Browser Mobile Responsiveness Utilities ───────────────────────── */
+html, body, #root {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
+@media (max-width: 768px) {
+  .footer-qr-col {
+    align-items: center;
+    text-align: center;
+  }
+  .footer-qr-card {
+    max-width: 240px;
+    padding: 14px;
+  }
+  .footer-qr-img {
+    width: 200px;
+    height: 200px;
+  }
+  .footer-save-contact-btn {
+    max-width: 240px;
+  }
+}
+
 

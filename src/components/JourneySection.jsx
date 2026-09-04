@@ -1,184 +1,266 @@
-import { useEffect, useRef, useState } from 'react'
-import './JourneySection.css'
+import React, { useState } from 'react'
+import { Target, BookOpen, MonitorPlay, BarChart2, Trophy, ChevronRight, ArrowRight, Image as ImageIcon } from 'lucide-react'
 import { driveStorage } from '../services/driveStorage'
+import './JourneySection.css'
 
-const DEFAULT_STEPS = [
-  { id: 1, title: 'உங்கள் இலக்கை தேர்வு செய்யுங்கள்', description: 'Choose from TNPSC, UPSC, Police or Banking on our Website.' },
-  { id: 2, title: 'பயிற்சியை தேர்வு செய்யுங்கள்', description: 'Find the right batch and course structure for your needs.' },
-  { id: 3, title: 'Join Class Platform', description: 'Redirect to our dedicated learning management portal.' },
-  { id: 4, title: 'பயிற்சி + தேர்வுகள்', description: 'Attend classes, take mock tests, and track your progress.' },
-  { id: 5, title: 'இலக்கை அடையுங்கள்', description: 'Clear the exam and become a Government Officer.' }
+const DEFAULT_MOCKUP_STEPS = [
+  {
+    number: '01',
+    title: 'Choose Your Goal',
+    description: 'Select the competitive examination you want to prepare for.',
+    btnText: 'EXPLORE EXAMS →',
+    link: '/courses',
+    badgeColor: '#C85A17',
+    bgColor: '#FFFBF7',
+    btnBg: '#FCEFE6',
+    btnColor: '#C85A17',
+    icon: <Target size={28} style={{ color: '#C85A17' }} />
+  },
+  {
+    number: '02',
+    title: 'Find Your Course',
+    description: 'Explore the right batch, programme and learning structure for your needs.',
+    btnText: 'VIEW COURSES →',
+    link: '/courses',
+    badgeColor: '#D48817',
+    bgColor: '#FFFDF7',
+    btnBg: '#FEF6E6',
+    btnColor: '#D48817',
+    icon: <BookOpen size={28} style={{ color: '#D48817' }} />
+  },
+  {
+    number: '03',
+    title: 'Begin Your Learning',
+    description: 'Join classes and access structured study resources.',
+    btnText: 'JOIN CLASS PLATFORM →',
+    link: 'https://lms.nermaiiasacademy.in',
+    badgeColor: '#5C0F1E',
+    bgColor: '#FDF6F7',
+    btnBg: '#F9EBEF',
+    btnColor: '#5C0F1E',
+    icon: <MonitorPlay size={28} style={{ color: '#5C0F1E' }} />
+  },
+  {
+    number: '04',
+    title: 'Practice & Progress',
+    description: 'Attend tests, evaluate performance and improve continuously.',
+    btnText: 'TAKE A MOCK TEST →',
+    link: '#mock-tests',
+    badgeColor: '#756B61',
+    bgColor: '#FAF9F7',
+    btnBg: '#F0EEE9',
+    btnColor: '#5E554D',
+    icon: <BarChart2 size={28} style={{ color: '#756B61' }} />
+  },
+  {
+    number: '05',
+    title: 'Achieve Your Goal',
+    description: 'Complete your preparation journey with confidence and become a successful government officer.',
+    btnText: 'OUR SUCCESS STORIES →',
+    link: '#success-stories',
+    badgeColor: '#1B6B48',
+    bgColor: '#F4FAF6',
+    btnBg: '#E4F4EA',
+    btnColor: '#1B6B48',
+    icon: <Trophy size={28} style={{ color: '#1B6B48' }} />
+  }
 ]
 
-export default function JourneySection({ steps = DEFAULT_STEPS }) {
-  const sectionRef = useRef(null)
-  const timelineRef = useRef(null)
+export default function JourneySection({ steps }) {
+  const [activeModalImage, setActiveModalImage] = useState(null)
 
-  useEffect(() => {
-    const timeline = timelineRef.current
-    const steps = sectionRef.current?.querySelectorAll('.journey-step')
-    const reveals = sectionRef.current?.querySelectorAll('.reveal')
-
-    if (!timeline || !steps || !reveals) return
-
-    /* ================================
-       HEADER REVEAL
-    ================================ */
-    const revealObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible')
-          }
-        })
-      },
-      { threshold: 0.15 }
-    )
-
-    reveals.forEach((element) => {
-      revealObserver.observe(element)
-    })
-
-    /* ================================
-       TIMELINE ACTIVATION
-    ================================ */
-    const timelineObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            timeline.classList.add('animate')
-
-            /* Sequential Step Animation */
-            steps.forEach((step, index) => {
-              setTimeout(() => {
-                step.classList.add('active')
-              }, index * 350)
-            })
-
-            timelineObserver.unobserve(entry.target)
-          }
-        })
-      },
-      { threshold: 0.2 }
-    )
-
-    timelineObserver.observe(timeline)
-
-    /* ================================
-       ACTIVE STEP ON SCROLL
-    ================================ */
-    const stepObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            steps.forEach((step) => {
-              step.classList.remove('current')
-            })
-            entry.target.classList.add('current')
-          }
-        })
-      },
-      { threshold: 0.65 }
-    )
-
-    steps.forEach((step) => {
-      stepObserver.observe(step)
-    })
-
-    return () => {
-      revealObserver.disconnect()
-      timelineObserver.disconnect()
-      stepObserver.disconnect()
+  // Map admin steps dynamically while supporting custom titles, descriptions, image uploads & links
+  const renderSteps = (steps && steps.length > 0) ? steps.map((s, i) => {
+    const def = DEFAULT_MOCKUP_STEPS[i % DEFAULT_MOCKUP_STEPS.length]
+    return {
+      id: s.id || i + 1,
+      number: String(i + 1).padStart(2, '0'),
+      title: s.title || def.title,
+      description: s.description || def.description,
+      btnText: s.btnText || def.btnText,
+      link: s.link || s.href || def.link,
+      imageUrl: s.imageUrl || '',
+      badgeColor: def.badgeColor,
+      bgColor: def.bgColor,
+      btnBg: def.btnBg,
+      btnColor: def.btnColor,
+      icon: def.icon
     }
-  }, [steps])
-
-  const hasAnyImages = steps.some((step) => step.imageUrl && step.imageUrl.trim() !== '')
-
-  // Initial state for image viewer
-  const firstAvailableImageIndex = steps.findIndex((step) => step.imageUrl && step.imageUrl.trim() !== '')
-  const [activeStepIndex, setActiveStepIndex] = useState(
-    firstAvailableImageIndex !== -1 ? firstAvailableImageIndex : null
-  )
-
-  const activeImage = activeStepIndex !== null && steps[activeStepIndex] ? steps[activeStepIndex].imageUrl : null
-  
-  // Provide CSS classes for node colors based on index
-  const stepColors = ['step-orange', 'step-outline', 'step-maroon', 'step-outline-dark', 'step-green']
+  }) : DEFAULT_MOCKUP_STEPS
 
   return (
-    <section className={`journey-section ${hasAnyImages ? 'has-images' : 'no-images'}`} id="journey" ref={sectionRef}>
-      
-      <div className="journey-header reveal">
-        <span className="section-label">YOUR JOURNEY</span>
-        <h2>Your Journey with Nermai</h2>
-        <p>
-          How our two platforms work together to guarantee your success.
-        </p>
-      </div>
-
-      <div className="journey-layout">
-        {/* LEFT / CENTER FLOW */}
-        <div className="journey-timeline-wrapper">
-          <div className="journey-timeline" ref={timelineRef}>
-
-            {/* Animated Background Line */}
-            <div className="timeline-line">
-              <div className="timeline-progress"></div>
-            </div>
-
-            {steps.map((step, index) => {
-              const colorClass = stepColors[index % stepColors.length]
-              
-              return (
-                <div
-                  key={step.id || index}
-                  className={`journey-step ${colorClass} reveal-step`}
-                  onMouseEnter={() => {
-                    if (step.imageUrl) {
-                      setActiveStepIndex(index)
-                    }
-                  }}
-                  onClick={() => {
-                    if (step.imageUrl) {
-                      setActiveStepIndex(index)
-                    }
-                  }}
-                >
-                  <div className="step-node">
-                    <span>{String(index + 1).padStart(2, '0')}</span>
-                  </div>
-                  <div className="step-content">
-                    <h3>{step.title}</h3>
-                    <p>{step.description}</p>
-                  </div>
-                </div>
-              )
-            })}
+    <section className="journey-section-wrap" id="journey" aria-label="Your Journey with Nermai">
+      <div className="container" style={{ maxWidth: '1440px' }}>
+        
+        {/* Section Header */}
+        <div className="journey-header-box">
+          <div className="journey-top-tag">
+            <span className="journey-tag-line" />
+            <span className="journey-tag-text">YOUR JOURNEY</span>
+            <span className="journey-tag-line" />
           </div>
+          <h2 className="journey-main-title">Your Journey with Nermai</h2>
+          <p className="journey-subtitle">A step-by-step path to turn your aspirations into success.</p>
         </div>
 
-        {/* RIGHT IMAGE VIEWER */}
-        {hasAnyImages && (
-          <div className="journey-image-viewer reveal">
-            {activeImage && (
-              <img
-                key={activeImage} // Force re-render for animation on change
-                src={driveStorage.formatImageUrl(activeImage)}
-                alt="Journey Step"
-                className="journey-image"
-              />
-            )}
+        {/* 5-Step Process Horizontal Cards */}
+        <div className="journey-grid-container">
+          {renderSteps.map((step, idx) => {
+            const isLast = idx === renderSteps.length - 1
+            const formattedImg = step.imageUrl ? driveStorage.formatImageUrl(step.imageUrl) : null
+
+            return (
+              <React.Fragment key={step.id || idx}>
+                {/* Step Card */}
+                <div 
+                  className="journey-card-box"
+                  style={{ backgroundColor: step.bgColor }}
+                >
+                  {/* Top Badge Number Circle */}
+                  <div 
+                    className="journey-card-badge"
+                    style={{ backgroundColor: step.badgeColor }}
+                  >
+                    {step.number}
+                  </div>
+
+                  {/* Circle Icon / Admin Image Container */}
+                  <div 
+                    className="journey-card-icon-circle"
+                    onClick={() => formattedImg && setActiveModalImage(formattedImg)}
+                    style={{ cursor: formattedImg ? 'pointer' : 'default' }}
+                    title={formattedImg ? "Click to view image" : ""}
+                  >
+                    {formattedImg ? (
+                      <img 
+                        src={formattedImg} 
+                        alt={step.title} 
+                        style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
+                      />
+                    ) : (
+                      step.icon
+                    )}
+                  </div>
+
+                  {/* Card Header & Description */}
+                  <h3 className="journey-card-title">{step.title}</h3>
+                  <p className="journey-card-desc">{step.description}</p>
+
+                  {/* Card Pill CTA Button */}
+                  <div className="journey-card-btn-wrapper">
+                    {step.link && step.link.startsWith('http') ? (
+                      <a 
+                        href={step.link} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="journey-card-pill-btn"
+                        style={{ backgroundColor: step.btnBg, color: step.btnColor }}
+                      >
+                        {step.btnText}
+                      </a>
+                    ) : (
+                      <a 
+                        href={step.link || '#courses'} 
+                        className="journey-card-pill-btn"
+                        style={{ backgroundColor: step.btnBg, color: step.btnColor }}
+                      >
+                        {step.btnText}
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                {/* Connecting Arrow Circle between cards */}
+                {!isLast && (
+                  <div className="journey-step-connector" aria-hidden="true">
+                    <div 
+                      className="connector-line-bar"
+                      style={{ backgroundColor: `${step.badgeColor}40` }}
+                    />
+                    <div 
+                      className="connector-arrow-circle"
+                      style={{ borderColor: step.badgeColor, color: step.badgeColor }}
+                    >
+                      <ChevronRight size={14} />
+                    </div>
+                  </div>
+                )}
+              </React.Fragment>
+            )
+          })}
+        </div>
+
+        {/* Bottom Banner Row: Dome Sketch + CTA + Motto */}
+        <div className="journey-footer-row">
+          
+          {/* Left Building Sketch & Handwritten Text */}
+          <div className="journey-footer-left">
+            <svg className="journey-building-svg" viewBox="0 0 100 60" fill="none" stroke="#C85A17" strokeWidth="1">
+              <path d="M20 55 V35 L50 15 L80 35 V55 H20 Z M50 15 V5 M35 35 H65 M40 55 V42 H60 V55" opacity="0.4" />
+              <circle cx="50" cy="25" r="5" stroke="#C85A17" opacity="0.4" />
+            </svg>
+            <div className="journey-handwriting">
+              <span>Same Dedication.</span>
+              <span className="handwriting-sub">A Brighter Tomorrow.</span>
+            </div>
           </div>
-        )}
+
+          {/* Center Main CTA Button */}
+          <div className="journey-footer-center">
+            <a href="#courses" className="journey-main-action-btn">
+              <span>START YOUR JOURNEY TODAY</span>
+              <ArrowRight size={16} />
+            </a>
+          </div>
+
+          {/* Right Spaced Motto */}
+          <div className="journey-footer-right">
+            <span>LEARN</span>
+            <span className="motto-dot">•</span>
+            <span>PRACTICE</span>
+            <span className="motto-dot">•</span>
+            <span>IMPROVE</span>
+            <span className="motto-dot">•</span>
+            <span>SUCCEED</span>
+          </div>
+
+        </div>
+
       </div>
 
-      <div className="journey-action reveal">
-        <a href="#courses" className="journey-btn">
-          <span>JOIN NERMAI</span>
-          <span className="btn-arrow">→</span>
-        </a>
-      </div>
-
+      {/* Admin Image Modal Viewer */}
+      {activeModalImage && (
+        <div className="search-modal-overlay" onClick={() => setActiveModalImage(null)}>
+          <div 
+            style={{ 
+              maxWidth: '700px', 
+              width: '90%', 
+              background: '#FFFDF9', 
+              padding: '1.5rem', 
+              borderRadius: '20px', 
+              boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
+              position: 'relative'
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <img 
+              src={activeModalImage} 
+              alt="Step Detail" 
+              style={{ width: '100%', maxHeight: '75vh', objectFit: 'contain', borderRadius: '12px' }} 
+            />
+            <button 
+              onClick={() => setActiveModalImage(null)}
+              style={{
+                position: 'absolute', top: '15px', right: '15px',
+                background: '#7B1B2E', color: '#FFF', border: 'none',
+                borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer'
+              }}
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   )
 }
