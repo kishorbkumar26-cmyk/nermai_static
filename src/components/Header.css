@@ -594,9 +594,14 @@
 }
 
 @media (max-width: 520px) {
-  /* On phone screens, hide email so location + phone fit on ONE single clean line */
-  .top-bar-email {
-    display: none !important;
+  .top-bar-left {
+    gap: 0.15rem 0.5rem;
+    font-size: 0.68rem;
+  }
+
+  .top-bar-item {
+    font-size: 0.68rem;
+    gap: 3px;
   }
   
   .top-bar-right {
@@ -614,5 +619,6 @@
     display: none;
   }
 }
+
 
 
