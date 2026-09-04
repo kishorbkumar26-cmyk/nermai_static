@@ -175,11 +175,11 @@ export default function WhatYouGet() {
   const activeFeat = featureList[activeIndex] || featureList[0]
 
   return (
-    <section className="what-section section" style={{ background: 'var(--cream)', padding: '5rem 1.5rem', overflow: 'hidden' }}>
-      <div className="container">
+    <section className="what-section section" style={{ background: 'var(--cream)', padding: '5rem 1rem', overflow: 'hidden' }}>
+      <div style={{ width: '100%', maxWidth: '1560px', margin: '0 auto', padding: '0 clamp(1rem, 2.5vw, 2.5rem)' }}>
         
         {/* Top Header */}
-        <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto 4rem' }}>
+        <div style={{ textAlign: 'center', maxWidth: '850px', margin: '0 auto 4rem' }}>
           <span style={{ 
             fontFamily: 'var(--font-body)', 
             fontSize: '0.8rem', 
@@ -194,7 +194,7 @@ export default function WhatYouGet() {
           </span>
           <h2 style={{ 
             fontFamily: 'var(--font-display)', 
-            fontSize: 'clamp(2.25rem, 4vw, 3.5rem)', 
+            fontSize: 'clamp(2.5rem, 4.5vw, 3.75rem)', 
             fontWeight: 700, 
             color: 'var(--ink)', 
             margin: '0 0 1rem', 
@@ -203,7 +203,7 @@ export default function WhatYouGet() {
             Everything You Need to Succeed
           </h2>
           <p style={{ 
-            fontSize: 'clamp(1rem, 1.2vw, 1.1rem)', 
+            fontSize: 'clamp(1.05rem, 1.25vw, 1.2rem)', 
             color: 'var(--gray-600)', 
             lineHeight: 1.6, 
             margin: 0 
@@ -216,15 +216,15 @@ export default function WhatYouGet() {
         <div style={{
           background: 'var(--surface)',
           border: '1px solid var(--gray-200)',
-          borderRadius: '20px',
-          padding: '2.5rem',
-          boxShadow: '0 10px 40px rgba(26, 16, 8, 0.04)',
+          borderRadius: '24px',
+          padding: 'clamp(2rem, 3vw, 3.5rem)',
+          boxShadow: '0 16px 50px rgba(26, 16, 8, 0.05)',
           marginBottom: '4rem'
         }}>
           <div className="wyg-platform-grid">
             
             {/* Left Column: 01 to 06 Feature List Selector */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
               {featureList.map((feat, i) => {
                 const isActive = activeIndex === i
                 const iconName = FA_TO_LUCIDE_MAP[feat.icon] || feat.icon
@@ -239,11 +239,11 @@ export default function WhatYouGet() {
                       display: 'flex',
                       alignItems: 'center',
                       gap: '1.25rem',
-                      padding: '1rem 1.25rem',
-                      background: isActive ? 'rgba(123, 27, 46, 0.04)' : 'transparent',
+                      padding: '1.1rem 1.35rem',
+                      background: isActive ? 'rgba(123, 27, 46, 0.05)' : 'transparent',
                       border: 'none',
                       borderLeft: isActive ? '4px solid var(--maroon)' : '4px solid transparent',
-                      borderRadius: '0 12px 12px 0',
+                      borderRadius: '0 14px 14px 0',
                       textAlign: 'left',
                       cursor: 'pointer',
                       transition: 'all 0.25s ease'
@@ -252,7 +252,7 @@ export default function WhatYouGet() {
                     {/* Number */}
                     <span style={{ 
                       fontFamily: 'var(--font-mono)', 
-                      fontSize: '0.9rem', 
+                      fontSize: '0.95rem', 
                       fontWeight: 700, 
                       color: isActive ? 'var(--maroon)' : 'var(--gray-400)',
                       minWidth: '24px'
@@ -262,8 +262,8 @@ export default function WhatYouGet() {
 
                     {/* Icon Circle */}
                     <div style={{ 
-                      width: '42px', 
-                      height: '42px', 
+                      width: '46px', 
+                      height: '46px', 
                       borderRadius: '50%', 
                       background: isActive ? 'var(--maroon)' : 'var(--gray-100)',
                       color: isActive ? 'var(--white)' : 'var(--gray-600)',
@@ -273,27 +273,23 @@ export default function WhatYouGet() {
                       flexShrink: 0,
                       transition: 'all 0.25s ease'
                     }}>
-                      <IconComponent size={18} strokeWidth={2.2} />
+                      <IconComponent size={20} strokeWidth={2.2} />
                     </div>
 
                     {/* Title & Subtitle */}
                     <div style={{ flex: 1 }}>
                       <div style={{ 
                         fontWeight: 700, 
-                        fontSize: '1rem', 
-                        color: isActive ? 'var(--ink)' : 'var(--gray-700)',
-                        marginBottom: '0.15rem'
+                        fontSize: '1.05rem', 
+                        color: isActive ? 'var(--ink)' : 'var(--gray-800)',
+                        marginBottom: '0.2rem'
                       }}>
                         {feat.title}
                       </div>
                       <div style={{ 
-                        fontSize: '0.8rem', 
+                        fontSize: '0.85rem', 
                         color: 'var(--gray-500)', 
-                        lineHeight: 1.35,
-                        display: '-webkit-box',
-                        WebkitLineClamp: 1,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden'
+                        lineHeight: 1.45
                       }}>
                         {feat.subtitle}
                       </div>
@@ -308,49 +304,49 @@ export default function WhatYouGet() {
               display: 'flex', 
               flexDirection: 'column', 
               justifyContent: 'space-between',
-              padding: '0 1rem',
+              padding: '0 0.5rem',
               transition: 'opacity 0.3s ease'
             }}>
               <div>
                 <span style={{ 
-                  fontSize: '0.75rem', 
+                  fontSize: '0.78rem', 
                   fontWeight: 700, 
-                  letterSpacing: '0.12em', 
+                  letterSpacing: '0.14em', 
                   color: 'var(--saffron-dark)', 
                   textTransform: 'uppercase',
                   display: 'block',
-                  marginBottom: '0.5rem'
+                  marginBottom: '0.6rem'
                 }}>
                   {activeFeat.tag || `FEATURE 0${activeIndex + 1}`}
                 </span>
 
                 <h3 style={{ 
                   fontFamily: 'var(--font-display)', 
-                  fontSize: '2rem', 
+                  fontSize: '2.25rem', 
                   fontWeight: 700, 
                   color: 'var(--ink)', 
-                  margin: '0 0 0.5rem',
+                  margin: '0 0 0.6rem',
                   lineHeight: 1.2
                 }}>
                   {activeFeat.title}
                 </h3>
 
                 {activeFeat.caption && (
-                  <p style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--maroon)', marginBottom: '1rem' }}>
+                  <p style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--maroon)', marginBottom: '1.25rem' }}>
                     {activeFeat.caption}
                   </p>
                 )}
 
-                <p style={{ fontSize: '0.92rem', color: 'var(--gray-600)', lineHeight: 1.6, marginBottom: '1.75rem' }}>
+                <p style={{ fontSize: '0.98rem', color: 'var(--gray-600)', lineHeight: 1.65, marginBottom: '2rem' }}>
                   {activeFeat.desc}
                 </p>
 
                 {/* Checkpoints */}
                 {activeFeat.checkpoints && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', marginBottom: '2rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2.25rem' }}>
                     {activeFeat.checkpoints.map((point, idx) => (
-                      <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', fontSize: '0.9rem', color: 'var(--gray-700)', fontWeight: 500 }}>
-                        <i className="fa-solid fa-circle-check" style={{ color: 'var(--maroon)', fontSize: '0.95rem' }} />
+                      <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', color: 'var(--gray-700)', fontWeight: 500 }}>
+                        <i className="fa-solid fa-circle-check" style={{ color: 'var(--maroon)', fontSize: '1rem' }} />
                         <span>{point}</span>
                       </div>
                     ))}
@@ -368,19 +364,19 @@ export default function WhatYouGet() {
                   style={{
                     background: 'var(--maroon)',
                     color: 'var(--white)',
-                    padding: '0.75rem 1.5rem',
-                    borderRadius: '8px',
+                    padding: '0.85rem 1.8rem',
+                    borderRadius: '10px',
                     fontWeight: 700,
-                    fontSize: '0.82rem',
+                    fontSize: '0.85rem',
                     letterSpacing: '0.04em',
                     textDecoration: 'none',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.5rem',
-                    boxShadow: '0 4px 14px rgba(123, 27, 46, 0.2)'
+                    boxShadow: '0 4px 16px rgba(123, 27, 46, 0.25)'
                   }}
                 >
-                  {activeFeat.primaryCta || 'EXPLORE CLASSES'} <i className="fa-solid fa-arrow-right" style={{ fontSize: '0.75rem' }} />
+                  {activeFeat.primaryCta || 'EXPLORE CLASSES'} <i className="fa-solid fa-arrow-right" style={{ fontSize: '0.8rem' }} />
                 </a>
 
                 {activeFeat.secondaryCta && (
@@ -392,18 +388,18 @@ export default function WhatYouGet() {
                       background: 'transparent',
                       color: 'var(--ink)',
                       border: '1px solid var(--gray-300)',
-                      padding: '0.7rem 1.25rem',
-                      borderRadius: '8px',
+                      padding: '0.8rem 1.4rem',
+                      borderRadius: '10px',
                       fontWeight: 600,
-                      fontSize: '0.82rem',
+                      fontSize: '0.85rem',
                       textDecoration: 'none',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '0.4rem',
+                      gap: '0.45rem',
                       transition: 'all 0.2s ease'
                     }}
                   >
-                    <i className="fa-regular fa-circle-play" style={{ color: 'var(--maroon)', fontSize: '0.9rem' }} />
+                    <i className="fa-regular fa-circle-play" style={{ color: 'var(--maroon)', fontSize: '0.95rem' }} />
                     {activeFeat.secondaryCta}
                   </a>
                 )}
@@ -413,12 +409,12 @@ export default function WhatYouGet() {
             {/* Right Column: Feature Image / Mockup & Testimonial Overlay */}
             <div style={{ position: 'relative' }}>
               <div style={{ 
-                borderRadius: '16px', 
+                borderRadius: '20px', 
                 overflow: 'hidden', 
-                boxShadow: '0 12px 32px rgba(0, 0, 0, 0.08)',
+                boxShadow: '0 16px 40px rgba(0, 0, 0, 0.09)',
                 position: 'relative',
                 height: '100%',
-                minHeight: '360px',
+                minHeight: '440px',
                 background: '#1a1008'
               }}>
                 <img
@@ -436,22 +432,22 @@ export default function WhatYouGet() {
                 {/* Floating Handwritten Style Note Overlay */}
                 <div style={{
                   position: 'absolute',
-                  top: '1.25rem',
-                  right: '1.25rem',
-                  background: 'rgba(253, 246, 236, 0.92)',
+                  top: '1.5rem',
+                  right: '1.5rem',
+                  background: 'rgba(253, 246, 236, 0.94)',
                   backdropFilter: 'blur(8px)',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '20px',
+                  padding: '0.6rem 1.2rem',
+                  borderRadius: '24px',
                   fontStyle: 'italic',
                   fontWeight: 600,
-                  fontSize: '0.82rem',
+                  fontSize: '0.88rem',
                   color: 'var(--maroon-deep)',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                  boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.4rem'
+                  gap: '0.5rem'
                 }}>
-                  <i className="fa-solid fa-graduation-cap" style={{ fontSize: '0.85rem' }} />
+                  <i className="fa-solid fa-graduation-cap" style={{ fontSize: '0.9rem' }} />
                   "Your classroom anywhere, anytime"
                 </div>
 
@@ -459,21 +455,21 @@ export default function WhatYouGet() {
                 {activeFeat.quote && (
                   <div style={{
                     position: 'absolute',
-                    bottom: '1rem',
-                    right: '1rem',
-                    left: '1rem',
-                    background: 'rgba(74, 14, 28, 0.92)',
-                    backdropFilter: 'blur(10px)',
+                    bottom: '1.25rem',
+                    right: '1.25rem',
+                    left: '1.25rem',
+                    background: 'rgba(74, 14, 28, 0.94)',
+                    backdropFilter: 'blur(12px)',
                     color: 'var(--cream)',
-                    padding: '1rem 1.25rem',
-                    borderRadius: '12px',
-                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)'
+                    padding: '1.2rem 1.5rem',
+                    borderRadius: '14px',
+                    boxShadow: '0 8px 28px rgba(0, 0, 0, 0.28)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)'
                   }}>
-                    <div style={{ fontSize: '0.88rem', fontStyle: 'italic', lineHeight: 1.4, marginBottom: '0.4rem' }}>
+                    <div style={{ fontSize: '0.95rem', fontStyle: 'italic', lineHeight: 1.45, marginBottom: '0.45rem' }}>
                       "{activeFeat.quote}"
                     </div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--saffron-light)', textAlign: 'right' }}>
+                    <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--saffron-light)', textAlign: 'right' }}>
                       {activeFeat.author}
                     </div>
                   </div>
@@ -488,9 +484,9 @@ export default function WhatYouGet() {
         <div style={{
           background: 'var(--white)',
           border: '1px solid var(--gray-200)',
-          borderRadius: '16px',
-          padding: '1.75rem 2rem',
-          boxShadow: '0 6px 24px rgba(0, 0, 0, 0.03)',
+          borderRadius: '20px',
+          padding: '2rem 2.5rem',
+          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.03)',
           marginBottom: '4rem'
         }}>
           <div className="wyg-highlights-grid">
@@ -502,16 +498,16 @@ export default function WhatYouGet() {
                   style={{ 
                     display: 'flex', 
                     alignItems: 'center', 
-                    gap: '1rem',
-                    padding: '0.5rem 1rem',
+                    gap: '1.1rem',
+                    padding: '0.5rem 1.25rem',
                     borderRight: idx < KEY_HIGHLIGHTS.length - 1 ? '1px solid var(--gray-200)' : 'none'
                   }}
                   className="highlight-col"
                 >
                   <div style={{ 
-                    width: '44px', 
-                    height: '44px', 
-                    borderRadius: '10px', 
+                    width: '48px', 
+                    height: '48px', 
+                    borderRadius: '12px', 
                     background: 'rgba(123, 27, 46, 0.06)', 
                     color: 'var(--maroon)', 
                     display: 'flex', 
@@ -519,13 +515,13 @@ export default function WhatYouGet() {
                     justifyContent: 'center',
                     flexShrink: 0 
                   }}>
-                    <IconComp size={22} strokeWidth={2.2} />
+                    <IconComp size={24} strokeWidth={2.2} />
                   </div>
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--ink)' }}>
+                    <div style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--ink)' }}>
                       {item.title}
                     </div>
-                    <div style={{ fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.08em', color: 'var(--gray-500)', textTransform: 'uppercase', marginTop: '0.15rem' }}>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', color: 'var(--gray-500)', textTransform: 'uppercase', marginTop: '0.15rem' }}>
                       {item.sub}
                     </div>
                   </div>
@@ -545,8 +541,8 @@ export default function WhatYouGet() {
       <style>{`
         .wyg-platform-grid {
           display: grid;
-          grid-template-columns: 320px 1fr 380px;
-          gap: 2rem;
+          grid-template-columns: 360px 1fr 460px;
+          gap: 3rem;
           align-items: stretch;
         }
         .wyg-highlights-grid {
@@ -554,9 +550,15 @@ export default function WhatYouGet() {
           grid-template-columns: repeat(4, 1fr);
           gap: 1rem;
         }
-        @media (max-width: 1200px) {
+        @media (max-width: 1380px) {
           .wyg-platform-grid {
-            grid-template-columns: 280px 1fr;
+            grid-template-columns: 320px 1fr 400px;
+            gap: 2rem;
+          }
+        }
+        @media (max-width: 1180px) {
+          .wyg-platform-grid {
+            grid-template-columns: 300px 1fr;
           }
           .wyg-platform-grid > *:last-child {
             grid-column: span 2;
