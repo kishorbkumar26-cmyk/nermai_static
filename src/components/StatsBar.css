@@ -138,13 +138,20 @@
   white-space: nowrap;
 }
 
-/* 5 Columns Grid inside Maroon Card */
-.stats-grid-5 {
+/* Layout inside Maroon Card */
+.stats-card-inner {
   display: grid;
-  grid-template-columns: repeat(4, 1fr) 1.25fr;
+  grid-template-columns: 1fr 280px;
+  gap: 1.5rem;
   align-items: stretch;
   position: relative;
   z-index: 2;
+}
+
+.stats-items-2x2 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
 }
 
 .stats-col-item {
@@ -243,6 +250,7 @@
   padding: 0.25rem 0.5rem 0.25rem 1.25rem;
   position: relative;
   text-align: left;
+  border-left: 1px dashed rgba(212, 175, 55, 0.3);
 }
 
 .stats-quote-mark {
@@ -317,11 +325,16 @@
 
 /* Responsive Breakdown */
 @media (max-width: 1024px) {
-  .stats-grid-5 {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.75rem;
+  .stats-card-inner {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
-  .stats-col-divider { display: none; }
+  .stats-quote-col {
+    border-left: none;
+    border-top: 1px dashed rgba(212, 175, 55, 0.3);
+    padding-left: 0;
+    padding-top: 1rem;
+  }
   .stats-header-row {
     flex-direction: column;
     align-items: flex-start;
@@ -330,26 +343,27 @@
   .stats-header-divider { display: none; }
 }
 
-/* Mobile View: 2x2 Square Grid Representation to save vertical space */
+/* Mobile View: STRICT 2x2 Square Grid Representation for 4 items */
 @media (max-width: 768px) {
   .stats-section {
-    padding: 2.25rem 0 2rem 0;
+    padding: 2rem 0 1.75rem 0;
   }
 
   .stats-maroon-card {
-    padding: 1.25rem 0.85rem;
-    border-radius: 20px;
+    padding: 1.1rem 0.75rem;
+    border-radius: 18px;
   }
 
-  .stats-grid-5 {
+  .stats-items-2x2 {
+    display: grid !important;
     grid-template-columns: 1fr 1fr !important;
-    gap: 1rem 0.75rem !important;
+    gap: 0.75rem !important;
   }
 
   .stats-col-item {
     padding: 0.85rem 0.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(212, 175, 55, 0.2);
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(212, 175, 55, 0.3);
     border-radius: 14px;
     box-sizing: border-box;
   }
@@ -357,7 +371,7 @@
   .stats-icon-badge {
     width: 40px;
     height: 40px;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
   }
 
   .stats-icon-badge svg {
@@ -366,23 +380,20 @@
   }
 
   .stats-num-bold {
-    font-size: 1.65rem;
-    margin-bottom: 0.2rem;
+    font-size: 1.55rem;
+    margin-bottom: 0.15rem;
   }
 
   .stats-item-label {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     margin-bottom: 0.2rem;
   }
 
   .stats-item-sub {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     max-width: 100%;
-    margin-bottom: 0.35rem;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    margin-bottom: 0;
+    line-height: 1.25;
   }
 
   .stats-arrow-circle {
@@ -390,12 +401,9 @@
   }
 
   .stats-quote-col {
-    grid-column: 1 / -1;
     text-align: center;
     align-items: center;
-    padding: 0.85rem 0.5rem 0 0.5rem;
-    border-top: 1px dashed rgba(212, 175, 55, 0.3);
-    margin-top: 0.5rem;
+    padding-top: 0.85rem;
   }
 
   .stats-quote-mark {
@@ -403,12 +411,8 @@
   }
 
   .stats-quote-body {
-    font-size: 0.82rem;
-    margin-bottom: 0.35rem;
-  }
-
-  .stats-quote-author {
-    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
   }
 
   .stats-since-badge {
@@ -418,7 +422,8 @@
   }
 
   .stats-title {
-    font-size: 1.85rem;
+    font-size: 1.75rem;
   }
 }
+
 

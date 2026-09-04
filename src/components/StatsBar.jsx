@@ -117,34 +117,30 @@ export default function StatsBar() {
         <div className="stats-maroon-card reveal visible">
           <div className="stats-bg-watermark">N E R M A I</div>
 
-          <div className="stats-grid-5">
-            {DEFAULT_ITEMS.map((item, i) => {
-              const IconComponent = item.icon
-              return (
-                <div key={i} className="stats-col-item">
-                  <div className="stats-icon-badge">
-                    <IconComponent size={24} />
-                  </div>
-                  <div className="stats-num-bold" ref={el => refs.current[i] = el}>
-                    {item.num}
-                  </div>
-                  <div className="stats-item-label">{item.label}</div>
-                  <div className="stats-item-sub">{item.sublabel}</div>
-
-                  <div className="stats-arrow-circle" title="Learn More">
-                    <ChevronRight size={14} />
-                  </div>
-
-                  {i < 4 && (
-                    <div className="stats-col-divider">
-                      <div className="stats-dot-glow" />
+          <div className="stats-card-inner">
+            <div className="stats-items-2x2">
+              {DEFAULT_ITEMS.map((item, i) => {
+                const IconComponent = item.icon
+                return (
+                  <div key={i} className="stats-col-item">
+                    <div className="stats-icon-badge">
+                      <IconComponent size={22} />
                     </div>
-                  )}
-                </div>
-              )
-            })}
+                    <div className="stats-num-bold" ref={el => refs.current[i] = el}>
+                      {item.num}
+                    </div>
+                    <div className="stats-item-label">{item.label}</div>
+                    <div className="stats-item-sub">{item.sublabel}</div>
 
-            {/* 5th Column - Quote & Since 2010 Badge */}
+                    <div className="stats-arrow-circle" title="Learn More">
+                      <ChevronRight size={14} />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* 5th Column - Quote & Since 2017 Badge */}
             <div className="stats-quote-col">
               <div>
                 <div className="stats-quote-mark">“</div>
@@ -160,6 +156,7 @@ export default function StatsBar() {
             </div>
           </div>
         </div>
+
 
         {/* Bottom Tagline Row */}
         <div className="stats-bottom-tagline reveal visible">
