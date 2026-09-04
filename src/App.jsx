@@ -99,7 +99,6 @@ function FloatingButtons() {
 export default function App() {
   return (
     <BrowserRouter>
-      <LiveBackground />
       <FloatingButtons />
       <Routes>
         {/* ── Public pages ── */}
