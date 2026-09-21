@@ -192,6 +192,7 @@ export default function WhyNermaiCard({ data = {} }) {
               src={activeHeroImg} 
               alt="Nermai IAS Academy Strategy & Excellence" 
               className={`wn-hero-image wn-fit-${heroImageFit}`}
+              crossOrigin="anonymous"
               onError={(e) => { e.target.src = '/assets/why-nermai-right-banner.png' }}
             />
           </div>

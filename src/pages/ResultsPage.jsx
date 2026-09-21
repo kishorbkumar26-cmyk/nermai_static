@@ -56,6 +56,7 @@ function AvatarImg({ photo, name, size = 130 }) {
     <img 
       src={url} 
       alt={name || 'Achiever'}
+      crossOrigin="anonymous"
       onError={() => setErr(true)}
       style={{ 
         width: size, 

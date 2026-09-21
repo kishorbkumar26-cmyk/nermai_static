@@ -2,9 +2,15 @@
  * Drive Storage Service for NERMAI
  * Priority: Google Apps Script → Drive REST API → Firestore base64
  * Ported from Construction project driveStorage.js
+ *
+ * Image Caching:
+ *  - formatImageUrl() returns the canonical URL (sync, unchanged)
+ *  - Use useCachedImage(url) hook in components for async Cache API resolution
+ *  - preloadImages(urls) / preloadSlideImages(slides) eagerly fill the cache in the background
  */
 import { compressImage, extractGoogleDriveId, getGoogleDriveCDNUrl } from '../utils/imageOptimizer'
 import { fbFirestore } from '../firebase/firestore'
+import { preloadImages as _preloadImages } from '../utils/imageCache'
 
 const DRIVE_CONFIG_KEY = 'nermai_drive_config'
 
@@ -214,6 +220,42 @@ export const driveStorage = {
   async uploadImage(file, options = {}) {
     const res = await this.processAndUploadImage(file, options)
     return res.url
+  },
+
+  /**
+   * Proactively fetch and cache a list of image URLs in the background.
+   * Fire-and-forget: does not block, never throws.
+   * @param {string[]} urls
+   */
+  preloadImages(urls = []) {
+    const formatted = urls
+      .map(url => this.formatImageUrl(url))
+      .filter(Boolean)
+    _preloadImages(formatted)
+  },
+
+  /**
+   * Preload hero/carousel slide images (desktop + mobile variants) in the background.
+   * Prioritises the active slide first, then the next slide.
+   * @param {Array<{ url?, urlDesktop?, urlMobile? }>} slides
+   * @param {number} [activeIdx=0]
+   */
+  preloadSlideImages(slides = [], activeIdx = 0) {
+    if (!slides.length) return
+    const ordered = [
+      slides[activeIdx],
+      slides[(activeIdx + 1) % slides.length],
+      ...slides.filter((_, i) => i !== activeIdx && i !== (activeIdx + 1) % slides.length)
+    ].filter(Boolean)
+
+    const urls = []
+    ordered.forEach(slide => {
+      const desktop = slide.urlDesktop || slide.url
+      const mobile  = slide.urlMobile  || slide.urlDesktop || slide.url
+      if (desktop) urls.push(this.formatImageUrl(desktop))
+      if (mobile && mobile !== desktop) urls.push(this.formatImageUrl(mobile))
+    })
+    _preloadImages(urls.filter(Boolean))
   },
 
   formatImageUrl(url) {

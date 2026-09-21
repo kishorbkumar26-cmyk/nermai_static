@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { fbFirestore } from '../firebase/firestore'
 import { driveStorage } from '../services/driveStorage'
 import { LMS_URL } from '../constants'
+import { checkSectionVersion } from '../utils/imageCacheVersion'
+import { invalidateCachedUrls } from '../utils/imageCache'
 
 const DEFAULT_SLIDES = [
   {
@@ -57,7 +59,26 @@ export default function HeroCarousel() {
 
   useEffect(() => {
     const unsub = fbFirestore.onHeroSlidesChanged(items => {
-      setSlides(items.length > 0 ? items : DEFAULT_SLIDES)
+      const newSlides = items.length > 0 ? items : DEFAULT_SLIDES
+      setSlides(newSlides)
+
+      // Build version-check items from slide image URLs + their updatedAt timestamp
+      const versionItems = newSlides.flatMap(slide => {
+        const updatedAt = slide.updatedAt?.toMillis?.() || slide.updatedAt || ''
+        const out = []
+        const desktop = driveStorage.formatImageUrl(slide.urlDesktop || slide.url)
+        const mobile  = driveStorage.formatImageUrl(slide.urlMobile  || slide.urlDesktop || slide.url)
+        if (desktop) out.push({ url: desktop, updatedAt })
+        if (mobile && mobile !== desktop) out.push({ url: mobile, updatedAt })
+        return out
+      })
+
+      // Invalidate only the specific stale URLs when the DB changes
+      const { staleUrls } = checkSectionVersion('hero', versionItems)
+      if (staleUrls.length) invalidateCachedUrls(staleUrls)
+
+      // Eagerly preload all slide images in the background
+      driveStorage.preloadSlideImages(newSlides, 0)
     })
     return () => unsub()
   }, [])
@@ -141,6 +162,7 @@ export default function HeroCarousel() {
                     src={desktopUrl || mobileUrl}
                     alt={slide.title || `Nermai Academy slide ${i + 1}`}
                     className="hero-slide-img"
+                    crossOrigin="anonymous"
                     onError={(e) => driveStorage.handleImageError(e, '')}
                     loading={i === 0 ? 'eager' : 'lazy'}
                   />

@@ -9,6 +9,8 @@ import {
   X, ArrowRight, SearchX 
 } from 'lucide-react'
 import './ToppersWall.css'
+import { checkSectionVersion } from '../utils/imageCacheVersion'
+import { invalidateCachedUrls } from '../utils/imageCache'
 
 const STAT_ICONS_MAP = {
   GraduationCap, Users, Award, Trophy, Star, Medal, BookOpen, CheckCircle, Target, 
@@ -22,6 +24,7 @@ function renderStatIcon(st, defaultIndex) {
       <img 
         src={driveStorage.formatImageUrl(st.logoUrl.trim())} 
         alt={st.label || 'Stat logo'} 
+        crossOrigin="anonymous"
         style={{ width: '22px', height: '22px', objectFit: 'contain', borderRadius: '4px', display: 'block' }} 
         onError={(e) => { e.target.style.display = 'none' }}
       />
@@ -185,6 +188,23 @@ export default function ToppersWall({ customConfig }) {
           photo: item.photo && item.photo.includes('unsplash.com') ? '' : item.photo
         }))
         setToppers(cleaned)
+
+        // Per-image cache invalidation on DB change
+        const versionItems = cleaned
+          .filter(t => t.photo && !t.photo.includes('unsplash.com'))
+          .map(t => {
+            const url = driveStorage.formatImageUrl(t.photo.trim())
+            return url ? { url, updatedAt: t.updatedAt?.toMillis?.() || t.updatedAt || '' } : null
+          })
+          .filter(Boolean)
+
+        const { staleUrls } = checkSectionVersion('toppers', versionItems)
+        if (staleUrls.length) invalidateCachedUrls(staleUrls)
+
+        // Preload visible topper photos in background
+        driveStorage.preloadImages(
+          cleaned.filter(t => t.photo && !t.photo.includes('unsplash.com')).map(t => t.photo)
+        )
       } else {
         setToppers([])
       }
@@ -396,6 +416,7 @@ export default function ToppersWall({ customConfig }) {
                               src={photoUrl} 
                               alt={topper.name} 
                               className="toppers-card-photo" 
+                              crossOrigin="anonymous"
                               loading="lazy" 
                               onError={(e) => driveStorage.handleImageError(e)}
                             />
@@ -536,6 +557,7 @@ export default function ToppersWall({ customConfig }) {
                 <img 
                   src={getTopperPhoto(selectedStory)} 
                   alt={selectedStory.name}
+                  crossOrigin="anonymous"
                   style={{ width: '75px', height: '75px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--gold)' }}
                 />
               ) : (

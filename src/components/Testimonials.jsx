@@ -3,6 +3,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { fbFirestore } from '../firebase/firestore'
 import { driveStorage } from '../services/driveStorage'
 import './Testimonials.css'
+import { checkSectionVersion } from '../utils/imageCacheVersion'
+import { invalidateCachedUrls } from '../utils/imageCache'
 
 export const DEFAULT_TESTIMONIALS_CONFIG = {
   eyebrow: 'STUDENT REVIEWS',
@@ -26,6 +28,23 @@ export default function Testimonials({ customConfig }) {
     const unsub = fbFirestore.onTestimonialsChanged(items => {
       if (items && items.length > 0) {
         setTestimonials(items)
+
+        // Per-image cache invalidation on DB change
+        const versionItems = items
+          .map(t => {
+            const raw = t.imageUrl || t.avatar || t.photo
+            const url = raw ? driveStorage.formatImageUrl(raw) : null
+            return url ? { url, updatedAt: t.updatedAt?.toMillis?.() || t.updatedAt || '' } : null
+          })
+          .filter(Boolean)
+
+        const { staleUrls } = checkSectionVersion('testimonials', versionItems)
+        if (staleUrls.length) invalidateCachedUrls(staleUrls)
+
+        // Preload avatar images in the background
+        driveStorage.preloadImages(
+          items.map(t => t.imageUrl || t.avatar || t.photo).filter(Boolean)
+        )
       } else {
         fbFirestore.getTestimonials().then(res => setTestimonials(res || []))
       }
@@ -97,7 +116,7 @@ export default function Testimonials({ customConfig }) {
         <p className="card-quote-text">{t.quote || t.text || t.content}</p>
         <div className="card-author-row">
           {avatarUrl ? (
-            <img src={avatarUrl} alt={t.name} className="card-avatar-img" />
+            <img src={avatarUrl} alt={t.name} crossOrigin="anonymous" className="card-avatar-img" />
           ) : (
             <div className="card-avatar-fallback">
               {(t.name || 'A')[0].toUpperCase()}

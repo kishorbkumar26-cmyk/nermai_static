@@ -153,6 +153,7 @@ export default function JourneySection({ steps }) {
                       <img 
                         src={formattedImg} 
                         alt={step.title} 
+                        crossOrigin="anonymous"
                         style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
                       />
                     ) : (
@@ -264,6 +265,7 @@ export default function JourneySection({ steps }) {
             <img 
               src={activeModalImage} 
               alt="Step Detail" 
+              crossOrigin="anonymous"
               style={{ width: '100%', maxHeight: '75vh', objectFit: 'contain', borderRadius: '12px' }} 
             />
             <button 

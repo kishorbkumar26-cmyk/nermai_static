@@ -364,6 +364,7 @@ export default function SuccessStoriesSection({ customConfig }) {
                               src={photoUrl}
                               alt={t.name}
                               className="ss-topper-photo"
+                              crossOrigin="anonymous"
                               onError={(e) => { e.currentTarget.style.display = 'none' }}
                             />
                           ) : (
@@ -584,6 +585,7 @@ export default function SuccessStoriesSection({ customConfig }) {
                   src={driveStorage.formatImageUrl(selectedStory.photo)}
                   alt={selectedStory.name}
                   className="rp-modal-photo"
+                  crossOrigin="anonymous"
                   onError={e => { e.currentTarget.style.display = 'none' }}
                 />
               )}

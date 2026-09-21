@@ -108,6 +108,7 @@ export default function CoursesHero({ customConfig }) {
         src={displayArtworkUrl}
         alt=""
         className="courses-hero-bg-img"
+        crossOrigin="anonymous"
         aria-hidden="true"
         onError={(e) => {
           if (e.currentTarget.src !== DEFAULT_COURSES_ARTWORK_ASSET) {

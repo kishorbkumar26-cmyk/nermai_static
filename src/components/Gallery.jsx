@@ -1,12 +1,30 @@
 import React, { useState, useEffect } from 'react'
 import { fbFirestore } from '../firebase/firestore'
 import { driveStorage } from '../services/driveStorage'
+import { checkSectionVersion } from '../utils/imageCacheVersion'
+import { invalidateCachedUrls } from '../utils/imageCache'
 
 export default function Gallery() {
   const [images, setImages] = useState([])
 
   useEffect(() => {
-    const unsub = fbFirestore.onGalleryChanged(items => setImages(items))
+    const unsub = fbFirestore.onGalleryChanged(items => {
+      setImages(items)
+
+      // Per-image cache invalidation driven by Firestore changes
+      const versionItems = items
+        .map(img => {
+          const url = driveStorage.formatImageUrl(img.url)
+          return url ? { url, updatedAt: img.updatedAt?.toMillis?.() || img.updatedAt || '' } : null
+        })
+        .filter(Boolean)
+
+      const { staleUrls } = checkSectionVersion('gallery', versionItems)
+      if (staleUrls.length) invalidateCachedUrls(staleUrls)
+
+      // Preload all gallery images into cache in the background
+      driveStorage.preloadImages(items.map(img => img.url).filter(Boolean))
+    })
     return () => unsub()
   }, [])
 
@@ -46,6 +64,7 @@ export default function Gallery() {
                   <img
                     src={photoUrl}
                     alt={img.caption || 'Nermai Gallery Image'}
+                    crossOrigin="anonymous"
                     style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.5s ease' }}
                     onError={(e) => driveStorage.handleImageError(e, '')}
                     loading="lazy"
