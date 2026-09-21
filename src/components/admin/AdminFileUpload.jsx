@@ -58,7 +58,8 @@ export default function AdminFileUpload({
   const handleUrlChange = (e) => {
     const rawVal = e.target.value
     setFileError(false)
-    onChange(rawVal)
+    const cleaned = rawVal.trim().replace(/^['"]|['"]$/g, '')
+    onChange(cleaned)
   }
 
   const handleCopy = () => {

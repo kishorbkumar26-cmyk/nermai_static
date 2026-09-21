@@ -87,7 +87,7 @@ export default function ResourceManager({ toast }) {
     <div className="ap-section">
       <div className="ap-section-header">
         <h2 className="ap-section-title">Resource Desk Manager</h2>
-        <p className="ap-section-desc">Manage PDFs, current affairs, and free study materials.</p>
+        <p className="ap-section-desc">Manage PDFs, Word docs, PowerPoint slides, current affairs, and free study materials.</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', alignItems: 'start' }}>
@@ -115,7 +115,7 @@ export default function ResourceManager({ toast }) {
             <div className="ap-form-group">
               <label>Upload File (To Google Drive)</label>
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                <input type="file" id="res-upload" style={{ display: 'none' }} onChange={handleFileChange} />
+                <input type="file" id="res-upload" style={{ display: 'none' }} onChange={handleFileChange} accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.xlsx,.xls" />
                 <button 
                   type="button" 
                   className="btn btn-outline" 
@@ -124,7 +124,7 @@ export default function ResourceManager({ toast }) {
                 >
                   {uploading ? <><i className="fa-solid fa-spinner fa-spin"/> Uploading...</> : <><i className="fa-solid fa-cloud-arrow-up"/> Select File</>}
                 </button>
-                <span style={{ fontSize: '0.85rem', color: 'var(--gray-500)' }}>PDF, DOCX, ZIP</span>
+                <span style={{ fontSize: '0.85rem', color: 'var(--gray-500)' }}>PDF · DOCX · DOC · PPTX · PPT · XLSX · ZIP</span>
               </div>
             </div>
 

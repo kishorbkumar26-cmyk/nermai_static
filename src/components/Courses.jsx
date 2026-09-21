@@ -224,19 +224,21 @@ export default function Courses({ hideHeader = false, layout = 'grid' }) {
         )}
 
         {/* Content Row with Left Accent, Filter Tabs + Grid, Right Accent */}
-        <div className="replicated-courses-content-row">
+        <div className={`replicated-courses-content-row ${hideHeader ? 'no-side-accents' : ''}`}>
           
           {/* Far Left Decorative Element */}
-          <div className="courses-accent-left" aria-hidden="true">
-            <div className="left-handwriting">
-              <span>Learn</span>
-              <span>Prepare</span>
-              <span className="sub">Succeed</span>
+          {!hideHeader && (
+            <div className="courses-accent-left" aria-hidden="true">
+              <div className="left-handwriting">
+                <span>Learn</span>
+                <span>Prepare</span>
+                <span className="sub">Succeed</span>
+              </div>
+              <svg className="left-lines-svg" viewBox="0 0 50 20" stroke="#C85A17" strokeWidth="1.5">
+                <path d="M5 10 Q25 18 45 10 M10 15 Q25 20 40 15" fill="none" opacity="0.6" />
+              </svg>
             </div>
-            <svg className="left-lines-svg" viewBox="0 0 50 20" stroke="#C85A17" strokeWidth="1.5">
-              <path d="M5 10 Q25 18 45 10 M10 15 Q25 20 40 15" fill="none" opacity="0.6" />
-            </svg>
-          </div>
+          )}
 
           {/* Center Content Box: Category Filter Pills + Course Cards Grid */}
           <div className="replicated-courses-center-box">
@@ -405,12 +407,14 @@ export default function Courses({ hideHeader = false, layout = 'grid' }) {
           </div>
 
           {/* Far Right Tilted Script Accent */}
-          <div className="courses-accent-right" aria-hidden="true">
-            <div className="right-script-box">
-              <span>Different Aspirations</span>
-              <span className="accent-underline">One Destination</span>
+          {!hideHeader && (
+            <div className="courses-accent-right" aria-hidden="true">
+              <div className="right-script-box">
+                <span>Different Aspirations</span>
+                <span className="accent-underline">One Destination</span>
+              </div>
             </div>
-          </div>
+          )}
 
         </div>
 

@@ -47,7 +47,12 @@ export const driveStorage = {
   saveConfig(config) {
     try {
       const current = this.getConfig()
-      const updated = { ...current, ...config }
+      const cleanedFolderId = config.folderId ? (extractGoogleDriveId(config.folderId) || config.folderId.trim()) : ''
+      const updated = {
+        ...current,
+        ...config,
+        ...(config.folderId !== undefined ? { folderId: cleanedFolderId } : {})
+      }
       localStorage.setItem(DRIVE_CONFIG_KEY, JSON.stringify(updated))
       fbFirestore.updateSettings({ driveConfig: updated }).catch(() => {})
       return updated
@@ -55,53 +60,6 @@ export const driveStorage = {
       console.error('Failed to save Drive config', e)
       return DEFAULT_DRIVE_CONFIG
     }
-  },
-
-  async processAndUploadFile(file, options = {}) {
-    const config = this.getConfig()
-    
-    // Convert to base64
-    const base64Data = await blobToBase64(file)
-    const cleanName = file.name || `file_${Date.now()}`
-
-    // 1. Try Google Apps Script Web App (actual Google Drive upload)
-    if (config.appsScriptUrl) {
-      try {
-        const rawSubFolder = options.subFolderName || ''
-        const subFolderName = rawSubFolder.replace(/[\\/:*?"<>|]/g, '').trim().slice(0, 80)
-
-        const response = await fetch(config.appsScriptUrl, {
-          method: 'POST',
-          mode: 'cors',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({
-            filename: cleanName,
-            mimeType: file.type || 'application/octet-stream',
-            base64: base64Data,
-            folderId: config.folderId,
-            ...(subFolderName ? { subFolderName } : {})
-          })
-        })
-
-        if (response.ok) {
-          const resData = await response.json()
-          if (resData.status === 'success' && resData.fileId) {
-            return {
-              url: `https://drive.google.com/uc?export=view&id=${resData.fileId}`,
-              driveUrl: `https://drive.google.com/file/d/${resData.fileId}/view`,
-              fileId: resData.fileId,
-              storageType: 'google_drive'
-            }
-          }
-        }
-      } catch (err) {
-        console.error('Apps Script file upload failed:', err)
-      }
-    }
-
-    // Fallback: local base64
-    const fallbackDataUrl = await fileToDataUrl(file)
-    return { url: fallbackDataUrl, storageType: 'local_base64' }
   },
 
   async processAndUploadImage(file, options = {}) {
@@ -125,6 +83,7 @@ export const driveStorage = {
 
     const uploadBlob = compressedBlob || file
     const cleanName = (file.name || `img_${Date.now()}`).replace(/\.\w+$/, '') + '.jpg'
+    const targetFolderId = extractGoogleDriveId(config.folderId) || (config.folderId || '').trim()
 
     // 1. Try Google Apps Script Web App (actual Google Drive upload)
     if (config.appsScriptUrl) {
@@ -142,7 +101,7 @@ export const driveStorage = {
             filename: cleanName,
             mimeType: actualMimeType,
             base64: base64Data,
-            folderId: config.folderId,
+            folderId: targetFolderId,
             ...(subFolderName ? { subFolderName } : {})
           })
         })
@@ -151,23 +110,30 @@ export const driveStorage = {
           const resData = await response.json()
           if (resData.status === 'success' && resData.fileId) {
             return {
-              url: getGoogleDriveCDNUrl(resData.fileId),
-              driveUrl: `https://drive.google.com/file/d/${resData.fileId}/view`,
+              url: getGoogleDriveCDNUrl(resData.fileId, options.maxWidth || 1600),
+              driveUrl: resData.viewUrl || `https://drive.google.com/file/d/${resData.fileId}/view`,
               fileId: resData.fileId,
               storageType: 'google_drive',
               reductionPct
             }
+          } else if (resData.status === 'error') {
+            console.error('Google Apps Script upload error:', resData.message)
+            throw new Error(resData.message || 'Google Drive Apps Script returned an error.')
           }
         }
       } catch (err) {
-        console.error('Apps Script upload failed, trying Drive API:', err)
+        console.error('Apps Script upload failed, checking fallbacks:', err)
+        // If it was an explicit script error, propagate so user knows
+        if (err.message && !err.message.includes('Failed to fetch')) {
+          console.warn('Google Drive Script Error:', err.message)
+        }
       }
     }
 
     // 2. Try Google Drive REST API (requires OAuth token)
     if (config.accessToken && uploadBlob) {
       try {
-        const metadata = { name: cleanName, parents: [config.folderId || ''] }
+        const metadata = { name: cleanName, parents: [targetFolderId || ''] }
         const formData = new FormData()
         formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }))
         formData.append('file', uploadBlob)
@@ -179,7 +145,7 @@ export const driveStorage = {
         if (res.ok) {
           const data = await res.json()
           return {
-            url: getGoogleDriveCDNUrl(data.id),
+            url: getGoogleDriveCDNUrl(data.id, options.maxWidth || 1600),
             driveUrl: data.webViewLink,
             fileId: data.id,
             storageType: 'google_drive',
@@ -200,6 +166,7 @@ export const driveStorage = {
   async processAndUploadFile(file, options = {}) {
     const config = this.getConfig()
     const cleanName = (file.name || `file_${Date.now()}`).replace(/[\\/:*?"<>|]/g, '')
+    const targetFolderId = extractGoogleDriveId(config.folderId) || (config.folderId || '').trim()
 
     // 1. Google Apps Script Web App
     if (config.appsScriptUrl) {
@@ -216,7 +183,7 @@ export const driveStorage = {
             filename: cleanName,
             mimeType: file.type || 'application/octet-stream',
             base64: base64Data,
-            folderId: config.folderId,
+            folderId: targetFolderId,
             ...(subFolderName ? { subFolderName } : {})
           })
         })
@@ -226,10 +193,12 @@ export const driveStorage = {
           if (resData.status === 'success' && resData.fileId) {
             return {
               url: getGoogleDriveCDNUrl(resData.fileId),
-              driveUrl: `https://drive.google.com/file/d/${resData.fileId}/view`,
+              driveUrl: resData.viewUrl || `https://drive.google.com/file/d/${resData.fileId}/view`,
               fileId: resData.fileId,
               storageType: 'google_drive'
             }
+          } else if (resData.status === 'error') {
+            throw new Error(resData.message || 'Google Drive upload error')
           }
         }
       } catch (err) {
@@ -237,7 +206,7 @@ export const driveStorage = {
       }
     }
 
-    // 2. Fallback: upload as base64 (not recommended for large PDFs, but fallback)
+    // 2. Fallback: upload as base64
     const fallbackDataUrl = await fileToDataUrl(file)
     return { url: fallbackDataUrl, storageType: 'local_base64' }
   },
@@ -258,16 +227,39 @@ export const driveStorage = {
     return null
   },
 
-  handleImageError(event, fallbackUrl = '/nermai-logo.svg') {
+  handleImageError(event, fallbackUrl = '') {
     const imgEl = event.target
     if (!imgEl) return
     const currentSrc = imgEl.src || ''
     const driveId = extractGoogleDriveId(currentSrc)
-    if (driveId && currentSrc.includes('googleusercontent.com') && !imgEl.dataset.triedUc) {
-      imgEl.dataset.triedUc = 'true'
-      imgEl.src = `https://drive.google.com/uc?export=view&id=${driveId}`
-      return
+    if (driveId) {
+      if (!imgEl.dataset.fallbackStep || imgEl.dataset.fallbackStep === '0') {
+        imgEl.dataset.fallbackStep = '1'
+        imgEl.src = `https://lh3.googleusercontent.com/d/${driveId}=w1000`
+        return
+      }
+      if (imgEl.dataset.fallbackStep === '1') {
+        imgEl.dataset.fallbackStep = '2'
+        imgEl.src = `https://lh3.googleusercontent.com/u/0/d/${driveId}=w1000`
+        return
+      }
+      if (imgEl.dataset.fallbackStep === '2') {
+        imgEl.dataset.fallbackStep = '3'
+        imgEl.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000`
+        return
+      }
+      if (imgEl.dataset.fallbackStep === '3') {
+        imgEl.dataset.fallbackStep = '4'
+        imgEl.src = `https://drive.usercontent.google.com/download?id=${driveId}&export=view`
+        return
+      }
     }
-    imgEl.src = fallbackUrl
+    if (fallbackUrl) {
+      imgEl.src = fallbackUrl
+    } else {
+      imgEl.style.display = 'none'
+      const fallbackSibling = imgEl.parentElement?.querySelector('.toppers-card-photo-fallback, .rp-avatar-fallback')
+      if (fallbackSibling) fallbackSibling.style.display = 'flex'
+    }
   }
 }

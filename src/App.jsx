@@ -11,6 +11,7 @@ import AdminPage from './pages/AdminPage'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminPortal from './components/AdminPortal'
 import FaqPage from './pages/FaqPage'
+import ResultsPage from './pages/ResultsPage'
 import LiveBackground from './components/LiveBackground'
 
 function VisibilityGuard({ pageKey, children }) {
@@ -105,6 +106,7 @@ export default function App() {
         <Route path="/"              element={<Home />} />
         <Route path="/why-nermai"    element={<WhyNermaiPage />} />
         <Route path="/contact"       element={<ContactPage />} />
+        <Route path="/results"       element={<ResultsPage />} />
         {/* FAQ integrated into Contact page */}
         <Route path="/faq"           element={<Navigate to="/contact#faq" replace />} />
 

@@ -63,6 +63,11 @@
   position: relative;
 }
 
+.replicated-courses-content-row.no-side-accents {
+  grid-template-columns: 1fr;
+  max-width: 1440px;
+}
+
 /* Far Left Decorative Element */
 .courses-accent-left {
   display: flex;
@@ -203,8 +208,12 @@
 .replicated-cards-viewport {
   width: 100%;
   overflow: hidden;
-  border-radius: 20px;
   box-sizing: border-box;
+  /* padding gives room for the card's ::after border + translateY transform to show
+     without being clipped; negative margin compensates so layout stays the same */
+  padding: 8px 4px 4px 4px;
+  margin: -8px -4px -4px -4px;
+  width: calc(100% + 8px);
 }
 
 .replicated-cards-track {
@@ -219,26 +228,46 @@
   flex: 0 0 calc((100% - 2.5rem) / 3);
   border-radius: 20px;
   background: #FFFFFF;
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  overflow: hidden;
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  overflow: visible;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   position: relative;
+  isolation: isolate;
+}
+
+/* Border frame drawn ABOVE banner image via pseudo-element */
+.replicated-course-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  border: 1.5px solid rgba(212, 175, 55, 0.5);
+  pointer-events: none;
+  z-index: 50;
+  transition: border-color 0.3s ease;
 }
 
 .replicated-course-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.08);
-  border-color: rgba(123, 27, 46, 0.4);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.09);
+}
+
+.replicated-course-card:hover::after {
+  border-color: rgba(123, 27, 46, 0.55);
 }
 
 .replicated-course-card.active-highlight {
-  border: 2px solid #7B1B2E;
-  box-shadow: 0 12px 35px rgba(123, 27, 46, 0.14);
+  box-shadow: 0 12px 35px rgba(123, 27, 46, 0.18);
   transform: translateY(-4px);
+}
+
+.replicated-course-card.active-highlight::after {
+  border-color: #7B1B2E;
+  border-width: 2px;
 }
 
 /* Card Top Cover Banner */
@@ -248,6 +277,9 @@
   width: 100%;
   overflow: hidden;
   background: linear-gradient(135deg, #FAF6EE, #F2EBE0);
+  /* Clip image cleanly to the card's top rounded corners */
+  border-radius: 20px 20px 0 0;
+  flex-shrink: 0;
 }
 
 .replicated-banner-img {
@@ -343,6 +375,10 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+  background: #FFFFFF;
+  border-radius: 0 0 20px 20px;
+  /* Clip any content that overflows the bottom curve */
+  overflow: hidden;
 }
 
 .replicated-card-title {

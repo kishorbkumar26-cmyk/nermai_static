@@ -11,8 +11,8 @@
 .top-bar-strip {
   background: linear-gradient(90deg, #5C0F1E 0%, #4A0E1C 50%, #5C0F1E 100%);
   color: #FFFFFF;
-  font-size: 0.78rem;
-  padding: 0.45rem 0;
+  font-size: 0.82rem;
+  padding: 0.6rem 0;
   border-bottom: 1px solid rgba(212, 175, 55, 0.3);
 }
 
@@ -43,9 +43,23 @@
   color: #F5D061;
 }
 
+.top-bar-item-tag {
+  font-size: 0.65rem;
+  background: rgba(245, 208, 97, 0.22);
+  color: #F5D061;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  display: inline-block;
+  line-height: 1.2;
+}
+
 .top-bar-divider {
   width: 1px;
-  height: 14px;
+  height: 16px;
   background: rgba(255, 255, 255, 0.3);
 }
 
@@ -59,7 +73,7 @@
   font-family: Georgia, serif;
   font-style: italic;
   color: #FDF6EC;
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   letter-spacing: 0.02em;
 }
 
@@ -87,7 +101,7 @@
 .main-nav-strip {
   background: #FAF6EE;
   border-bottom: 1px solid rgba(212, 175, 55, 0.25);
-  padding: 0.65rem 0;
+  padding: 1.1rem 0;
   transition: all 0.3s ease;
 }
 
@@ -107,8 +121,8 @@
 }
 
 .brand-emblem {
-  width: 50px;
-  height: 50px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
   background: linear-gradient(135deg, #7B1B2E, #4A0E1C);
   border: 2px solid #D4AF37;
@@ -121,8 +135,8 @@
 }
 
 .brand-logo-img {
-  width: 50px;
-  height: 50px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
   object-fit: cover;
   box-shadow: 0 4px 14px rgba(123, 27, 46, 0.25);
@@ -144,14 +158,17 @@
   font-size: 1.35rem;
   font-weight: 800;
   color: #7B1B2E;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.315em;
+  margin-right: -0.315em;
   line-height: 1;
+  display: block;
 }
 
 .brand-sub {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
   color: #996515;
   text-transform: uppercase;
   margin-top: 2px;
@@ -159,14 +176,14 @@
 
 .brand-divider {
   width: 1px;
-  height: 36px;
+  height: 44px;
   background: rgba(212, 175, 55, 0.4);
 }
 
 .brand-motto {
   font-family: Georgia, serif;
   font-style: italic;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: #635345;
   line-height: 1.25;
   display: flex;
@@ -177,7 +194,7 @@
 .nav-links-row {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
 .nav-item-wrap {
@@ -187,10 +204,10 @@
 .nav-link-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 0.55rem 1rem;
+  gap: 6px;
+  padding: 0.65rem 1.15rem;
   border-radius: 12px;
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   font-weight: 600;
   color: #332215;
   text-decoration: none;
@@ -245,9 +262,9 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0.55rem 0.85rem;
+  padding: 0.6rem 0.9rem;
   border-radius: 8px;
-  font-size: 0.84rem;
+  font-size: 0.86rem;
   color: #332215;
   text-decoration: none;
   transition: all 0.2s ease;
@@ -263,12 +280,12 @@
 .nav-actions-right {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.85rem;
 }
 
 .action-circle-btn {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: rgba(212, 175, 55, 0.15);
   color: #7B1B2E;
@@ -287,8 +304,8 @@
 }
 
 .action-wa-circle {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: #25D366;
   color: #FFFFFF;
@@ -308,9 +325,9 @@
 .enroll-gold-btn {
   background: linear-gradient(135deg, #E5B82C 0%, #C9910A 100%);
   color: #1A1008;
-  padding: 0.65rem 1.4rem;
+  padding: 0.72rem 1.55rem;
   border-radius: 50px;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-decoration: none;
@@ -334,7 +351,7 @@
 .ticker-strip {
   background: #FAF6EE;
   border-bottom: 1px solid rgba(212, 175, 55, 0.25);
-  padding: 0.35rem 0;
+  padding: 0.65rem 0;
   position: relative;
   overflow: hidden;
 }
@@ -343,20 +360,20 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .ticker-badge-tab {
   background: linear-gradient(135deg, #5C0F1E, #3D0913);
   color: #FFFFFF;
-  font-size: 0.78rem;
+  font-size: 0.84rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  padding: 0.4rem 1.1rem;
-  border-radius: 50px;
+  padding: 0.52rem 1.2rem 0.52rem 1.35rem;
+  border-radius: 50px 0 0 50px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   flex-shrink: 0;
   box-shadow: 0 2px 8px rgba(92, 15, 30, 0.25);
 }
@@ -390,7 +407,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.84rem;
+  font-size: 0.9rem;
   color: #4A3A2C;
   font-weight: 600;
 }
@@ -402,13 +419,13 @@
 .ticker-controls-group {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   flex-shrink: 0;
 }
 
 .ticker-ctrl-btn {
-  width: 26px;
-  height: 26px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   border: 1px solid rgba(212, 175, 55, 0.4);
   background: transparent;
@@ -417,7 +434,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   transition: all 0.2s ease;
 }
 
@@ -560,12 +577,13 @@
 
   .brand-name {
     font-size: 1.05rem;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.315em;
+    margin-right: -0.315em;
   }
 
   .brand-sub {
     font-size: 0.6rem;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.16em;
     margin-top: 1px;
   }
 

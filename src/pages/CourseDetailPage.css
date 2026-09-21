@@ -5,11 +5,27 @@
 /* ── Hero ───────────────────────────────────────────── */
 .cdp-hero-section {
   background: linear-gradient(135deg, #5a0a0a 0%, #1a0505 100%);
-  color: #fff;
+  color: #fff !important;
   padding: 4rem 0 3.5rem;
   position: relative;
   overflow: hidden;
+  max-width: 100vw;
 }
+
+/* Force white on ONLY the left text column — excludes the white CTA card */
+.cdp-hero-text,
+.cdp-hero-text * {
+  color: #fff !important;
+}
+
+/* Restore specific intentional colors inside the text column */
+.cdp-hero-tag { color: #e0b45c !important; }
+.cdp-hero-feature .fa-circle-check { color: #e0b45c !important; }
+.cdp-breadcrumb { color: rgba(255,255,255,0.5) !important; }
+.cdp-breadcrumb a { color: rgba(255,255,255,0.55) !important; }
+.cdp-breadcrumb span { color: rgba(255,255,255,0.85) !important; }
+
+
 
 .cdp-hero-pattern {
   position: absolute;
@@ -44,8 +60,8 @@
 
 .cdp-hero-content {
   display: grid;
-  grid-template-columns: auto 1fr 340px;
-  gap: 2.5rem;
+  grid-template-columns: auto 1fr minmax(0, 320px);
+  gap: 2rem;
   align-items: start;
 }
 
@@ -89,12 +105,17 @@
 }
 
 .cdp-hero-subtitle {
-  color: rgba(255,255,255,0.55);
+  color: rgba(255,255,255,0.82) !important;
   font-family: var(--font-mono, monospace);
-  font-size: 0.82rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: 0.88rem;
+  letter-spacing: 0.04em;
   margin-bottom: 1.5rem;
+  line-height: 1.7;
+  text-transform: none;
+}
+/* Force white text — override any Quill inline color styles */
+.cdp-hero-subtitle * {
+  color: rgba(255,255,255,0.82) !important;
 }
 
 .cdp-hero-features {
@@ -107,17 +128,23 @@
   align-items: center;
   gap: 0.6rem;
   font-size: 0.88rem;
-  color: rgba(255,255,255,0.75);
+  color: rgba(255,255,255,0.85);
 }
-.cdp-hero-feature .fa-circle-check { color: #e0b45c; font-size: 0.8rem; }
+/* Force white text — override any Quill inline color styles */
+.cdp-hero-feature span,
+.cdp-hero-feature * {
+  color: rgba(255,255,255,0.85) !important;
+}
+.cdp-hero-feature .fa-circle-check { color: #e0b45c !important; font-size: 0.8rem; }
 
 /* CTA Card in Hero */
 .cdp-hero-cta-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: #fff;
+  border: 1px solid rgba(255,255,255,0.18);
   border-radius: 20px;
   backdrop-filter: blur(12px);
   overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
 }
 .cdp-hero-cta-img {
   width: 100%;
@@ -134,12 +161,13 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  background: #fff;
 }
 .cdp-hero-cta-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: rgba(255,255,255,0.45);
-  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #7B1B2E !important;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   margin: 0;
 }
@@ -151,7 +179,7 @@
   justify-content: center;
   gap: 0.6rem;
   background: var(--color-primary, #A00001);
-  color: #fff;
+  color: #fff !important;
   padding: 0.85rem 1.5rem;
   border-radius: 12px;
   font-weight: 700;
@@ -177,13 +205,13 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  color: rgba(255,255,255,0.55);
+  color: #5a5a5a !important;
   text-decoration: none;
   font-size: 0.85rem;
   font-weight: 500;
   transition: color 0.2s;
 }
-.cdp-hero-contact-link:hover { color: rgba(255,255,255,0.9); }
+.cdp-hero-contact-link:hover { color: #1a1a1a !important; }
 
 /* Coming soon badge */
 .cdp-coming-soon-badge {
@@ -245,10 +273,11 @@
 .cdp-body {
   padding: 3rem 0 4rem;
   background: var(--color-background, #FAF9F7);
+  overflow-x: hidden;
 }
 .cdp-body-layout {
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: 1fr minmax(0, 280px);
   gap: 3rem;
   align-items: start;
 }
@@ -256,6 +285,8 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+  min-width: 0; /* prevent grid blowout */
+  overflow-x: hidden;
 }
 
 /* ── Section Blocks ──────────────────────────────────── */
@@ -293,6 +324,11 @@
   color: var(--color-text, #181818);
   font-size: 0.97rem;
   line-height: 1.85;
+  /* Prevent Quill content from overflowing its container */
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* Paragraphs */
@@ -642,10 +678,15 @@
 /* ── Final CTA ───────────────────────────────────────── */
 .cdp-final-cta {
   background: linear-gradient(135deg, #5a0a0a 0%, #1a0505 100%);
-  color: #fff;
+  color: #fff !important;
   padding: 6rem 1.5rem;
   position: relative;
   overflow: hidden;
+}
+
+/* Force ALL text in final CTA to white — beats inherited body color */
+.cdp-final-cta *:not(.cdp-cta-btn-primary):not(.cdp-hero-enroll-btn) {
+  color: #fff !important;
 }
 .cdp-final-cta::before {
   content: '';
@@ -658,19 +699,20 @@
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.2em;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.85) !important;
   margin-bottom: 1.25rem;
+  text-transform: uppercase;
 }
 .cdp-final-cta-title {
   font-family: var(--font-display, serif);
   font-size: clamp(1.75rem, 4vw, 2.75rem);
-  color: #fff;
+  color: #D4AF37 !important;
   margin-bottom: 1.25rem;
   line-height: 1.2;
 }
-.cdp-final-cta-title span { color: var(--color-accent, #C89B3C); }
+.cdp-final-cta-title span { color: #D4AF37 !important; }
 .cdp-final-cta-desc {
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.92) !important;
   max-width: 480px;
   margin: 0 auto 2.5rem;
   line-height: 1.8;
@@ -700,17 +742,20 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.12);
+  color: #fff;
   padding: 0.85rem 1.75rem;
   border-radius: 100px;
   font-weight: 600;
   font-size: 0.95rem;
   text-decoration: none;
-  border: 1px solid rgba(255,255,255,0.15);
-  transition: background 0.2s;
+  border: 1.5px solid rgba(255,255,255,0.6);
+  transition: background 0.2s, border-color 0.2s;
 }
-.cdp-cta-btn-ghost:hover { background: rgba(255,255,255,0.15); }
+.cdp-cta-btn-ghost:hover {
+  background: rgba(255,255,255,0.22);
+  border-color: #fff;
+}
 
 /* ── Floating Button ─────────────────────────────────── */
 .cdp-floating-btn {
@@ -743,49 +788,130 @@
 .cdp-floating-btn:hover { background: var(--color-primary-hover, #C81012); }
 
 /* ── Responsive ──────────────────────────────────────── */
+
+/* Large tablet — hero CTA moves below, sidebar collapses */
 @media (max-width: 1024px) {
   .cdp-hero-content {
     grid-template-columns: auto 1fr;
     grid-template-rows: auto auto;
+    gap: 1.5rem;
   }
   .cdp-hero-cta-card {
     grid-column: 1 / -1;
-    background: rgba(255,255,255,0.05);
+    background: #fff;
     border-radius: 16px;
     display: flex;
     align-items: center;
     gap: 1.5rem;
     padding: 1.25rem;
+    overflow: hidden;
   }
-  .cdp-hero-cta-img { width: 120px; height: 80px; flex-shrink: 0; border-radius: 10px; overflow: hidden; }
-  .cdp-hero-cta-body { flex: 1; flex-direction: row; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+  .cdp-hero-cta-img {
+    width: 130px;
+    height: 90px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .cdp-hero-cta-body {
+    flex: 1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    background: transparent;
+  }
   .cdp-hero-enroll-btn { width: auto; }
+
+  /* Body layout: stack sidebar below on tablet */
   .cdp-body-layout {
     grid-template-columns: 1fr;
+    gap: 2rem;
   }
   .cdp-sidebar { order: -1; }
   .cdp-sidebar-sticky {
     position: static;
     flex-direction: row;
     flex-wrap: wrap;
+    gap: 1rem;
   }
   .cdp-sidebar-card { flex: 1; min-width: 240px; }
   .cdp-two-col { grid-template-columns: 1fr; }
 }
 
-@media (max-width: 640px) {
-  .cdp-hero-content { grid-template-columns: 1fr; }
+/* Tablet — hero fully stacked */
+@media (max-width: 768px) {
+  .cdp-hero-section {
+    padding: 2.5rem 0 2rem;
+  }
+  .cdp-hero-content {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
   .cdp-hero-icon { display: none; }
-  .cdp-hero-title { font-size: 1.75rem; }
-  .cdp-hero-cta-card { flex-direction: column; }
-  .cdp-hero-cta-img { width: 100%; height: 140px; }
-  .cdp-hero-cta-body { flex-direction: column; }
+  .cdp-hero-title { font-size: 2rem; }
+  .cdp-hero-cta-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .cdp-hero-cta-img { width: 100%; height: 160px; }
+  .cdp-hero-cta-body {
+    flex-direction: column;
+    padding: 1rem;
+    background: #fff;
+  }
   .cdp-hero-enroll-btn { width: 100%; }
+
+  /* Body */
   .cdp-body { padding: 2rem 0 3rem; }
   .cdp-section-title { font-size: 1.4rem; }
+  .cdp-body-layout { gap: 1.5rem; }
   .cdp-sidebar-sticky { flex-direction: column; }
   .cdp-sidebar-card { min-width: unset; }
-  .cdp-floating-btn { bottom: 1rem; right: 1rem; padding: 0.75rem 1.25rem; font-size: 0.85rem; }
-  .cdp-final-cta { padding: 4rem 1.5rem; }
+
+  /* Final CTA */
+  .cdp-final-cta { padding: 4rem 1.25rem; }
   .cdp-final-cta-btns { flex-direction: column; align-items: center; }
+
+  /* Floating btn */
+  .cdp-floating-btn {
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.85rem;
+  }
+
+  /* Sticky nav */
+  .cdp-sticky-nav-inner { padding: 0 1rem; }
+  .cdp-nav-tab { padding: 0.85rem 1rem; font-size: 0.82rem; }
+}
+
+/* Mobile phone */
+@media (max-width: 480px) {
+  .cdp-hero-section { padding: 2rem 0 1.5rem; }
+  .cdp-hero-tags { gap: 0.3rem; }
+  .cdp-hero-tag { font-size: 0.6rem; padding: 2px 8px; }
+  .cdp-hero-title { font-size: 1.6rem; }
+  .cdp-hero-subtitle { font-size: 0.8rem; }
+  .cdp-hero-features { gap: 0.4rem; }
+  .cdp-hero-feature { font-size: 0.82rem; }
+
+  /* Cards become full width */
+  .cdp-hero-cta-card { border-radius: 12px; }
+  .cdp-hero-cta-img { height: 130px; }
+
+  .cdp-section-title { font-size: 1.25rem; }
+  .cdp-section-block { padding: 1.75rem 0; }
+
+  /* Rich text */
+  .cdp-rich-text { font-size: 0.92rem; }
+  .cdp-rich-text h1 { font-size: 1.25rem; }
+  .cdp-rich-text h2 { font-size: 1.1rem; }
+  .cdp-rich-text h3 { font-size: 1rem; }
+  .cdp-rich-text img { max-width: 100% !important; height: auto !important; }
+
+  .cdp-final-cta { padding: 3rem 1rem; }
+  .cdp-final-cta-title { font-size: 1.5rem; }
+
+  .cdp-floating-btn { display: none; } /* too cramped on very small phones */
 }

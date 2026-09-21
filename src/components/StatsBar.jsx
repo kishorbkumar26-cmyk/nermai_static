@@ -1,11 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
-import { Users, Calendar, GraduationCap, Trophy, ChevronRight, Star } from 'lucide-react'
+import { Users, Calendar, GraduationCap, Trophy, ChevronRight, Star, Award, Target, TrendingUp } from 'lucide-react'
 import { fbFirestore } from '../firebase/firestore'
 import './StatsBar.css'
 
 function animateCounter(el, numStr) {
-  const match = numStr.match(/^(\d+)(.*)$/)
-  if (!match) { el.textContent = numStr; return }
+  if (!el || !numStr) return
+  const str = String(numStr).trim()
+  const match = str.match(/^(\d+)(.*)$/)
+  if (!match) {
+    el.textContent = str
+    return
+  }
   const target = parseInt(match[1], 10)
   const suffix = match[2]
   const duration = 1800
@@ -39,23 +44,53 @@ const DEFAULT_ITEMS = [
     icon: GraduationCap
   },
   {
-    num: '99%',
+    num: 'Highest',
     label: 'SUCCESS',
     sublabel: 'Consistent results, brighter futures',
     icon: Trophy
   }
 ]
 
+const ICONS_POOL = [Users, Calendar, GraduationCap, Trophy, Award, Target, TrendingUp, Star]
+
 export default function StatsBar() {
+  const [statsData, setStatsData] = useState(DEFAULT_ITEMS)
   const refs = useRef([])
   const animated = useRef(false)
+
+  // Real-time Firestore settings subscription
+  useEffect(() => {
+    const unsub = fbFirestore.onSettingsChanged(s => {
+      if (s.homeContent?.stats && Array.isArray(s.homeContent.stats) && s.homeContent.stats.length > 0) {
+        const visibleList = s.homeContent.stats.filter(st => st.visible !== false)
+        const formatted = (visibleList.length > 0 ? visibleList : s.homeContent.stats).map((st, i) => {
+          let fallback = DEFAULT_ITEMS[i % DEFAULT_ITEMS.length]
+          let numVal = st.num || fallback?.num || '0'
+          // If legacy 99% or 98% is present and not explicitly customized, prefer "Highest" for success
+          if (st.label?.toLowerCase().includes('success') && (numVal === '99%' || numVal === '98%')) {
+            numVal = 'Highest'
+          }
+
+          return {
+            num: numVal,
+            label: (st.label || fallback?.label || 'STAT').toUpperCase(),
+            sublabel: st.sublabel || fallback?.sublabel || '',
+            icon: ICONS_POOL[i % ICONS_POOL.length]
+          }
+        })
+        setStatsData(formatted)
+        animated.current = false // allow counter animation to re-run on fresh data
+      }
+    })
+    return () => { if (typeof unsub === 'function') unsub() }
+  }, [])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !animated.current) {
           animated.current = true
-          DEFAULT_ITEMS.forEach((item, i) => {
+          statsData.forEach((item, i) => {
             if (refs.current[i]) animateCounter(refs.current[i], item.num)
           })
         }
@@ -65,7 +100,7 @@ export default function StatsBar() {
     const el = document.querySelector('.stats-maroon-card')
     if (el) observer.observe(el)
     return () => observer.disconnect()
-  }, [])
+  }, [statsData])
 
   return (
     <section className="stats-section" id="impact">
@@ -119,8 +154,8 @@ export default function StatsBar() {
 
           <div className="stats-card-inner">
             <div className="stats-items-2x2">
-              {DEFAULT_ITEMS.map((item, i) => {
-                const IconComponent = item.icon
+              {statsData.map((item, i) => {
+                const IconComponent = item.icon || Trophy
                 return (
                   <div key={i} className="stats-col-item">
                     <div className="stats-icon-badge">
@@ -156,7 +191,6 @@ export default function StatsBar() {
             </div>
           </div>
         </div>
-
 
         {/* Bottom Tagline Row */}
         <div className="stats-bottom-tagline reveal visible">

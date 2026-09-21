@@ -3,47 +3,64 @@
  * Ported from Construction project — same battle-tested logic.
  */
 
-// Extract Google Drive File ID from various URL formats
+// Extract Google Drive File ID from various URL formats or raw IDs
 export function extractGoogleDriveId(urlOrId) {
-  if (!urlOrId) return ''
-  const str = urlOrId.trim()
-  if (/^[a-zA-Z0-9_-]{25,50}$/.test(str)) return str
+  if (!urlOrId || typeof urlOrId !== 'string') return ''
+  // Remove all whitespace, newlines, and surrounding quotes
+  let str = urlOrId.replace(/\s+/g, '').replace(/['"]/g, '').trim()
+  if (!str) return ''
+
+  // Decode URI component if encoded
+  try {
+    if (str.includes('%')) str = decodeURIComponent(str)
+  } catch {}
+
+  // Strip query parameters or sizing suffixes for raw check
+  const stripped = str.replace(/[?#].*$/, '').replace(/=[sw]\d+.*$/, '')
+
+  // 1. Direct ID check (Google Drive IDs are 25-60 chars alphanumeric with _ or -)
+  if (/^[a-zA-Z0-9_-]{25,60}$/.test(stripped)) {
+    return stripped
+  }
+
+  // 2. Pattern matching across all known Google Drive & Google CDN URLs
   const patterns = [
-    /\/file\/d\/([a-zA-Z0-9_-]+)/,
-    /\/folders\/([a-zA-Z0-9_-]+)/,
-    /id=([a-zA-Z0-9_-]+)/,
-    /\/d\/([a-zA-Z0-9_-]+)/
+    /\/file\/d\/([a-zA-Z0-9_-]{25,60})/,
+    /\/folders\/([a-zA-Z0-9_-]{25,60})/,
+    /\/d\/([a-zA-Z0-9_-]{25,60})/,
+    /[?&]id=([a-zA-Z0-9_-]{25,60})/,
+    /\/thumbnail\?id=([a-zA-Z0-9_-]{25,60})/,
+    /\/uc\?.*id=([a-zA-Z0-9_-]{25,60})/,
+    /\/open\?.*id=([a-zA-Z0-9_-]{25,60})/,
+    /googleusercontent\.com\/[ud]\/([a-zA-Z0-9_-]{25,60})/
   ]
+
   for (const pattern of patterns) {
     const match = str.match(pattern)
     if (match && match[1]) return match[1]
   }
+
+  // Fallback: search anywhere in string for a sequence of 28-45 valid ID characters
+  const broadMatch = str.match(/[a-zA-Z0-9_-]{28,45}/)
+  if (broadMatch && broadMatch[0] && !broadMatch[0].startsWith('http')) {
+    return broadMatch[0]
+  }
+
   return ''
 }
 
-const GOOGLE_CDN_NODES = [
-  'https://lh3.googleusercontent.com/d/',
-  'https://lh4.googleusercontent.com/d/',
-  'https://lh5.googleusercontent.com/d/',
-  'https://lh6.googleusercontent.com/d/'
-]
-
-export function getGoogleDriveCDNUrl(urlOrId, width = 1600) {
+export function getGoogleDriveCDNUrl(urlOrId, width = 1000) {
   const fileId = extractGoogleDriveId(urlOrId)
   if (!fileId) return urlOrId
-  let hash = 0
-  for (let i = 0; i < fileId.length; i++) {
-    hash = (hash << 5) - hash + fileId.charCodeAt(i)
-    hash |= 0
-  }
-  const nodeIndex = Math.abs(hash % GOOGLE_CDN_NODES.length)
-  return `${GOOGLE_CDN_NODES[nodeIndex]}${fileId}=w${width}`
+  // High-reliability Google Multi-Node CDN endpoint (bypasses third-party cookie restrictions and CORS blocks)
+  const sizeParam = width && width > 0 ? `=w${width}` : '=s0'
+  return `https://lh3.googleusercontent.com/d/${fileId}${sizeParam}`
 }
 
 export function getGoogleDriveDirectUrl(urlOrId) {
   const fileId = extractGoogleDriveId(urlOrId)
   if (!fileId) return urlOrId
-  return `https://drive.google.com/uc?export=view&id=${fileId}`
+  return `https://lh3.googleusercontent.com/d/${fileId}`
 }
 
 function dataURLtoBlob(dataurl) {

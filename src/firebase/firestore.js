@@ -17,7 +17,8 @@ const COLLECTIONS = {
   GALLERY:           'nermai_gallery',
   SETTINGS:          'nermai_settings',
   COURSE_CONTENT:    'nermai_course_content',
-  RESULT_CATEGORIES: 'nermai_result_categories'
+  RESULT_CATEGORIES: 'nermai_result_categories',
+  RESULTS:           'nermai_results'
 }
 
 const heroCol            = () => collection(db, COLLECTIONS.HERO_SLIDES)
@@ -27,11 +28,66 @@ const testimonialsCol    = () => collection(db, COLLECTIONS.TESTIMONIALS)
 const galleryCol         = () => collection(db, COLLECTIONS.GALLERY)
 const courseContentDoc   = (slug) => doc(db, COLLECTIONS.COURSE_CONTENT, slug)
 const resultCategoriesCol = () => collection(db, COLLECTIONS.RESULT_CATEGORIES)
+const resultsCol          = () => collection(db, COLLECTIONS.RESULTS)
 const settingsDoc    = () => doc(db, COLLECTIONS.SETTINGS, 'main')
 
 // ─── DEFAULT DATA ─────────────────────────────────────────────────────────────
 
+export const DEFAULT_WHY_NERMAI = {
+  eyebrow: 'OUR STRENGTH',
+  titlePrefix: 'Why',
+  titleHighlight: 'NermaiIAS?',
+  subtitleLine1: 'Quality mentorship. Accessible learning. Proven results.',
+  subtitleLine2: "That's the Nermai difference.",
+  heroImageUrl: '/assets/why-nermai-right-banner.png',
+  heroImageFit: 'cover',
+  showCustomScript: false,
+  topScriptLine1: 'Same Commitment',
+  topScriptLine2: 'A Brighter India',
+  bottomScriptLine1: 'Students Today',
+  bottomScriptLine2: 'A Stronger Tomorrow',
+  mottoWords: ['Learn', 'Prepare', 'Serve', 'Succeed'],
+  pillars: [
+    {
+      id: 'p1',
+      number: '01',
+      icon: 'Trophy',
+      title: 'Proven Results',
+      desc: '**243+** Nermai students cleared government exams in 2022–26, including **105** in Police recruitments, **15** Sub-Inspector, **7** Deputy Tahsildar, **29** LDC, **25** UDC.'
+    },
+    {
+      id: 'p2',
+      number: '02',
+      icon: 'Users',
+      title: 'Experienced Mentors',
+      desc: 'Every class is taught by a dedicated mentor with at least **15 years** of experience.'
+    },
+    {
+      id: 'p3',
+      number: '03',
+      icon: 'HandCoins',
+      title: 'Non-Commercial Initiative',
+      desc: "Quality coaching at an **affordable fee**, so money is never the reason an aspirant can't prepare."
+    },
+    {
+      id: 'p4',
+      number: '04',
+      icon: 'Laptop',
+      title: 'Hybrid Classes',
+      desc: 'Learn in our **classroom or online**. It is the same class, recorded for revision.'
+    },
+    {
+      id: 'p5',
+      number: '05',
+      icon: 'TrendingUp',
+      title: 'Result-Driven Learning',
+      desc: 'Daily and weekly tests and **full mock tests**, with in-depth teaching that covers the complete syllabus.'
+    }
+  ]
+}
+
 const DEFAULT_SETTINGS = {
+  whyNermai: DEFAULT_WHY_NERMAI,
   passcode: 'nermai2024',
   pageVisibility: {
     courses: true,
@@ -49,14 +105,48 @@ const DEFAULT_SETTINGS = {
     quality: 0.85
   },
   siteInfo: {
-    phone: '+91 98765 43210',
-    email: 'info@nermai.in',
-    address: 'Nermai Training Center, Chennai - 600001, Tamil Nadu',
-    whatsapp: '919876543210',
-    instagram: '#',
-    facebook: '#',
-    youtube: '#',
-    telegram: '#'
+    phone: '+91 8903 189000',
+    email: 'nermaiasacademy@gmail.com',
+    address: 'No. 156 / 3, (1st & 2nd Floor), Nanbargal Nagar, Pondy – Villianur Main Road, Oulgaret, Puducherry – 605 010',
+    whatsapp: '918903189000',
+    instagram: 'https://instagram.com',
+    facebook: 'https://facebook.com',
+    youtube: 'https://youtube.com',
+    telegram: 'https://t.me/'
+  },
+  topBar: {
+    visible: true,
+    location: 'Puducherry, India',
+    locationLink: '',
+    showLocation: true,
+    contacts: [
+      { id: 'c1', value: '+91 8903 189000', label: 'Primary', visible: true }
+    ],
+    email: 'nermaiasacademy@gmail.com',
+    showEmail: true,
+    tagline: 'Empowering Aspirants. Strengthening the Nation.',
+    showTagline: true,
+    socials: {
+      youtube: 'https://youtube.com',
+      instagram: 'https://instagram.com',
+      telegram: 'https://t.me/',
+      facebook: 'https://facebook.com'
+    },
+    socialsVisibility: {
+      youtube: true,
+      instagram: true,
+      telegram: true,
+      facebook: true
+    }
+  },
+  branding: {
+    logoUrl: '/nermai-logo.png',
+    title: 'NERMAI',
+    subtitle: 'IAS ACADEMY',
+    showMotto: true,
+    mottoLine1: 'Learn',
+    mottoLine2: 'Compete',
+    mottoLine3: 'Serve'
   },
   footer: {
     cta: { heading: '', sub: '', btnText: '', btnLink: '' },
@@ -69,8 +159,75 @@ const DEFAULT_SETTINGS = {
   },
   officeLocations: {
     visible: true,
+    eyebrow: '📍 OUR LOCATION',
     title: 'Our Office Locations',
-    locations: []
+    subtitle: 'Visit our centre to experience a supportive learning environment, expert guidance, and a community that believes in your potential.',
+    leftScriptLine1: 'Accessible',
+    leftScriptLine2: 'Supportive',
+    leftScriptLine3: 'Always Near You',
+    rightScriptLine1: 'Same City.',
+    rightScriptLine2: 'Bigger Aspirations.',
+    feature1Icon: 'fa-graduation-cap',
+    feature1Title: 'Easy Access',
+    feature1Desc: 'Centrally located with convenient transport options',
+    feature2Icon: 'fa-users',
+    feature2Title: 'Student Friendly',
+    feature2Desc: 'A welcoming space designed for aspirants',
+    feature3Icon: 'fa-shield-halved',
+    feature3Title: 'A Supportive Community',
+    feature3Desc: 'More than a coaching centre — a place to grow',
+    mottoLine1: 'EMPOWERING ASPIRANTS.',
+    mottoLine2: 'STRENGTHENING THE NATION.',
+    locations: [
+      {
+        id: 'loc_main',
+        name: 'Main Office – Puducherry',
+        tagline: 'MAIN OFFICE',
+        address: 'No. 156 / 3, (1st & 2nd Floor), Nanbargal Nagar,\nPondy – Villianur Main Road, Oulgaret, Puducherry – 605 010',
+        phone: '+91 8903 108000',
+        phoneLabel: 'Call Us',
+        email: 'nermaiiasacademy@gmail.com',
+        emailLabel: 'Email Us',
+        hoursDays: 'Mon – Sat',
+        hoursTime: '9:00 AM – 6:00 PM',
+        mapEmbedUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3903.6262799342416!2d79.7997576!3d11.9309786!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5361a93fffe92f%3A0x6b449b2513f51175!2sNermai%20IAS%20Academy!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin',
+        directionsUrl: 'https://maps.google.com/maps?daddr=Nermai+IAS+Academy+Puducherry',
+        directionsButtonText: 'Get Directions on Google Maps',
+        quote: 'A space to learn, grow and achieve together.',
+        visible: true
+      }
+    ]
+  },
+  coursesHero: {
+    visible: true,
+    eyebrow: 'ACADEMIC PROGRAMS & COURSES',
+    eyebrowIcon: 'fa-building-columns',
+    titleLine1: 'Choose Your Path to',
+    titleLine2: 'Government Service',
+    subtitle: 'Renowned coaching for UPSC (Civil Services), Puducherry UDC, LDC, Sub-Inspector, Deputy Tahsildar, TNPSC Group I/II/IV and other competitive examinations.',
+    leftScriptLine1: 'Learn',
+    leftScriptLine2: 'Prepare',
+    leftScriptLine3: 'Succeed',
+    rightScriptLine1: 'Different',
+    rightScriptLine2: 'Aspirations',
+    rightScriptLine3: 'One',
+    rightScriptLine4: 'Destination',
+    feature1Icon: 'fa-graduation-cap',
+    feature1Title: 'Expert Faculty',
+    feature1Sub: '15+ Years of Experience',
+    feature2Icon: 'fa-file-lines',
+    feature2Title: 'Structured Learning',
+    feature2Sub: 'From Basics to Advanced',
+    feature3Icon: 'fa-chart-column',
+    feature3Title: 'Proven Results',
+    feature3Sub: 'Guiding Aspirants to Success',
+    book1Title: 'DISCIPLINE',
+    book2Title: 'KNOWLEDGE',
+    book3Title: 'SERVICE',
+    book4Title: 'A BETTER TOMORROW',
+    showScripts: true,
+    showFeatures: true,
+    showArtwork: true
   },
   homeContent: {
     visibility: {
@@ -92,10 +249,173 @@ const DEFAULT_SETTINGS = {
       { date: '2026-11-12', title: 'ICAISDA 26', subtitle: 'Two days International Conference organized by CSE', url: '', visible: true }
     ],
     stats: [
-      { num: '2400+', label: 'Students',  sublabel: 'Trained Students' },
-      { num: '14+',   label: 'Years',     sublabel: 'Years of Experience' },
-      { num: '28+',   label: 'Batches',   sublabel: 'Successful Batches' },
-      { num: '98%',   label: 'Success',   sublabel: 'Success Rate' }
+      { num: '5000+', label: 'Students',  sublabel: 'From towns, cities and rural communities' },
+      { num: '15+',   label: 'Years',     sublabel: 'Of academic excellence and trust' },
+      { num: '28+',   label: 'Batches',   sublabel: 'Across competitive examinations' },
+      { num: 'Highest', label: 'Success', sublabel: 'Consistent results, brighter futures' }
+    ],
+    featuresConfig: {
+      eyebrow: 'NERMAI CLASS PLATFORM',
+      title: 'Everything You Need to Succeed',
+      subtitle: 'A complete learning ecosystem designed for Tamil-medium aspirants, with expert guidance, structured preparation and continuous support.',
+      highlights: [
+        { icon: 'Tv', title: 'Live + Recorded', sub: 'FLEXIBLE LEARNING' },
+        { icon: 'GraduationCap', title: 'Expert Faculty', sub: '15+ YEARS EXPERIENCE' },
+        { icon: 'ShieldCheck', title: 'Exam Focused', sub: 'RESULT ORIENTED' },
+        { icon: 'Globe', title: 'Tamil & English', sub: 'BILINGUAL SUPPORT' }
+      ]
+    },
+    featureDetails: [
+      {
+        number: '01',
+        icon: 'GraduationCap',
+        title: 'Structured Classes',
+        subtitle: 'Daily scheduled classes with expert faculty in Tamil & English medium.',
+        tag: 'FEATURE 01',
+        caption: 'Learn from the best, at your own pace.',
+        desc: 'Daily scheduled classes covering the complete syllabus with expert faculty in Tamil and English medium. Includes live interactive sessions, recorded classes, doubt clearing and revision sessions.',
+        checkpoints: [
+          'Expert faculty with years of experience',
+          'Live + recorded classes',
+          'Tamil & English medium',
+          'Exam-oriented teaching approach',
+          'Doubt clearing sessions'
+        ],
+        primaryCta: 'EXPLORE CLASSES',
+        primaryCtaLink: '',
+        secondaryCta: 'View Sample Class',
+        secondaryCtaLink: '',
+        imageUrl: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop',
+        calloutNote: 'Your classroom anywhere, anytime',
+        quote: 'Well-structured classes made it easy for me to understand complex topics.',
+        author: '— M. Karthik, TNPSC Group II (2024)',
+        visible: true
+      },
+      {
+        number: '02',
+        icon: 'BookOpen',
+        title: 'Study Materials',
+        subtitle: 'Comprehensive study notes and question banks aligned to exam pattern.',
+        tag: 'FEATURE 02',
+        caption: 'Comprehensive notes tailored for civil service exams.',
+        desc: 'Access structured study materials, topic-wise PDFs, hand-curated question banks, and standard reference materials updated according to the latest exam pattern.',
+        checkpoints: [
+          'Comprehensive Tamil & English PDF notes',
+          'Topic-wise previous year questions',
+          'Curated standard textbook summaries',
+          'Regular current affairs updates',
+          'Downloadable for offline learning'
+        ],
+        primaryCta: 'GET STUDY MATERIALS',
+        primaryCtaLink: '',
+        secondaryCta: 'View Sample PDF',
+        secondaryCtaLink: '',
+        imageUrl: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=1200&auto=format&fit=crop',
+        calloutNote: 'Curated for Tamil Medium',
+        quote: 'The study materials provided by Nermai were concise, exam-focused, and easy to review.',
+        author: '— S. Priyadharshini, TNPSC Group I Selected',
+        visible: true
+      },
+      {
+        number: '03',
+        icon: 'PenTool',
+        title: 'Mock Tests',
+        subtitle: 'Weekly full-length tests and sectional tests with detailed analysis.',
+        tag: 'FEATURE 03',
+        caption: 'Simulate the real exam experience before test day.',
+        desc: 'Take weekly full-length mock tests and sectional practice tests. Get instant performance analytics, detailed solutions, and rank comparisons.',
+        checkpoints: [
+          'Weekly full-length exam simulations',
+          'Sectional and subject-wise test series',
+          'Detailed answer keys & explanations',
+          'All-Puducherry & Tamil Nadu rank tracking',
+          'Personalized weak-area analysis'
+        ],
+        primaryCta: 'TAKE MOCK TEST',
+        primaryCtaLink: '',
+        secondaryCta: 'View Test Schedule',
+        secondaryCtaLink: '',
+        imageUrl: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=1200&auto=format&fit=crop',
+        calloutNote: 'Real Exam Simulation',
+        quote: 'Weekly mock tests helped me eliminate exam fear and manage my time effectively.',
+        author: '— R. Vimal, TNPSC Group II Rank 14',
+        visible: true
+      },
+      {
+        number: '04',
+        icon: 'LineChart',
+        title: 'Progress Tracking',
+        subtitle: 'Personal performance dashboard to monitor strengths and weaknesses.',
+        tag: 'FEATURE 04',
+        caption: 'Data-driven insights for smarter preparation.',
+        desc: 'Monitor your study hours, score trends, and subject mastery over time with our intuitive student analytics dashboard.',
+        checkpoints: [
+          'Subject-wise mastery percentages',
+          'Time management & speed analytics',
+          'Score trend graphs over weeks',
+          'Personalized study plan recommendations',
+          'Direct feedback from course mentors'
+        ],
+        primaryCta: 'VIEW DASHBOARD',
+        primaryCtaLink: '',
+        secondaryCta: 'Learn More',
+        secondaryCtaLink: '',
+        imageUrl: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1200&auto=format&fit=crop',
+        calloutNote: 'AI-Powered Insights',
+        quote: 'Tracking my weekly scores helped me focus exactly where I was losing marks.',
+        author: '— A. Soundarya, Sub-Inspector Exam 2024',
+        visible: true
+      },
+      {
+        number: '05',
+        icon: 'CalendarCheck',
+        title: 'Class Schedule',
+        subtitle: 'Flexible batch timings for students, working professionals and rural aspirants.',
+        tag: 'FEATURE 05',
+        caption: 'Study on your timeline without compromising quality.',
+        desc: 'Choose from weekday regular batches, weekend batches for working professionals, or evening online sessions designed for maximum flexibility.',
+        checkpoints: [
+          'Morning & Evening live batch timings',
+          'Special weekend batches for professionals',
+          '24/7 access to recorded lectures',
+          'Flexible batch transfer options',
+          'Structured weekly timetable updates'
+        ],
+        primaryCta: 'VIEW TIMETABLE',
+        primaryCtaLink: '',
+        secondaryCta: 'Batch Details',
+        secondaryCtaLink: '',
+        imageUrl: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=1200&auto=format&fit=crop',
+        calloutNote: 'Weekday & Weekend Batches',
+        quote: 'As a working professional, the flexible weekend schedule made my preparation possible.',
+        author: '— K. Venkatesh, VAO Selected',
+        visible: true
+      },
+      {
+        number: '06',
+        icon: 'UserCircle',
+        title: 'Academic Guidance',
+        subtitle: 'One-on-one mentoring sessions with IAS/IPS selected alumni faculty.',
+        tag: 'FEATURE 06',
+        caption: 'Direct 1-on-1 mentorship throughout your journey.',
+        desc: 'Get guidance from selected officers, experienced faculty, and subject experts to clear strategy doubts, stay motivated, and refine your approach.',
+        checkpoints: [
+          '1-on-1 personal mentorship sessions',
+          'Strategy planning with selected alumni',
+          'Regular progress reviews & feedback',
+          'Answer writing evaluation & review',
+          'Motivation and stress management support'
+        ],
+        primaryCta: 'BOOK MENTOR SESSION',
+        primaryCtaLink: '',
+        secondaryCta: 'Our Faculty',
+        secondaryCtaLink: '',
+        imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop',
+        calloutNote: '1-on-1 Officer Guidance',
+        quote: 'One-on-one sessions with faculty kept me focused during tough phases of preparation.',
+        author: '— P. Divya, TNPSC Group I Mains Aspirant',
+        visible: true
+      }
     ],
     features: [
       { icon: 'GraduationCap', title: 'Structured Classes',  desc: 'Daily scheduled classes with expert faculty in Tamil & English medium.', imageUrl: '', visible: true },
@@ -140,6 +460,17 @@ const DEFAULT_SETTINGS = {
         { text: 'Online GS PCM 2027 - Admission Open', link: '#' },
         { text: 'StepUp Mentorship 2027 - Admission Open', link: '#' }
       ]
+    },
+    testimonialsConfig: {
+      eyebrow: 'STUDENT REVIEWS',
+      title: 'Hear What They Say',
+      subtitle: 'Honest feedback from successful Nermai students.',
+      leftNoteLine1: 'Same Dedication.',
+      leftNoteLine2: 'A Brighter Tomorrow.',
+      rightScriptLine1: 'Real Aspirants',
+      rightScriptLine2: 'Real Stories',
+      rightScriptLine3: 'Real Success',
+      bottomTagline: 'THOUSANDS OF DREAMS. A STRONGER INDIA.'
     }
   },
   footer: {
@@ -190,12 +521,127 @@ const DEFAULT_NOTICES = [
   { title: 'TN Police SI Exam Application', content: 'Model questions for Tamil Nadu Police Sub-Inspector exam are available.', priority: 'normal', date: new Date().toISOString().split('T')[0] }
 ]
 
-const DEFAULT_TOPPERS = [
-  { name: 'Kavitha S.', rank: '1', exam: 'TNPSC Group II', year: '2024', photo: '', quote: 'This success was possible only through Nermai\'s guidance.' },
-  { name: 'Murugan R.', rank: '3', exam: 'TNPSC Group I', year: '2023', photo: '', quote: 'I studied 8 hours daily. Nermai Academy built my self-confidence.' },
-  { name: 'Priya M.', rank: '7', exam: 'UPSC CSE', year: '2023', photo: '', quote: 'Current affairs and Tamil medium materials were exceptional here.' },
-  { name: 'Selvam K.', rank: '2', exam: 'TN Police SI', year: '2024', photo: '', quote: 'Physical training guidance along with academics made the difference.' }
+const DEFAULT_RESULTS = [
+  {
+    id: 'res-1',
+    name: 'Arjun Kumar',
+    exam: 'UPSC Civil Services',
+    year: '2026',
+    rank: '01',
+    category: 'upsc',
+    quote: 'A journey of discipline leads to a life of purpose.',
+    story: 'Comprehensive guidance for Prelims and Mains along with individual answer writing evaluation at Nermai played a critical role in clearing UPSC Civil Services.',
+    photo: '',
+    isFeatured: true,
+    visible: true
+  },
+  {
+    id: 'res-2',
+    name: 'Priya S.',
+    exam: 'TNPSC Group I',
+    year: '2026',
+    rank: '01',
+    category: 'tnpsc-g1',
+    quote: 'Consistent effort creates extraordinary results.',
+    story: 'Nermai Academy structured test series, daily current affairs analysis, and personalized mentorship helped me secure State Rank 1.',
+    photo: '',
+    isFeatured: true,
+    visible: true
+  },
+  {
+    id: 'res-3',
+    name: 'Karthik R.',
+    exam: 'Banking (IBPS PO)',
+    year: '2026',
+    rank: '01',
+    category: 'banking',
+    quote: 'Dream. Prepare. Achieve.',
+    story: 'The shortcut techniques in Quantitative Aptitude and speed test batches helped me clear both Prelims and Mains on my first attempt.',
+    photo: '',
+    isFeatured: true,
+    visible: true
+  },
+  {
+    id: 'res-4',
+    name: 'Vignesh M.',
+    exam: 'UPSC Civil Services',
+    year: '2026',
+    rank: '45',
+    category: 'upsc',
+    quote: 'The faculty were more than teachers — they were mentors.',
+    story: 'Daily answer writing and individual mentoring sessions at Nermai built my confidence to secure AIR 45.',
+    photo: '',
+    isFeatured: true,
+    visible: true
+  },
+  {
+    id: 'res-5',
+    name: 'Divya S.',
+    exam: 'TNPSC Group II',
+    year: '2026',
+    rank: '03',
+    category: 'tnpsc-g2',
+    quote: 'Nermai gave me the right direction and the confidence to stay consistent.',
+    story: 'From foundational coaching to final revision batches, Nermai provided the exact roadmap needed.',
+    photo: '',
+    isFeatured: true,
+    visible: true
+  },
+  {
+    id: 'res-6',
+    name: 'Suresh K.',
+    exam: 'TNPSC Group II',
+    year: '2026',
+    rank: '07',
+    category: 'tnpsc-g2',
+    quote: 'Constant motivation and regular doubt-clearing sessions.',
+    story: 'Weekly tests and faculty feedback helped me continuously improve my score.',
+    photo: '',
+    isFeatured: true,
+    visible: true
+  },
+  {
+    id: 'res-7',
+    name: 'Anitha R.',
+    exam: 'TNPSC Group IV',
+    year: '2026',
+    rank: '12',
+    category: 'tnpsc-g4',
+    quote: 'Mock tests at Nermai made me exam-ready and fearless.',
+    story: 'Tamil medium materials and general studies classes were exceptionally structured.',
+    photo: '',
+    isFeatured: false,
+    visible: true
+  },
+  {
+    id: 'res-8',
+    name: 'V. Anbuselvan',
+    exam: 'Puducherry UDC/LDC',
+    year: '2024',
+    rank: '03',
+    category: 'puducherry',
+    quote: 'Focused coaching and structured test series made all the difference.',
+    story: 'Clearing Puducherry government exam required thorough coverage of local syllabus and current affairs.',
+    photo: '',
+    isFeatured: false,
+    visible: true
+  },
+  {
+    id: 'res-9',
+    name: 'Selvam K.',
+    exam: 'TN Police SI',
+    year: '2024',
+    rank: '02',
+    category: 'police',
+    quote: 'Physical training guidance along with academics made the difference.',
+    story: 'Nermai provided both top quality classroom sessions and physical ground training support.',
+    photo: '',
+    isFeatured: false,
+    visible: true
+  }
 ]
+
+const DEFAULT_TOPPERS = DEFAULT_RESULTS
 
 const DEFAULT_TESTIMONIALS = [
   { name: 'Anitha Devi', role: 'TNPSC Group IV Aspirant', quote: 'I succeeded in my first attempt by studying at Nermai. The dedication of the teachers is outstanding.' },
@@ -327,44 +773,25 @@ export const fbFirestore = {
     await deleteDoc(doc(db, COLLECTIONS.NOTICES, id))
   },
 
-  // ── TOPPERS ──
+  // ── TOPPERS & RESULTS (Unified Collection) ──
   async getToppers() {
-    try {
-      const q = query(toppersCol(), orderBy('createdAt', 'asc'))
-      const snap = await getDocs(q)
-      return snap.docs.map(d => ({ id: d.id, ...d.data() }))
-    } catch {
-      return []
-    }
+    return await this.getResults()
   },
 
   onToppersChanged(callback) {
-    const q = query(toppersCol(), orderBy('createdAt', 'asc'))
-    return onSnapshot(q, (snap) => {
-      const items = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-      callback(items)
-    }, () => callback([]))
+    return this.onResultsChanged(callback)
   },
 
   async addTopper(data) {
-    return await addDoc(toppersCol(), {
-      name: data.name || '',
-      rank: data.rank || '',
-      exam: data.exam || '',
-      year: data.year || new Date().getFullYear().toString(),
-      photo: data.photo || '',
-      quote: data.quote || '',
-      storageType: data.storageType || 'url',
-      createdAt: serverTimestamp()
-    })
+    return await this.addResult(data)
   },
 
   async updateTopper(id, data) {
-    await updateDoc(doc(db, COLLECTIONS.TOPPERS, id), data)
+    return await this.updateResult(id, data)
   },
 
   async deleteTopper(id) {
-    await deleteDoc(doc(db, COLLECTIONS.TOPPERS, id))
+    return await this.deleteResult(id)
   },
 
   // ── TESTIMONIALS ──
@@ -530,6 +957,47 @@ export const fbFirestore = {
     } catch { return [] }
   },
 
+  // ── RESULTS (dedicated results page entries) ──
+  async getResults() {
+    try {
+      const q = query(resultsCol(), orderBy('createdAt', 'desc'))
+      const snap = await getDocs(q)
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }))
+    } catch { return [] }
+  },
+
+  onResultsChanged(callback) {
+    const q = query(resultsCol(), orderBy('createdAt', 'desc'))
+    return onSnapshot(q, snap => {
+      callback(snap.docs.map(d => ({ id: d.id, ...d.data() })))
+    }, () => callback([]))
+  },
+
+  async addResult(data) {
+    return await addDoc(resultsCol(), {
+      name:       data.name       || '',
+      rank:       data.rank       || '',
+      exam:       data.exam       || '',
+      year:       data.year       || new Date().getFullYear().toString(),
+      photo:      data.photo      || '',
+      quote:      data.quote      || '',
+      story:      data.story      || '',
+      category:   data.category   || 'upsc',
+      isFeatured: data.isFeatured === true,
+      visible:    data.visible !== false,
+      storageType: data.storageType || 'url',
+      createdAt:  serverTimestamp()
+    })
+  },
+
+  async updateResult(id, data) {
+    await updateDoc(doc(db, COLLECTIONS.RESULTS, id), data)
+  },
+
+  async deleteResult(id) {
+    await deleteDoc(doc(db, COLLECTIONS.RESULTS, id))
+  },
+
   COLLECTIONS
 }
 
@@ -580,9 +1048,61 @@ if (isDemo) {
     }
   }
 
+  const getStoredResults = () => {
+    const r = ls.get('results', null)
+    const t = ls.get('toppers', null)
+    if (r !== null && Array.isArray(r) && r.length > 0) return r
+    if (t !== null && Array.isArray(t) && t.length > 0) return t
+    return DEFAULT_RESULTS
+  }
+
+  const resultsColHandler = {
+    get: async () => getStoredResults(),
+    on: (cb) => {
+      const trig = () => cb(getStoredResults())
+      trig()
+      window.addEventListener('nermai_db_results', trig)
+      window.addEventListener('nermai_db_toppers', trig)
+      return () => {
+        window.removeEventListener('nermai_db_results', trig)
+        window.removeEventListener('nermai_db_toppers', trig)
+      }
+    },
+    add: async (data) => {
+      const items = getStoredResults()
+      const id = ls.genId()
+      const newItem = { id, ...data, createdAt: new Date().toISOString() }
+      items.unshift(newItem)
+      ls.set('results', items)
+      ls.set('toppers', items)
+      window.dispatchEvent(new Event('nermai_db_results'))
+      window.dispatchEvent(new Event('nermai_db_toppers'))
+      return { id }
+    },
+    update: async (id, data) => {
+      const items = getStoredResults()
+      const idx = items.findIndex(x => x.id === id)
+      if (idx >= 0) {
+        items[idx] = { ...items[idx], ...data }
+        ls.set('results', items)
+        ls.set('toppers', items)
+        window.dispatchEvent(new Event('nermai_db_results'))
+        window.dispatchEvent(new Event('nermai_db_toppers'))
+      }
+    },
+    del: async (id) => {
+      const items = getStoredResults()
+      const filtered = items.filter(x => x.id !== id)
+      ls.set('results', filtered)
+      ls.set('toppers', filtered)
+      window.dispatchEvent(new Event('nermai_db_results'))
+      window.dispatchEvent(new Event('nermai_db_toppers'))
+    }
+  }
+
   const heroes = mockCol('hero', [])
   const notices = mockCol('notices', DEFAULT_NOTICES.map((n,i) => ({id:`def_${i}`, ...n})))
-  const toppers = mockCol('toppers', DEFAULT_TOPPERS.map((t,i) => ({id:`def_${i}`, ...t})))
+  const results = resultsColHandler
   const testimonials = mockCol('testimonials', DEFAULT_TESTIMONIALS.map((t,i) => ({id:`def_${i}`, ...t})))
   const gallery = mockCol('gallery', [])
   const resultCats = mockCol('resultCats', [])
@@ -615,7 +1135,13 @@ if (isDemo) {
 
     getNotices: notices.get, onNoticesChanged: notices.on, addNotice: notices.add, updateNotice: notices.update, deleteNotice: notices.del,
     
-    getToppers: toppers.get, onToppersChanged: toppers.on, addTopper: toppers.add, updateTopper: toppers.update, deleteTopper: toppers.del,
+    getToppers: results.get, onToppersChanged: results.on, 
+    addTopper: async (data) => results.add({ 
+      name: data.name||'', rank: data.rank||'', exam: data.exam||'', year: data.year||new Date().getFullYear().toString(), 
+      photo: data.photo||'', quote: data.quote||'', story: data.story||'', category: data.category||'upsc', 
+      isFeatured: data.isFeatured === true, visible: data.visible !== false, storageType: data.storageType||'url' 
+    }), 
+    updateTopper: results.update, deleteTopper: results.del,
     
     getTestimonials: testimonials.get, onTestimonialsChanged: testimonials.on, addTestimonial: testimonials.add, updateTestimonial: testimonials.update, deleteTestimonial: testimonials.del,
     
@@ -636,6 +1162,14 @@ if (isDemo) {
       const all = await resultCats.get()
       return resultCats.add({ name: data.name || 'Category', slug: data.slug || data.name?.toLowerCase().replace(/\s+/g,'-') || 'cat', color: data.color || '#7b1b2e', order: all.length })
     },
+
+    getResults: results.get, onResultsChanged: results.on, deleteResult: results.del,
+    addResult: async (data) => results.add({ 
+      name: data.name||'', rank: data.rank||'', exam: data.exam||'', year: data.year||new Date().getFullYear().toString(), 
+      photo: data.photo||'', quote: data.quote||'', story: data.story||'', category: data.category||'upsc', 
+      isFeatured: data.isFeatured === true, visible: data.visible !== false, storageType: data.storageType||'url' 
+    }),
+    updateResult: results.update,
 
     async getCourseContent(slug) {
       const map = ls.get('courses', {})

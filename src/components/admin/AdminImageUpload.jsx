@@ -1,18 +1,15 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { driveStorage } from '../../services/driveStorage'
-import { extractGoogleDriveId, getGoogleDriveCDNUrl } from '../../utils/imageOptimizer'
+import { extractGoogleDriveId } from '../../utils/imageOptimizer'
 
 /**
- * Universal Admin Image Uploader
- * Provides 3 full options on every image field:
- * 1. Direct File Upload (Uploads to Google Drive if configured, else Firestore base64 with compression)
- * 2. Google Drive URL / Direct Web Image URL Input
- * 3. Live Image Preview with Link Test & Format Detection
+ * Universal Admin Image Uploader with Explicit Dimension Indicators
  */
 export default function AdminImageUpload({
   value = '',
   onChange,
   label = 'Image',
+  dimensions = '',
   subFolderName = 'nermai-uploads',
   maxWidth = 1600,
   quality = 0.85,
@@ -27,10 +24,31 @@ export default function AdminImageUpload({
   const [dragOver, setDragOver] = useState(false)
   const [imgError, setImgError] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [naturalDims, setNaturalDims] = useState(null)
   const fileInputRef = useRef(null)
 
   const config = driveStorage.getConfig()
   const isDriveConfigured = !!config.appsScriptUrl || !!config.accessToken
+
+  // Smart fallback for dimensions if not explicitly passed
+  const getComputedDimensions = () => {
+    if (dimensions) return dimensions
+    const lbl = (label || '').toLowerCase()
+    const folder = (subFolderName || '').toLowerCase()
+
+    if (lbl.includes('desktop') || folder.includes('desktop')) return '1920 × 800 px (Landscape 16:9 / 21:9)'
+    if (lbl.includes('mobile') || folder.includes('mobile')) return '800 × 1200 px (Portrait 2:3)'
+    if (lbl.includes('why nermai') || folder.includes('why-nermai')) return '1024 × 475 px (Panoramic Landscape)'
+    if (lbl.includes('logo') || folder.includes('logo')) return '512 × 512 px (Square PNG/SVG)'
+    if (lbl.includes('topper') || lbl.includes('student') || folder.includes('toppers')) return '600 × 750 px (Portrait 4:5)'
+    if (lbl.includes('gallery') || folder.includes('gallery')) return '1200 × 800 px (Landscape 3:2)'
+    if (lbl.includes('review') || lbl.includes('testimonial') || folder.includes('testimonials')) return '400 × 400 px (Square 1:1)'
+    if (lbl.includes('course') || folder.includes('course')) return '800 × 500 px (Landscape 16:10)'
+    if (lbl.includes('result') || folder.includes('results')) return '1080 × 1350 px (Poster 4:5)'
+    return '1200 × 800 px (Recommended)'
+  }
+
+  const dimText = getComputedDimensions()
 
   const handleFileUpload = async (file) => {
     if (!file || !file.type.startsWith('image/')) {
@@ -67,7 +85,8 @@ export default function AdminImageUpload({
   const handleUrlChange = (e) => {
     const rawVal = e.target.value
     setImgError(false)
-    onChange(rawVal)
+    const cleaned = rawVal.trim().replace(/^['"]|['"]$/g, '')
+    onChange(cleaned)
   }
 
   const handleCopy = () => {
@@ -81,6 +100,7 @@ export default function AdminImageUpload({
   const handleClear = () => {
     onChange('')
     setImgError(false)
+    setNaturalDims(null)
   }
 
   // Format preview URL
@@ -89,54 +109,85 @@ export default function AdminImageUpload({
   const isDriveLink = !!driveId
   const isBase64 = typeof value === 'string' && value.startsWith('data:')
 
-  // Direct test link for user to verify
   let testUrl = value
   if (driveId) {
     testUrl = `https://drive.google.com/file/d/${driveId}/view`
   }
 
+  const handlePreviewError = (e) => {
+    const imgEl = e.target
+    if (driveId) {
+      if (!imgEl.dataset.fallbackStep || imgEl.dataset.fallbackStep === '0') {
+        imgEl.dataset.fallbackStep = '1'
+        imgEl.src = `https://lh3.googleusercontent.com/d/${driveId}=w1000`
+        return
+      }
+      if (imgEl.dataset.fallbackStep === '1') {
+        imgEl.dataset.fallbackStep = '2'
+        imgEl.src = `https://lh3.googleusercontent.com/u/0/d/${driveId}=w1000`
+        return
+      }
+      if (imgEl.dataset.fallbackStep === '2') {
+        imgEl.dataset.fallbackStep = '3'
+        imgEl.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000`
+        return
+      }
+      if (imgEl.dataset.fallbackStep === '3') {
+        imgEl.dataset.fallbackStep = '4'
+        imgEl.src = `https://drive.usercontent.google.com/download?id=${driveId}&export=view`
+        return
+      }
+    }
+    setImgError(true)
+  }
+
   return (
     <div className="ap-image-upload-wrapper" style={{
-      background: 'var(--gray-50, #f8fafc)',
-      border: '1.5px solid var(--gray-200, #e2e8f0)',
-      borderRadius: '8px',
-      padding: '1rem',
-      marginBottom: '1.25rem'
+      background: '#ffffff',
+      border: '1.5px solid #e2e8f0',
+      borderRadius: '10px',
+      padding: '1.1rem',
+      marginBottom: '1.25rem',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
     }}>
-      {/* Header with Label & Dimension / Source Hints */}
+      {/* Header with Label & Required Dimensions Badge */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <i className="fa-solid fa-image" style={{ color: 'var(--maroon, #7b1b2e)', fontSize: '0.9rem' }} />
-          <strong style={{ fontSize: '0.85rem', color: 'var(--ink, #1e293b)' }}>{label}</strong>
+          <i className="fa-solid fa-image" style={{ color: 'var(--maroon, #7b1b2e)', fontSize: '0.95rem' }} />
+          <strong style={{ fontSize: '0.88rem', color: '#1e293b' }}>{label}</strong>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-          {hint && (
-            <span style={{
-              fontSize: '0.7rem',
-              background: 'rgba(0,0,0,0.06)',
-              color: 'var(--gray-600, #475569)',
-              padding: '2px 8px',
-              borderRadius: '4px',
-              fontWeight: 500
-            }}>
-              {hint}
-            </span>
-          )}
+          {/* Dimension Tag */}
+          <span style={{
+            fontSize: '0.72rem',
+            background: '#eff6ff',
+            color: '#1d4ed8',
+            border: '1px solid #bfdbfe',
+            padding: '3px 9px',
+            borderRadius: '6px',
+            fontWeight: 700,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '5px'
+          }}>
+            <i className="fa-solid fa-ruler-combined" />
+            Size: {dimText}
+          </span>
 
           <span style={{
             fontSize: '0.7rem',
             background: isDriveConfigured ? '#dcfce7' : '#fef3c7',
             color: isDriveConfigured ? '#166534' : '#92400e',
-            padding: '2px 8px',
-            borderRadius: '4px',
+            padding: '3px 8px',
+            borderRadius: '6px',
             fontWeight: 600,
             display: 'inline-flex',
             alignItems: 'center',
             gap: '4px'
           }}>
             <i className={isDriveConfigured ? 'fa-brands fa-google-drive' : 'fa-solid fa-floppy-disk'} />
-            {isDriveConfigured ? 'Drive Auto-Upload' : 'Firestore Base64'}
+            {isDriveConfigured ? 'Drive Upload' : 'Auto Compress'}
           </span>
         </div>
       </div>
@@ -145,12 +196,12 @@ export default function AdminImageUpload({
       <div
         className={`ap-file-drop ${dragOver ? 'drag-over' : ''}`}
         style={{
-          border: '2px dashed var(--gray-300, #cbd5e1)',
-          borderRadius: '6px',
-          padding: '1rem 0.75rem',
+          border: '2px dashed #cbd5e1',
+          borderRadius: '8px',
+          padding: '1.1rem 0.85rem',
           textAlign: 'center',
           cursor: 'pointer',
-          background: dragOver ? 'rgba(230, 92, 0, 0.05)' : '#ffffff',
+          background: dragOver ? 'rgba(230, 92, 0, 0.05)' : '#f8fafc',
           transition: 'all 0.2s ease',
           marginBottom: '0.75rem'
         }}
@@ -164,13 +215,13 @@ export default function AdminImageUpload({
         onClick={() => fileInputRef.current?.click()}
       >
         <i className={`fa-solid ${uploading ? 'fa-spinner fa-spin' : 'fa-cloud-arrow-up'}`}
-          style={{ fontSize: '1.4rem', color: uploading ? 'var(--saffron, #e65c00)' : 'var(--gray-400, #94a3b8)', marginBottom: '0.35rem', display: 'block' }}
+          style={{ fontSize: '1.5rem', color: uploading ? 'var(--saffron, #e65c00)' : '#64748b', marginBottom: '0.35rem', display: 'block' }}
         />
-        <div style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--ink, #1e293b)' }}>
-          {uploading ? `Uploading & Optimizing... ${progress}%` : '📁 Click to Browse or Drag Photo Here'}
+        <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#1e293b' }}>
+          {uploading ? `Uploading & Optimizing... ${progress}%` : 'Click to Browse or Drag Photo Here'}
         </div>
-        <div style={{ fontSize: '0.7rem', color: 'var(--gray-400, #94a3b8)', marginTop: '2px' }}>
-          {isDriveConfigured ? 'Directly uploads to Google Drive with automatic CDN link' : 'Uploads & compresses into instant local storage'}
+        <div style={{ fontSize: '0.73rem', color: '#64748b', marginTop: '3px', fontWeight: 500 }}>
+          Ideal Resolution: <strong style={{ color: '#0f172a' }}>{dimText}</strong>
         </div>
         <input
           ref={fileInputRef}
@@ -192,8 +243,8 @@ export default function AdminImageUpload({
       {/* Option 2: Google Drive / Image URL Input */}
       <div style={{ marginBottom: '0.75rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
-          <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--gray-600, #475569)' }}>
-            🔗 Or Paste Google Drive Link / Web URL / File ID:
+          <label style={{ fontSize: '0.75rem', fontWeight: 600, color: '#475569' }}>
+            Or Paste Web Image / Google Drive URL:
           </label>
           {isDriveLink && (
             <span style={{ fontSize: '0.68rem', color: '#16a34a', fontWeight: 600 }}>
@@ -224,27 +275,26 @@ export default function AdminImageUpload({
         </div>
       </div>
 
-      {/* Option 3: Live Image & Link Preview */}
-      {value ? (
-        <div style={{
-          background: '#ffffff',
-          border: '1px solid var(--gray-200, #e2e8f0)',
-          borderRadius: '6px',
+      {/* Image Preview & Detected Dimensions Box */}
+      {value && (
+        <div className="ap-image-preview-box" style={{
+          background: '#f8fafc',
+          borderRadius: '8px',
+          border: '1px solid #e2e8f0',
           padding: '0.75rem',
           display: 'flex',
           gap: '1rem',
           alignItems: 'center',
           flexWrap: 'wrap'
         }}>
-          {/* Image Thumbnail Box */}
+          {/* Thumbnail */}
           <div style={{
-            width: aspectRatio === '16/5' ? '140px' : (aspectRatio === '3/4' ? '75px' : '90px'),
-            height: previewHeight,
-            maxHeight: previewHeight,
-            borderRadius: '4px',
+            width: '120px',
+            height: `${previewHeight}px`,
+            borderRadius: '6px',
             overflow: 'hidden',
-            background: '#f1f5f9',
-            border: '1px solid var(--gray-300, #cbd5e1)',
+            background: '#0f172a',
+            border: '1px solid #cbd5e1',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -255,88 +305,75 @@ export default function AdminImageUpload({
               <img
                 src={previewUrl}
                 alt="Preview"
-                style={{ width: '100%', height: '100%', objectFit: aspectRatio === 'contain' ? 'contain' : 'cover' }}
-                onError={() => setImgError(true)}
+                onLoad={e => {
+                  setNaturalDims({
+                    w: e.target.naturalWidth,
+                    h: e.target.naturalHeight
+                  })
+                }}
+                onError={handlePreviewError}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain'
+                }}
               />
             ) : (
-              <div style={{ textAlign: 'center', padding: '0.5rem', color: '#dc2626' }}>
-                <i className="fa-solid fa-triangle-exclamation" style={{ fontSize: '1.2rem', marginBottom: '0.25rem' }} />
-                <div style={{ fontSize: '0.65rem' }}>Failed to load</div>
+              <div style={{ color: '#ef4444', fontSize: '0.7rem', textAlign: 'center', padding: '0.25rem' }}>
+                <i className="fa-solid fa-triangle-exclamation" style={{ fontSize: '1.1rem', display: 'block', marginBottom: '2px' }} />
+                Image Failed
               </div>
             )}
           </div>
 
-          {/* Details & Action Controls */}
+          {/* Metadata & Actions */}
           <div style={{ flex: 1, minWidth: '180px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-              <span style={{
-                fontSize: '0.7rem',
-                fontWeight: 700,
-                color: imgError ? '#dc2626' : '#16a34a',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px'
-              }}>
-                <i className={`fa-solid ${imgError ? 'fa-circle-xmark' : 'fa-circle-check'}`} />
-                {imgError ? 'Image Not Accessible' : 'Image Active & Ready'}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#16a34a', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <i className="fa-solid fa-circle-check" /> Active Image
               </span>
 
-              {isDriveLink && (
-                <span style={{ fontSize: '0.65rem', background: '#dbeafe', color: '#1e40af', padding: '1px 6px', borderRadius: '3px', fontWeight: 600 }}>
-                  Google Drive CDN
-                </span>
-              )}
-              {isBase64 && (
-                <span style={{ fontSize: '0.65rem', background: '#fef3c7', color: '#92400e', padding: '1px 6px', borderRadius: '3px', fontWeight: 600 }}>
-                  Base64 Data
+              {naturalDims && (
+                <span style={{
+                  fontSize: '0.7rem',
+                  background: '#f1f5f9',
+                  color: '#334155',
+                  border: '1px solid #cbd5e1',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  fontWeight: 600
+                }}>
+                  Actual: {naturalDims.w} × {naturalDims.h} px
                 </span>
               )}
             </div>
 
-            {/* URL String Snippet */}
-            <div style={{
-              fontSize: '0.72rem',
-              color: 'var(--gray-500, #64748b)',
-              fontFamily: 'var(--font-mono, monospace)',
-              wordBreak: 'break-all',
-              maxHeight: '38px',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              marginBottom: '0.6rem'
-            }}>
-              {value.startsWith('data:') ? `data:image/... (${Math.round(value.length / 1024)} KB)` : value}
+            <div style={{ fontSize: '0.72rem', color: '#64748b', wordBreak: 'break-all', marginBottom: '0.5rem' }}>
+              {isBase64 ? 'Compressed Base64 Image' : value}
             </div>
 
-            {/* Actions: Open in new tab + Copy */}
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-              {!value.startsWith('data:') && (
+              {!isBase64 && (
                 <a
                   href={testUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="ap-btn ap-btn-ghost ap-btn-sm"
-                  style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                  className="ap-btn ap-btn-sm"
+                  style={{ fontSize: '0.72rem', padding: '2px 8px', background: '#f1f5f9', color: '#334155', textDecoration: 'none' }}
                 >
-                  <i className="fa-solid fa-arrow-up-right-from-square" />
-                  Test / Open Link
+                  <i className="fa-solid fa-arrow-up-right-from-square" /> Test Link
                 </a>
               )}
-
               <button
                 type="button"
-                className="ap-btn ap-btn-ghost ap-btn-sm"
+                className="ap-btn ap-btn-sm"
                 onClick={handleCopy}
-                style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                style={{ fontSize: '0.72rem', padding: '2px 8px', background: '#f1f5f9', color: '#334155' }}
               >
-                <i className={`fa-solid ${copied ? 'fa-check' : 'fa-copy'}`} />
-                {copied ? 'Copied!' : 'Copy URL'}
+                <i className="fa-solid fa-copy" /> {copied ? 'Copied!' : 'Copy URL'}
               </button>
             </div>
           </div>
-        </div>
-      ) : (
-        <div style={{ fontSize: '0.75rem', color: 'var(--gray-400, #94a3b8)', fontStyle: 'italic', padding: '0.25rem 0' }}>
-          No image uploaded yet. Use the upload zone or paste a link above.
         </div>
       )}
     </div>

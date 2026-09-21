@@ -54,7 +54,15 @@
 
 @media (max-width: 768px) {
   .hero-banner-container {
-    height: 100svh; /* On mobile, let it fill the whole screen */
+    height: 65vh;
+    min-height: 360px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-banner-container {
+    height: 60vh;
+    min-height: 320px;
   }
 }
 

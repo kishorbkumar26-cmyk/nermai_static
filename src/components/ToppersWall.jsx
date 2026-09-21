@@ -2,8 +2,37 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { fbFirestore } from '../firebase/firestore'
 import { driveStorage } from '../services/driveStorage'
-import { GraduationCap, Users, Award, Trophy, ChevronLeft, ChevronRight, BookOpen, UserCheck, TrendingUp, Target, X, ArrowRight, SearchX } from 'lucide-react'
+import { 
+  GraduationCap, Users, Award, Trophy, Star, Medal, BookOpen, CheckCircle, Target, 
+  Flame, Heart, Building, Clock, TrendingUp, ShieldCheck, Zap, Sparkles, UserCheck, 
+  ThumbsUp, Crown, Smile, Compass, Briefcase, Bookmark, ChevronLeft, ChevronRight, 
+  X, ArrowRight, SearchX 
+} from 'lucide-react'
 import './ToppersWall.css'
+
+const STAT_ICONS_MAP = {
+  GraduationCap, Users, Award, Trophy, Star, Medal, BookOpen, CheckCircle, Target, 
+  Flame, Heart, Building, Clock, TrendingUp, ShieldCheck, Zap, Sparkles, UserCheck, 
+  ThumbsUp, Crown, Smile, Compass, Briefcase, Bookmark
+}
+
+function renderStatIcon(st, defaultIndex) {
+  if (st && st.logoUrl && typeof st.logoUrl === 'string' && st.logoUrl.trim().length > 3) {
+    return (
+      <img 
+        src={driveStorage.formatImageUrl(st.logoUrl.trim())} 
+        alt={st.label || 'Stat logo'} 
+        style={{ width: '22px', height: '22px', objectFit: 'contain', borderRadius: '4px', display: 'block' }} 
+        onError={(e) => { e.target.style.display = 'none' }}
+      />
+    )
+  }
+  const defaultIcons = [GraduationCap, Users, Award, Trophy, Star, Medal, Target, TrendingUp]
+  const IconComp = (st && st.icon && STAT_ICONS_MAP[st.icon]) 
+    ? STAT_ICONS_MAP[st.icon] 
+    : defaultIcons[defaultIndex % defaultIcons.length] || GraduationCap
+  return <IconComp size={20} />
+}
 
 const BASE_CATEGORIES = [
   { id: 'all', label: 'All' },
@@ -14,79 +43,9 @@ const BASE_CATEGORIES = [
   { id: 'ssc', label: 'SSC' },
 ]
 
-const FALLBACK_AVATARS = [
-  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=800&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=800&auto=format&fit=crop'
-]
-
-const DEFAULT_TOPPERS = [
-  {
-    id: 'def-1',
-    name: 'S. Priya',
-    exam: 'TNPSC Group II',
-    year: '2024',
-    rank: '12',
-    quote: '"Nermai gave me the right direction and the confidence to stay consistent."',
-    story: 'From a small town to a big opportunity. Coming from a rural background, Nermai IAS Academy provided comprehensive study materials, daily practice tests, and individual mentoring sessions that helped me secure State Rank 12.',
-    photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop',
-    categoryId: 'tnpsc',
-    visible: true
-  },
-  {
-    id: 'def-2',
-    name: 'R. Karthik',
-    exam: 'UPSC CSE',
-    year: '2023',
-    rank: '45',
-    quote: '"The faculty were more than teachers — they were mentors."',
-    story: 'A journey of discipline, dedication, and daily practice. The individual mentorship and answer writing evaluation at Nermai played a critical role in clearing the UPSC Civil Services Examination.',
-    photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop',
-    categoryId: 'upsc',
-    visible: true
-  },
-  {
-    id: 'def-3',
-    name: 'M. Divya',
-    exam: 'Banking (SBI PO)',
-    year: '2024',
-    rank: '08',
-    quote: '"Mock tests at Nermai made me exam-ready and fearless."',
-    story: 'Practice today, progress tomorrow. The speed tests and shortcut techniques taught by expert mentors helped me crack both Prelims and Mains on my first attempt.',
-    photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop',
-    categoryId: 'banking',
-    visible: true
-  },
-  {
-    id: 'def-4',
-    name: 'V. Anbuselvan',
-    exam: 'Puducherry UDC/LDC',
-    year: '2024',
-    rank: '03',
-    quote: '"Focused coaching and structured test series made all the difference."',
-    story: 'Clearing Puducherry government exam required thorough coverage of local syllabus and current affairs. Nermai provided the exact roadmap needed.',
-    photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=800&auto=format&fit=crop',
-    categoryId: 'puducherry',
-    visible: true
-  },
-  {
-    id: 'def-5',
-    name: 'K. Balaji',
-    exam: 'SSC CGL',
-    year: '2023',
-    rank: '19',
-    quote: '"Constant motivation and regular doubt-clearing sessions."',
-    story: 'The quantitative aptitude and reasoning shortcuts helped me achieve top score in Tier 1 and Tier 2 of SSC CGL.',
-    photo: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=800&auto=format&fit=crop',
-    categoryId: 'ssc',
-    visible: true
-  }
-]
-
 function getTopperPhoto(topper) {
   if (topper && topper.photo && typeof topper.photo === 'string' && topper.photo.trim().length > 5) {
+    if (topper.photo.includes('unsplash.com')) return null
     return driveStorage.formatImageUrl(topper.photo.trim())
   }
   return null
@@ -98,7 +57,7 @@ function getDynamicCategories(toppersList) {
 
   toppersList.forEach(t => {
     if (t.visible === false) return
-    const rawCat = (t.categoryId || '').trim()
+    const rawCat = (t.category || t.categoryId || '').trim()
     const rawExam = (t.exam || '').trim()
 
     if (rawCat) {
@@ -132,53 +91,64 @@ function matchCategory(topper, targetCategoryId) {
   if (targetCategoryId === 'all') return true
   if (topper.visible === false) return false
 
-  const catId = (topper.categoryId || '').toLowerCase().trim()
+  const catId = (topper.category || topper.categoryId || '').toLowerCase().trim()
   const exam = (topper.exam || '').toLowerCase().trim()
   const target = targetCategoryId.toLowerCase().trim()
 
-  // 1. Direct match on categoryId
   if (catId && (catId === target || catId.includes(target))) {
     return true
   }
 
-  // 2. Direct match on exam name / token (e.g. "CAT (2026)" matching "cat", "TN2026 (2026)" matching "tn2026")
   const examClean = exam.replace(/[^a-z0-9\s]/g, '')
   const examWords = examClean.split(/\s+/)
   if (examWords.includes(target) || examClean.startsWith(target)) {
     return true
   }
 
-  // 3. Strict base category matching
-  if (target === 'upsc') {
-    return exam.includes('upsc') || catId === 'upsc'
-  }
-  if (target === 'tnpsc') {
-    return exam.includes('tnpsc') || (exam.includes('group') && !exam.includes('cat') && !exam.includes('tn2026')) || catId === 'tnpsc'
-  }
-  if (target === 'banking') {
-    return exam.includes('bank') || exam.includes('sbi') || exam.includes('ibps') || exam.includes('po') || catId === 'banking'
-  }
-  if (target === 'puducherry') {
-    return exam.includes('puducherry') || exam.includes('udc') || exam.includes('ldc') || catId === 'puducherry'
-  }
-  if (target === 'ssc') {
-    return exam.includes('ssc') || exam.includes('cgl') || exam.includes('chsl') || catId === 'ssc'
-  }
+  if (target === 'upsc') return exam.includes('upsc') || catId === 'upsc'
+  if (target === 'tnpsc') return exam.includes('tnpsc') || (exam.includes('group') && !exam.includes('cat')) || catId.startsWith('tnpsc')
+  if (target === 'banking') return exam.includes('bank') || exam.includes('sbi') || exam.includes('ibps') || exam.includes('po') || catId === 'banking'
+  if (target === 'puducherry') return exam.includes('puducherry') || exam.includes('udc') || exam.includes('ldc') || catId === 'puducherry'
+  if (target === 'ssc') return exam.includes('ssc') || exam.includes('cgl') || exam.includes('chsl') || catId === 'ssc'
 
   if (target === 'others') {
     return !matchCategory(topper, 'upsc') && 
            !matchCategory(topper, 'tnpsc') && 
            !matchCategory(topper, 'banking') && 
            !matchCategory(topper, 'puducherry') && 
-           !matchCategory(topper, 'ssc') &&
-           !matchCategory(topper, 'cat') &&
-           !matchCategory(topper, 'tn2026')
+           !matchCategory(topper, 'ssc')
   }
 
   return false
 }
 
-export default function ToppersWall() {
+export const DEFAULT_TOPPERS_WALL = {
+  eyebrow: 'NERMAI SUCCESS STORIES',
+  title: 'From Aspirants to Achievers',
+  subtitle: 'Real journeys. Real people. Real results. Be inspired by our students who turned their dreams into reality with Nermai.',
+  calloutNote: 'Different Backgrounds\nSame Determination\nSuccess with Nermai',
+  stats: [
+    { num: '187+', label: 'Successful Candidates' },
+    { num: '2400+', label: 'Students Trained' },
+    { num: '97%', label: 'Recommend Nermai' },
+    { num: '14+', label: 'Years of Trust' }
+  ],
+  quoteText: 'The best investment I made for my future.',
+  quoteAuthor: '— Nermai Student',
+  defaultBadge: 'Guided by Nermai',
+  readStoryBtnText: 'Read Story',
+  features: [
+    { title: 'Diverse Backgrounds', desc: 'Students from towns, cities and rural areas' },
+    { title: 'Expert Guidance', desc: 'By experienced faculty and mentors' },
+    { title: 'Consistent Practice', desc: 'Through mock tests and analysis' },
+    { title: 'Remarkable Results', desc: 'Across competitive exams' }
+  ],
+  ctaBtnText: 'View All Success Stories',
+  ctaBtnLink: '/results'
+}
+
+export default function ToppersWall({ customConfig }) {
+  const [wallConfig, setWallConfig] = useState(customConfig || DEFAULT_TOPPERS_WALL)
   const [toppers, setToppers] = useState([])
   const [activeCategory, setActiveCategory] = useState('all')
   const [activeIndex, setActiveIndex] = useState(0)
@@ -189,8 +159,17 @@ export default function ToppersWall() {
   const [touchEnd, setTouchEnd] = useState(null)
 
   useEffect(() => {
+    fbFirestore.getSettings().then(s => {
+      const saved = s?.homeContent?.toppersWall || s?.toppersWall
+      if (saved) {
+        setWallConfig(prev => ({ ...DEFAULT_TOPPERS_WALL, ...saved }))
+      }
+    })
+  }, [])
+
+  useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
+      setIsMobile(window.innerWidth < 992)
     }
     checkMobile()
     window.addEventListener('resize', checkMobile)
@@ -198,26 +177,34 @@ export default function ToppersWall() {
   }, [])
 
   useEffect(() => {
-    const unsub = fbFirestore.onToppersChanged(items => {
-      if (items && items.length > 0) {
-        setToppers(items)
+    const unsub = fbFirestore.onResultsChanged(items => {
+      if (items && Array.isArray(items)) {
+        // Clean out any legacy mock unsplash URLs
+        const cleaned = items.map(item => ({
+          ...item,
+          photo: item.photo && item.photo.includes('unsplash.com') ? '' : item.photo
+        }))
+        setToppers(cleaned)
       } else {
-        setToppers(DEFAULT_TOPPERS)
+        setToppers([])
       }
     })
     return () => unsub()
   }, [])
 
-  const displayList = toppers.length > 0 ? toppers : DEFAULT_TOPPERS
+  const visibleItems = toppers.filter(t => t.visible !== false)
+  const featuredOnly = visibleItems.filter(t => t.isFeatured === true)
+  const nonFeatured = visibleItems.filter(t => t.isFeatured !== true)
+  // Show featured items first, followed by all other achievers so admin uploads are never hidden
+  const displayList = [...featuredOnly, ...nonFeatured]
+
   const categoriesList = getDynamicCategories(displayList)
   const currentList = displayList.filter(t => matchCategory(t, activeCategory))
 
-  // Reset active index when category changes
   useEffect(() => {
     setActiveIndex(0)
   }, [activeCategory])
 
-  // Auto-slide interval (5 seconds)
   useEffect(() => {
     if (isHovered || currentList.length <= 1) return
     const timer = setInterval(() => {
@@ -254,13 +241,11 @@ export default function ToppersWall() {
     }
   }
 
-  // Get visible cards centered around activeIndex
   const getVisibleCards = () => {
     const len = currentList.length
     if (len === 0) return []
     const safeActive = activeIndex % len
 
-    // On mobile view (< 768px), display ONLY 1 card (single card view with sliding)
     if (isMobile) {
       return [{ topper: currentList[safeActive], idx: safeActive, position: 'center' }]
     }
@@ -282,7 +267,6 @@ export default function ToppersWall() {
   }
 
   const activeCategoryLabel = categoriesList.find(c => c.id === activeCategory)?.label || activeCategory
-
 
   return (
     <section className="toppers-section" id="success-stories">
@@ -310,17 +294,17 @@ export default function ToppersWall() {
         {/* Header */}
         <div className="toppers-header">
           <div className="toppers-eyebrow">
-            NERMAI SUCCESS STORIES
+            {wallConfig.eyebrow || 'NERMAI SUCCESS STORIES'}
           </div>
           <h2 className="toppers-title">
-            From Aspirants to Achievers
+            {wallConfig.title || 'From Aspirants to Achievers'}
           </h2>
           <p className="toppers-subtitle">
-            Real journeys. Real people. Real results. Be inspired by our students who turned their dreams into reality with Nermai.
+            {wallConfig.subtitle || 'Real journeys. Real people. Real results. Be inspired by our students who turned their dreams into reality with Nermai.'}
           </p>
 
-          <div className="toppers-callout-note">
-            Different Backgrounds<br />Same Determination<br />Success with Nermai
+          <div className="toppers-callout-note" style={{ whiteSpace: 'pre-line' }}>
+            {wallConfig.calloutNote || 'Different Backgrounds\nSame Determination\nSuccess with Nermai'}
           </div>
         </div>
 
@@ -342,54 +326,40 @@ export default function ToppersWall() {
           
           {/* Left Sidebar Stats Box */}
           <div className="toppers-sidebar">
-            <div className="toppers-stat-item">
-              <div className="toppers-stat-icon">
-                <GraduationCap size={22} />
-              </div>
-              <div>
-                <div className="toppers-stat-number">187+</div>
-                <div className="toppers-stat-label">Successful Candidates</div>
-              </div>
-            </div>
+            {(() => {
+              const statsToRender = (wallConfig.stats && wallConfig.stats.length > 0) ? wallConfig.stats : DEFAULT_TOPPERS_WALL.stats
+              const count = statsToRender.length
+              return (
+                <div className={`toppers-stats-list count-${count}`}>
+                  {statsToRender.map((st, i) => (
+                    <div key={i} className="toppers-stat-item">
+                      <div className="toppers-stat-icon">
+                        {renderStatIcon(st, i)}
+                      </div>
+                      <div className="toppers-stat-info">
+                        <div className="toppers-stat-number">{st.num}</div>
+                        <div className="toppers-stat-label">{st.label}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )
+            })()}
 
-            <div className="toppers-stat-item">
-              <div className="toppers-stat-icon">
-                <Users size={22} />
+            {(wallConfig.quoteText || wallConfig.quoteAuthor) && (
+              <div className="toppers-quote-box">
+                {wallConfig.quoteText && (
+                  <div className="toppers-quote-text">
+                    “{wallConfig.quoteText}”
+                  </div>
+                )}
+                {wallConfig.quoteAuthor && (
+                  <div className="toppers-quote-author">
+                    {wallConfig.quoteAuthor}
+                  </div>
+                )}
               </div>
-              <div>
-                <div className="toppers-stat-number">2400+</div>
-                <div className="toppers-stat-label">Students Trained</div>
-              </div>
-            </div>
-
-            <div className="toppers-stat-item">
-              <div className="toppers-stat-icon">
-                <Award size={22} />
-              </div>
-              <div>
-                <div className="toppers-stat-number">97%</div>
-                <div className="toppers-stat-label">Recommend Nermai</div>
-              </div>
-            </div>
-
-            <div className="toppers-stat-item">
-              <div className="toppers-stat-icon">
-                <Trophy size={22} />
-              </div>
-              <div>
-                <div className="toppers-stat-number">14+</div>
-                <div className="toppers-stat-label">Years of Trust</div>
-              </div>
-            </div>
-
-            <div className="toppers-quote-box">
-              <div className="toppers-quote-text">
-                “The best investment I made for my future.”
-              </div>
-              <div className="toppers-quote-author">
-                — Nermai Student
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Center Carousel */}
@@ -404,14 +374,14 @@ export default function ToppersWall() {
             {currentList.length > 0 ? (
               <>
                 <button className="toppers-arrow-btn" onClick={handlePrev} aria-label="Previous story">
-                  <ChevronLeft size={24} />
+                  <ChevronLeft size={22} />
                 </button>
 
                 <div className="toppers-cards-container">
                   {getVisibleCards().map(({ topper, idx, position }) => {
                     const photoUrl = getTopperPhoto(topper)
                     const isCenter = position === 'center'
-                    const displayQuote = topper.quote || topper.story || 'Nermai gave me the right direction and confidence.'
+                    const displayQuote = topper.quote || wallConfig.defaultBadge || 'Guided by Nermai'
 
                     return (
                       <div
@@ -419,7 +389,7 @@ export default function ToppersWall() {
                         className={`toppers-card ${isCenter ? 'active-card' : ''}`}
                         onClick={() => setActiveIndex(idx)}
                       >
-                        {/* Photo & Speech Bubble */}
+                        {/* Photo / Monogram Box with Speech Bubble */}
                         <div className="toppers-card-photo-wrapper">
                           {photoUrl ? (
                             <img 
@@ -427,16 +397,19 @@ export default function ToppersWall() {
                               alt={topper.name} 
                               className="toppers-card-photo" 
                               loading="lazy" 
+                              onError={(e) => driveStorage.handleImageError(e)}
                             />
                           ) : (
                             <div className="toppers-card-photo-fallback">
-                              <div className="fallback-initial-badge">{(topper.name || 'S')[0].toUpperCase()}</div>
+                              <div className="fallback-initial-badge">
+                                {(topper.name || 'S')[0].toUpperCase()}
+                              </div>
                             </div>
                           )}
                           
                           {displayQuote && (
                             <div className="toppers-card-quote-bubble">
-                              "{displayQuote.length > 55 ? `${displayQuote.slice(0, 55)}...` : displayQuote}"
+                              "{displayQuote}"
                             </div>
                           )}
                         </div>
@@ -445,11 +418,11 @@ export default function ToppersWall() {
                         <div className="toppers-card-body">
                           <div className="toppers-card-name">{topper.name}</div>
                           <div className="toppers-card-exam">
-                            {topper.exam} {topper.year ? `(${topper.year})` : ''} {topper.rank ? `• AIR ${topper.rank}` : ''}
+                            {topper.exam} {topper.year ? `(${topper.year})` : ''} • AIR {topper.rank || '1'}
                           </div>
 
                           <p className="toppers-card-story-snippet">
-                            {topper.story ? (topper.story.length > 70 ? `${topper.story.slice(0, 70)}...` : topper.story) : 'A journey of discipline, dedication and daily practice.'}
+                            {topper.story ? (topper.story.length > 65 ? `${topper.story.slice(0, 65)}...` : topper.story) : 'A journey of discipline, dedication and daily practice.'}
                           </p>
 
                           <button 
@@ -459,7 +432,8 @@ export default function ToppersWall() {
                               setSelectedStory(topper)
                             }}
                           >
-                            Read Story <ArrowRight size={14} />
+                            <span>{wallConfig.readStoryBtnText || 'Read Story'}</span>
+                            <ArrowRight size={13} />
                           </button>
                         </div>
                       </div>
@@ -468,26 +442,38 @@ export default function ToppersWall() {
                 </div>
 
                 <button className="toppers-arrow-btn" onClick={handleNext} aria-label="Next story">
-                  <ChevronRight size={24} />
+                  <ChevronRight size={22} />
                 </button>
               </>
             ) : (
-              /* Clean Empty State when category has no matching items */
               <div className="toppers-empty-box">
-                <SearchX size={44} style={{ color: 'var(--gold-light)', marginBottom: '0.85rem' }} />
-                <h4 style={{ color: '#FFFFFF', fontSize: '1.25rem', marginBottom: '0.4rem', fontFamily: 'var(--font-display)' }}>
-                  No Stories Found in {activeCategoryLabel}
-                </h4>
-                <p style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.9rem', maxWidth: '380px', margin: '0 auto 1.25rem auto' }}>
-                  There are currently no featured achievers listed under the {activeCategoryLabel} category.
-                </p>
-                <button 
-                  className="toppers-tab active"
-                  onClick={() => setActiveCategory('all')}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-                >
-                  View All Stories
-                </button>
+                <SearchX size={38} style={{ color: 'var(--gold-light)', marginBottom: '0.65rem' }} />
+                {displayList.length === 0 ? (
+                  <>
+                    <h4 style={{ color: '#FFFFFF', fontSize: '1.25rem', marginBottom: '0.35rem', fontFamily: 'var(--font-display)' }}>
+                      {wallConfig.emptyTitle || 'No Achievers Added Yet'}
+                    </h4>
+                    <p style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: '0.88rem', maxWidth: '380px', margin: '0 auto', lineHeight: 1.5 }}>
+                      {wallConfig.emptyDesc || 'Achievers and toppers added in the Admin Portal will appear here automatically on the Wall of Fame.'}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h4 style={{ color: '#FFFFFF', fontSize: '1.2rem', marginBottom: '0.35rem', fontFamily: 'var(--font-display)' }}>
+                      No Stories Found in {activeCategoryLabel}
+                    </h4>
+                    <p style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: '0.85rem', maxWidth: '360px', margin: '0 auto 1rem auto' }}>
+                      There are currently no achievers listed under the {activeCategoryLabel} category.
+                    </p>
+                    <button 
+                      className="toppers-tab active"
+                      onClick={() => setActiveCategory('all')}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem' }}
+                    >
+                      {wallConfig.viewAllStoriesBtnText || 'View All Stories'}
+                    </button>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -508,46 +494,30 @@ export default function ToppersWall() {
           </div>
         )}
 
-
         {/* Bottom Feature Bar */}
-        <div className="toppers-bottom-bar" style={{ marginTop: '1.75rem' }}>
+        <div className="toppers-bottom-bar">
           <div className="toppers-features-list">
-            <div className="toppers-feature-item">
-              <BookOpen className="toppers-feature-icon" size={24} />
-              <div>
-                <div className="toppers-feature-title">Diverse Backgrounds</div>
-                <div className="toppers-feature-desc">Students from towns, cities and rural areas</div>
-              </div>
-            </div>
-
-            <div className="toppers-feature-item">
-              <UserCheck className="toppers-feature-icon" size={24} />
-              <div>
-                <div className="toppers-feature-title">Expert Guidance</div>
-                <div className="toppers-feature-desc">By experienced faculty and mentors</div>
-              </div>
-            </div>
-
-            <div className="toppers-feature-item">
-              <TrendingUp className="toppers-feature-icon" size={24} />
-              <div>
-                <div className="toppers-feature-title">Consistent Practice</div>
-                <div className="toppers-feature-desc">Through mock tests and analysis</div>
-              </div>
-            </div>
-
-            <div className="toppers-feature-item">
-              <Target className="toppers-feature-icon" size={24} />
-              <div>
-                <div className="toppers-feature-title">Remarkable Results</div>
-                <div className="toppers-feature-desc">Across competitive exams</div>
-              </div>
-            </div>
+            {(() => {
+              const featureIcons = [BookOpen, UserCheck, TrendingUp, Target]
+              const featuresToRender = (wallConfig.features && wallConfig.features.length > 0) ? wallConfig.features : DEFAULT_TOPPERS_WALL.features
+              return featuresToRender.map((feat, i) => {
+                const IconComp = featureIcons[i % featureIcons.length]
+                return (
+                  <div key={i} className="toppers-feature-item">
+                    <IconComp className="toppers-feature-icon" size={20} />
+                    <div>
+                      <div className="toppers-feature-title">{feat.title}</div>
+                      <div className="toppers-feature-desc">{feat.desc}</div>
+                    </div>
+                  </div>
+                )
+              })
+            })()}
           </div>
 
-          <Link to="/why-nermai" className="toppers-view-all-btn">
-            <span>View All Success Stories</span>
-            <ArrowRight size={16} />
+          <Link to={wallConfig.ctaBtnLink || '/results'} className="toppers-view-all-btn">
+            <span>{wallConfig.ctaBtnText || 'View All Success Stories'}</span>
+            <ArrowRight size={15} />
           </Link>
         </div>
 
@@ -558,21 +528,21 @@ export default function ToppersWall() {
         <div className="toppers-modal-overlay" onClick={() => setSelectedStory(null)}>
           <div className="toppers-modal-content" onClick={e => e.stopPropagation()}>
             <button className="toppers-modal-close" onClick={() => setSelectedStory(null)}>
-              <X size={20} />
+              <X size={18} />
             </button>
 
-            <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', marginBottom: '1.25rem' }}>
               {getTopperPhoto(selectedStory) ? (
                 <img 
                   src={getTopperPhoto(selectedStory)} 
                   alt={selectedStory.name}
-                  style={{ width: '90px', height: '90px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--gold)' }}
+                  style={{ width: '75px', height: '75px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--gold)' }}
                 />
               ) : (
                 <div style={{
-                  width: '90px', height: '90px', borderRadius: '50%',
+                  width: '75px', height: '75px', borderRadius: '50%',
                   background: 'linear-gradient(135deg, #D4AF37, #996515)',
-                  color: '#1A1008', fontSize: '2.5rem', fontWeight: 800,
+                  color: '#1A1008', fontSize: '2rem', fontWeight: 800,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   border: '2px solid var(--gold)', fontFamily: 'Georgia, serif'
                 }}>
@@ -580,10 +550,10 @@ export default function ToppersWall() {
                 </div>
               )}
               <div>
-                <h3 style={{ fontSize: '1.8rem', fontFamily: 'var(--font-display)', color: '#fff', marginBottom: '4px' }}>
+                <h3 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-display)', color: '#fff', marginBottom: '3px' }}>
                   {selectedStory.name}
                 </h3>
-                <div style={{ color: 'var(--gold-light)', fontWeight: 700, fontSize: '1rem' }}>
+                <div style={{ color: 'var(--gold-light)', fontWeight: 700, fontSize: '0.95rem' }}>
                   {selectedStory.exam} {selectedStory.year ? `(${selectedStory.year})` : ''} {selectedStory.rank ? `• AIR ${selectedStory.rank}` : ''}
                 </div>
               </div>
@@ -591,16 +561,18 @@ export default function ToppersWall() {
 
             {selectedStory.quote && (
               <blockquote style={{ 
-                fontStyle: 'italic', color: 'var(--gold-light)', fontSize: '1.1rem',
-                borderLeft: '3px solid var(--gold)', paddingLeft: '1rem', margin: '1rem 0 1.5rem 0',
-                background: 'rgba(212, 175, 55, 0.1)', padding: '1rem', borderRadius: '0 12px 12px 0'
+                fontStyle: 'italic', color: 'var(--gold-light)', fontSize: '1.02rem',
+                borderLeft: '3px solid var(--gold)', paddingLeft: '0.85rem', margin: '0.75rem 0 1.25rem 0',
+                background: 'rgba(212, 175, 55, 0.1)', padding: '0.75rem 1rem', borderRadius: '0 10px 10px 0'
               }}>
-                {selectedStory.quote}
+                "{selectedStory.quote}"
               </blockquote>
             )}
 
-            <div style={{ lineHeight: 1.7, opacity: 0.9, fontSize: '0.98rem' }}>
-              {selectedStory.story || 'Nermai IAS Academy is proud of our student’s dedication and outstanding result.'}
+            <div style={{ color: 'rgba(255,255,255,0.88)', lineHeight: 1.65, fontSize: '0.94rem' }}>
+              <p style={{ margin: 0 }}>
+                {selectedStory.story || selectedStory.quote || 'From foundational preparation to mock tests, individual mentoring and answer writing at Nermai IAS Academy proved instrumental in achieving this milestone.'}
+              </p>
             </div>
           </div>
         </div>
@@ -608,4 +580,3 @@ export default function ToppersWall() {
     </section>
   )
 }
-

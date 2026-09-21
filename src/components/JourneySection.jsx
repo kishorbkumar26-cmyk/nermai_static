@@ -66,6 +66,24 @@ const DEFAULT_MOCKUP_STEPS = [
   }
 ]
 
+const TAMIL_TO_ENGLISH_MAP = {
+  'உங்கள் இலக்கை தேர்வு செய்யுங்கள்': 'Choose Your Goal',
+  'பயிற்சியை தேர்வு செய்யுங்கள்': 'Find Your Course',
+  'பயிற்சி + தேர்வுகள்': 'Classes & Mock Tests',
+  'இலக்கை அடையுங்கள்': 'Achieve Your Goal',
+}
+
+function toEnglishText(val, fallback) {
+  if (!val || typeof val !== 'string') return fallback
+  const trimmed = val.trim()
+  if (TAMIL_TO_ENGLISH_MAP[trimmed]) return TAMIL_TO_ENGLISH_MAP[trimmed]
+  // If contains Tamil script characters, use English fallback
+  if (/[\u0B80-\u0BFF]/.test(trimmed)) {
+    return fallback
+  }
+  return trimmed
+}
+
 export default function JourneySection({ steps }) {
   const [activeModalImage, setActiveModalImage] = useState(null)
 
@@ -75,9 +93,9 @@ export default function JourneySection({ steps }) {
     return {
       id: s.id || i + 1,
       number: String(i + 1).padStart(2, '0'),
-      title: s.title || def.title,
-      description: s.description || def.description,
-      btnText: s.btnText || def.btnText,
+      title: toEnglishText(s.title, def.title),
+      description: toEnglishText(s.description, def.description),
+      btnText: toEnglishText(s.btnText, def.btnText),
       link: s.link || s.href || def.link,
       imageUrl: s.imageUrl || '',
       badgeColor: def.badgeColor,

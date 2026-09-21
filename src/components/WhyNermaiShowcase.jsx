@@ -1,3 +1,4 @@
+import React, { useState } from 'react'
 import { Heart, BookOpen, ClipboardCheck, UserCheck, Laptop, Trophy, Users, GraduationCap, TrendingUp, ArrowRight } from 'lucide-react'
 import { LMS_URL } from '../constants'
 import './WhyNermaiShowcase.css'
@@ -48,6 +49,18 @@ const STEPS = [
 ]
 
 export default function WhyNermaiShowcase() {
+  const [flippedCards, setFlippedCards] = useState({})
+
+  const handleCardClick = (num) => {
+    // Only toggle flip on mobile screens <= 768px
+    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+      setFlippedCards(prev => ({
+        ...prev,
+        [num]: !prev[num]
+      }))
+    }
+  }
+
   return (
     <section className="why-showcase-section" id="features">
       {/* Background Building Watermark */}
@@ -79,7 +92,7 @@ export default function WhyNermaiShowcase() {
         </svg>
       </div>
 
-      <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+      <div className="container-wide" style={{ maxWidth: '1540px', width: '100%', margin: '0 auto', padding: '0 1.5rem', position: 'relative', zIndex: 2 }}>
         
         {/* Header */}
         <div className="why-showcase-header">
@@ -121,15 +134,46 @@ export default function WhyNermaiShowcase() {
           <div className="why-steps-grid">
             {STEPS.map((step) => {
               const IconComp = step.icon
+              const isFlipped = !!flippedCards[step.num]
+
               return (
-                <div key={step.num} className="why-step-col reveal visible">
-                  <div className="why-step-number">{step.num}</div>
-                  <div className={`why-step-circle ${step.circleStyle}`}>
-                    <IconComp size={28} />
+                <div 
+                  key={step.num} 
+                  className={`why-step-col reveal visible ${isFlipped ? 'is-flipped' : ''}`}
+                  onClick={() => handleCardClick(step.num)}
+                >
+                  <div className="why-card-flip-inner">
+                    {/* Front Face: Logo and Topic Alone (Mobile default, Desktop full) */}
+                    <div className="why-card-front">
+                      <div className="why-step-number">{step.num}</div>
+                      <div className={`why-step-circle ${step.circleStyle}`}>
+                        <IconComp size={28} />
+                      </div>
+                      <h3 className="why-step-title">{step.title}</h3>
+                      <div className="why-title-underline" />
+                      {/* Desktop displays description directly here */}
+                      <p className="why-step-desc why-desktop-desc">{step.desc}</p>
+                      {/* Mobile hint */}
+                      <div className="why-card-tap-hint why-mobile-hint">
+                        <span>Tap for details</span>
+                        <i className="fa-solid fa-arrow-right-arrow-left" style={{ fontSize: '0.62rem' }} />
+                      </div>
+                    </div>
+
+                    {/* Back Face: Content of the Card (Mobile only) */}
+                    <div className="why-card-back why-mobile-back">
+                      <div className="why-back-top-row">
+                        <span className="why-back-num">{step.num}</span>
+                        <h4 className="why-back-topic">{step.title}</h4>
+                      </div>
+                      <div className="why-title-underline" style={{ margin: '0.25rem 0 0.55rem 0', width: '28px' }} />
+                      <p className="why-step-desc why-mobile-desc">{step.desc}</p>
+                      <div className="why-card-tap-hint why-back-hint">
+                        <span>Tap to flip back</span>
+                        <i className="fa-solid fa-rotate-left" style={{ fontSize: '0.62rem' }} />
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="why-step-title">{step.title}</h3>
-                  <div className="why-title-underline" />
-                  <p className="why-step-desc">{step.desc}</p>
                 </div>
               )
             })}

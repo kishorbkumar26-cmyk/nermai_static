@@ -4,8 +4,13 @@ import { driveStorage } from '../services/driveStorage'
 import { getGoogleDriveCDNUrl } from '../utils/imageOptimizer'
 import HomeContentSection from './admin/HomeContentSection'
 import FooterContentSection from './admin/FooterContentSection'
+import TopBarAdminSection from './admin/TopBarAdminSection'
+import OfficeLocationsSection from './admin/OfficeLocationsSection'
+import CourseContentSection from './admin/CourseContentSection'
 import AdminImageUpload from './admin/AdminImageUpload'
 import ResourceManager from './admin/ResourceManager'
+import { DEFAULT_TOPPERS_WALL } from './ToppersWall'
+import { DEFAULT_TESTIMONIALS_CONFIG } from './Testimonials'
 import ReactQuill from 'react-quill-new'
 import 'react-quill-new/dist/quill.snow.css'
 
@@ -448,52 +453,157 @@ function NoticesSection({ toast }) {
   )
 }
 
-// ─── Section: Toppers ─────────────────────────────────────────────────────────
+// ─── Section: Toppers & Results Manager ───────────────────────────────────────
 function ToppersSection({ toast }) {
+  const [subTab, setSubTab] = useState('achievers')
+  const [wallSettings, setWallSettings] = useState(DEFAULT_TOPPERS_WALL)
+  const [savingWall, setSavingWall] = useState(false)
   const [toppers, setToppers] = useState([])
   const [editingId, setEditingId] = useState(null)
-  const [form, setForm] = useState({ name: '', rank: '', exam: 'TNPSC Group II', customExam: '', year: new Date().getFullYear().toString(), photo: '', quote: '' })
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filterCat, setFilterCat] = useState('all')
   const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState({
+    name: '',
+    rank: '',
+    exam: 'TNPSC Group II',
+    category: 'tnpsc-g2',
+    customExam: '',
+    year: new Date().getFullYear().toString(),
+    photo: '',
+    quote: '',
+    story: '',
+    isFeatured: true,
+    visible: true
+  })
 
   useEffect(() => {
-    const unsub = fbFirestore.onToppersChanged(setToppers)
+    const unsub = fbFirestore.onResultsChanged(items => {
+      setToppers(items || [])
+    })
+    fbFirestore.getSettings().then(s => {
+      const saved = s?.homeContent?.toppersWall || s?.toppersWall
+      if (saved) {
+        setWallSettings(prev => ({ ...DEFAULT_TOPPERS_WALL, ...saved }))
+      }
+    })
     return () => unsub()
   }, [])
 
+  const handleSaveWall = async () => {
+    setSavingWall(true)
+    try {
+      const s = await fbFirestore.getSettings()
+      const updatedHomeContent = { ...(s.homeContent || {}), toppersWall: wallSettings }
+      await fbFirestore.updateSettings({ homeContent: updatedHomeContent, toppersWall: wallSettings })
+      toast.success('Homepage Success Stories card texts updated! Refresh to view live.')
+    } catch (e) {
+      toast.error(e.message)
+    } finally {
+      setSavingWall(false)
+    }
+  }
+
+  const updateWallStat = (i, key, val) => {
+    const current = wallSettings.stats || DEFAULT_TOPPERS_WALL.stats
+    const next = current.map((st, idx) => idx === i ? { ...st, [key]: val } : st)
+    setWallSettings(w => ({ ...w, stats: next }))
+  }
+
+  const addWallStat = () => {
+    const current = wallSettings.stats || DEFAULT_TOPPERS_WALL.stats
+    setWallSettings(w => ({ ...w, stats: [...current, { num: '', label: '', icon: 'GraduationCap', logoUrl: '' }] }))
+  }
+
+  const removeWallStat = (i) => {
+    const current = wallSettings.stats || DEFAULT_TOPPERS_WALL.stats
+    setWallSettings(w => ({ ...w, stats: current.filter((_, idx) => idx !== i) }))
+  }
+
+  const updateWallFeature = (i, key, val) => {
+    const current = wallSettings.features || DEFAULT_TOPPERS_WALL.features
+    const next = current.map((feat, idx) => idx === i ? { ...feat, [key]: val } : feat)
+    setWallSettings(w => ({ ...w, features: next }))
+  }
+
+  const addWallFeature = () => {
+    const current = wallSettings.features || DEFAULT_TOPPERS_WALL.features
+    setWallSettings(w => ({ ...w, features: [...current, { title: '', desc: '' }] }))
+  }
+
+  const removeWallFeature = (i) => {
+    const current = wallSettings.features || DEFAULT_TOPPERS_WALL.features
+    setWallSettings(w => ({ ...w, features: current.filter((_, idx) => idx !== i) }))
+  }
+
   const handleStartEdit = (t) => {
     setEditingId(t.id)
-    const presetExams = ['TNPSC Group I', 'TNPSC Group II', 'TNPSC Group IV', 'UPSC CSE', 'TN Police SI', 'TN Police Constable', 'IBPS PO', 'SBI PO']
+    const presetExams = [
+      'TNPSC Group I', 'TNPSC Group II', 'TNPSC Group IV', 
+      'UPSC CSE', 'TN Police SI', 'TN Police Constable', 
+      'Banking (SBI PO)', 'Banking (IBPS PO)', 'Puducherry UDC/LDC', 'SSC CGL'
+    ]
     const isPreset = presetExams.includes(t.exam)
     setForm({
       name: t.name || '',
       rank: t.rank || '',
       exam: isPreset ? t.exam : 'Others',
+      category: t.category || 'upsc',
       customExam: isPreset ? '' : t.exam || '',
       year: t.year || new Date().getFullYear().toString(),
       photo: t.photo || '',
-      quote: t.quote || ''
+      quote: t.quote || '',
+      story: t.story || '',
+      isFeatured: t.isFeatured === true,
+      visible: t.visible !== false
     })
-    toast.info(`Editing details for ${t.name || 'topper'}. Modify fields and click "Update Topper".`)
-    // Scroll smoothly to form
+    setSubTab('achievers')
+    toast.info(`Editing details for ${t.name || 'topper'}. Modify fields and click "Update Topper & Result".`)
     const formEl = document.querySelector('.ap-topper-form-card')
     if (formEl) formEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   const handleCancelEdit = () => {
     setEditingId(null)
-    setForm({ name: '', rank: '', exam: 'TNPSC Group II', customExam: '', year: new Date().getFullYear().toString(), photo: '', quote: '' })
+    setForm({
+      name: '',
+      rank: '',
+      exam: 'TNPSC Group II',
+      category: 'tnpsc-g2',
+      customExam: '',
+      year: new Date().getFullYear().toString(),
+      photo: '',
+      quote: '',
+      story: '',
+      isFeatured: true,
+      visible: true
+    })
+  }
+
+  const handleExamPresetChange = (selected) => {
+    let cat = 'others'
+    if (selected.includes('UPSC')) cat = 'upsc'
+    else if (selected.includes('Group I')) cat = 'tnpsc-g1'
+    else if (selected.includes('Group II')) cat = 'tnpsc-g2'
+    else if (selected.includes('Group IV')) cat = 'tnpsc-g4'
+    else if (selected.includes('Police')) cat = 'police'
+    else if (selected.includes('Banking') || selected.includes('SBI') || selected.includes('IBPS')) cat = 'banking'
+    else if (selected.includes('Puducherry') || selected.includes('UDC') || selected.includes('LDC')) cat = 'puducherry'
+    else if (selected.includes('SSC')) cat = 'ssc'
+
+    setForm(f => ({ ...f, exam: selected, category: cat }))
   }
 
   const handleSaveOrAdd = async () => {
     if (!form.name.trim() || !form.rank.toString().trim()) {
-      toast.error('Name and rank required')
+      toast.error('Student Name and Rank are required')
       return
     }
     
     let finalExam = form.exam
     if (form.exam === 'Others') {
       if (!form.customExam || !form.customExam.trim()) {
-        toast.error('Please specify the exam manually')
+        toast.error('Please specify the exam name manually')
         return
       }
       finalExam = form.customExam.trim()
@@ -505,19 +615,24 @@ function ToppersSection({ toast }) {
         name: form.name.trim(),
         rank: form.rank.toString().trim(),
         exam: finalExam,
+        category: form.category || 'upsc',
         year: form.year.toString().trim(),
         photo: form.photo || '',
-        quote: form.quote || ''
+        quote: form.quote || '',
+        story: form.story || '',
+        isFeatured: form.isFeatured === true,
+        visible: form.visible !== false,
+        storageType: (form.photo && form.photo.includes('drive.google.com')) ? 'google_drive' : 'url'
       }
 
       if (editingId) {
-        await fbFirestore.updateTopper(editingId, payload)
-        toast.success(`Topper "${payload.name}" updated successfully!`)
+        await fbFirestore.updateResult(editingId, payload)
+        toast.success(`Achiever "${payload.name}" updated successfully!`)
         handleCancelEdit()
       } else {
-        await fbFirestore.addTopper(payload)
-        toast.success(`Topper "${payload.name}" added successfully!`)
-        setForm({ name: '', rank: '', exam: 'TNPSC Group II', customExam: '', year: new Date().getFullYear().toString(), photo: '', quote: '' })
+        await fbFirestore.addResult(payload)
+        toast.success(`Achiever "${payload.name}" added successfully!`)
+        handleCancelEdit()
       }
     } catch (e) {
       toast.error('Operation failed: ' + e.message)
@@ -527,11 +642,21 @@ function ToppersSection({ toast }) {
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this topper?')) return
+    if (!confirm('Are you sure you want to delete this result/topper?')) return
     try {
-      await fbFirestore.deleteTopper(id)
+      await fbFirestore.deleteResult(id)
       if (editingId === id) handleCancelEdit()
-      toast.success('Topper deleted successfully')
+      toast.success('Deleted successfully')
+    } catch (e) {
+      toast.error(e.message)
+    }
+  }
+
+  const handleToggleFeatured = async (t) => {
+    try {
+      const newFeatured = !t.isFeatured
+      await fbFirestore.updateResult(t.id, { isFeatured: newFeatured })
+      toast.success(newFeatured ? 'Marked as ⭐ Featured on Home Screen' : 'Removed from Featured')
     } catch (e) {
       toast.error(e.message)
     }
@@ -540,36 +665,316 @@ function ToppersSection({ toast }) {
   const handleToggleVisibility = async (t) => {
     try { 
       const newVisible = t.visible === false ? true : false
-      await fbFirestore.updateTopper(t.id, { visible: newVisible })
-      toast.success(newVisible ? 'Topper made visible' : 'Topper hidden')
+      await fbFirestore.updateResult(t.id, { visible: newVisible })
+      toast.success(newVisible ? 'Made visible on public website' : 'Hidden from public website')
     } catch (e) {
       toast.error(e.message)
     }
   }
 
+  // Filtered list
+  const filteredToppers = toppers.filter(t => {
+    const matchCat = filterCat === 'all' || t.category === filterCat || (filterCat === 'featured' && t.isFeatured)
+    const matchSearch = !searchQuery || [t.name, t.exam, t.rank, t.year].some(v => v?.toLowerCase().includes(searchQuery.toLowerCase()))
+    return matchCat && matchSearch
+  })
+
   return (
     <div>
       <h2 className="ap-section-title">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-        Toppers
+        <i className="fa-solid fa-trophy" style={{ marginRight: '8px', color: 'var(--gold, #D4AF37)' }}></i>
+        Toppers &amp; Results Manager
       </h2>
 
-      {/* Photo Dimension Guide */}
-      <div className="ap-hero-dim-guide" style={{ marginBottom: '1.25rem' }}>
-        <div className="ap-hero-dim-badge ap-hero-dim-badge--mob" style={{ width: '100%', background: 'rgba(230, 92, 0, 0.06)', border: '1px solid rgba(230, 92, 0, 0.2)' }}>
-          <i className="fa-solid fa-ruler-combined" style={{ color: 'var(--saffron)' }}></i>
-          <div>
-            <div className="ap-hero-dim-label">📸 Recommended Topper Photo Dimensions</div>
-            <div className="ap-hero-dim-size">Square 1:1 Aspect Ratio • Recommended: <strong>600 × 600 px</strong> or <strong>800 × 800 px</strong></div>
-            <div className="ap-hero-dim-hint">Passport style or square portrait • JPG, PNG, WebP • Center-aligned face for circular avatar and 3D card display</div>
-          </div>
-        </div>
+      {/* Sub-tab Navigation */}
+      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '2px solid var(--gray-200)', paddingBottom: '0.75rem' }}>
+        <button
+          onClick={() => setSubTab('achievers')}
+          style={{
+            padding: '0.5rem 1.25rem',
+            border: subTab === 'achievers' ? '2px solid var(--maroon)' : '2px solid var(--gray-200)',
+            background: subTab === 'achievers' ? 'var(--maroon)' : 'var(--white)',
+            color: subTab === 'achievers' ? 'var(--white)' : 'var(--gray-600)',
+            fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: '0.5rem'
+          }}
+        >
+          <i className="fa-solid fa-users" /> Achievers &amp; Toppers List ({toppers.length})
+        </button>
+
+        <button
+          onClick={() => setSubTab('homepageCard')}
+          style={{
+            padding: '0.5rem 1.25rem',
+            border: subTab === 'homepageCard' ? '2px solid var(--maroon)' : '2px solid var(--gray-200)',
+            background: subTab === 'homepageCard' ? 'var(--maroon)' : 'var(--white)',
+            color: subTab === 'homepageCard' ? 'var(--white)' : 'var(--gray-600)',
+            fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: '0.5rem'
+          }}
+        >
+          <i className="fa-solid fa-pen-to-square" /> Customize Homepage Card (Every Word)
+        </button>
       </div>
 
+      {/* TAB 2: Homepage Card Text Customizer */}
+      {subTab === 'homepageCard' && (
+        <div>
+          <p style={{ fontSize: '0.85rem', color: 'var(--gray-500)', marginBottom: '1.5rem' }}>
+            Customize every word, title, stat, quote, badge, and button on the homepage <strong>"From Aspirants to Achievers"</strong> section.
+          </p>
+
+          {/* 1. Header & Callout Note */}
+          <div className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+            <h4 style={{ color: 'var(--maroon)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '1rem', borderBottom: '1px solid var(--gray-200)', paddingBottom: '0.5rem' }}>
+              <i className="fa-solid fa-heading" style={{ marginRight: '6px' }} /> 1. Section Header &amp; Top-Right Callout Note
+            </h4>
+            <div className="ap-form-row">
+              <div className="ap-form-group">
+                <label>Eyebrow Badge Text</label>
+                <input className="ap-input" value={wallSettings.eyebrow || ''} onChange={e => setWallSettings(w => ({ ...w, eyebrow: e.target.value }))} placeholder="e.g. NERMAI SUCCESS STORIES" />
+              </div>
+              <div className="ap-form-group">
+                <label>Main Section Title</label>
+                <input className="ap-input" value={wallSettings.title || ''} onChange={e => setWallSettings(w => ({ ...w, title: e.target.value }))} placeholder="e.g. From Aspirants to Achievers" />
+              </div>
+            </div>
+            <div className="ap-form-group">
+              <label>Subtitle Description</label>
+              <textarea className="ap-input" rows={2} value={wallSettings.subtitle || ''} onChange={e => setWallSettings(w => ({ ...w, subtitle: e.target.value }))} placeholder="Real journeys. Real people..." />
+            </div>
+            <div className="ap-form-group">
+              <label>Top-Right Cursive Note (Use Enter for new lines)</label>
+              <textarea className="ap-input" rows={3} value={wallSettings.calloutNote || ''} onChange={e => setWallSettings(w => ({ ...w, calloutNote: e.target.value }))} placeholder="Different Backgrounds&#10;Same Determination&#10;Success with Nermai" />
+            </div>
+          </div>
+
+          {/* 2. Left Sidebar Stats & Quote */}
+          <div className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--gray-200)', paddingBottom: '0.5rem' }}>
+              <h4 style={{ color: 'var(--maroon)', fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>
+                <i className="fa-solid fa-chart-pie" style={{ marginRight: '6px' }} /> 2. Left Sidebar Impact Stats &amp; Testimonial Quote
+              </h4>
+              <button
+                type="button"
+                onClick={addWallStat}
+                className="btn"
+                style={{ fontSize: '0.8rem', padding: '0.35rem 0.8rem', background: 'var(--maroon)', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+              >
+                <i className="fa-solid fa-plus" style={{ marginRight: '6px' }} /> Add Stat
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
+              {(wallSettings.stats || DEFAULT_TOPPERS_WALL.stats).map((st, i) => (
+                <div key={i} style={{ background: 'var(--gray-50)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--gray-200)', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--gray-200)', paddingBottom: '0.4rem' }}>
+                    <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--maroon)' }}>
+                      Stat #{i + 1}
+                    </div>
+                    {(wallSettings.stats || DEFAULT_TOPPERS_WALL.stats).length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeWallStat(i)}
+                        className="btn"
+                        style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #f87171', padding: '0.2rem 0.5rem', fontSize: '0.7rem', borderRadius: '4px' }}
+                        title="Remove Stat"
+                      >
+                        <i className="fa-solid fa-trash" style={{ marginRight: '4px' }} /> Delete
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="ap-form-group">
+                    <label>Number / Value</label>
+                    <input className="ap-input" value={st.num || ''} onChange={e => updateWallStat(i, 'num', e.target.value)} placeholder="243+ or Highest" />
+                  </div>
+                  <div className="ap-form-group">
+                    <label>Label</label>
+                    <input className="ap-input" value={st.label || ''} onChange={e => updateWallStat(i, 'label', e.target.value)} placeholder="Successful Candidates" />
+                  </div>
+
+                  <div className="ap-form-group">
+                    <label>Icon / Logo Symbol</label>
+                    <select className="ap-input" value={st.icon || (['GraduationCap', 'Users', 'Award', 'Trophy'][i % 4])} onChange={e => updateWallStat(i, 'icon', e.target.value)}>
+                      <option value="GraduationCap">🎓 Graduation Cap (Degree)</option>
+                      <option value="Users">👥 Users / Community</option>
+                      <option value="Award">🏅 Award / Badge</option>
+                      <option value="Trophy">🏆 Trophy / Winner</option>
+                      <option value="Star">⭐ Star</option>
+                      <option value="Medal">🥇 Medal</option>
+                      <option value="BookOpen">📖 Book / Notes</option>
+                      <option value="CheckCircle">✅ Check / Verified</option>
+                      <option value="Target">🎯 Target / Goal</option>
+                      <option value="Flame">🔥 Flame / Power</option>
+                      <option value="Heart">❤️ Heart / Trust</option>
+                      <option value="Building">🏛️ Building / Academy</option>
+                      <option value="Clock">⏱️ Clock / Experience</option>
+                      <option value="TrendingUp">📈 Trending Up / Rank</option>
+                      <option value="ShieldCheck">🛡️ Shield / Security</option>
+                      <option value="Zap">⚡ Zap / Speed</option>
+                      <option value="Sparkles">✨ Sparkles / Premium</option>
+                      <option value="UserCheck">👤 Selected Officer</option>
+                      <option value="Crown">👑 Crown / Top Rank</option>
+                      <option value="ThumbsUp">👍 Thumbs Up</option>
+                      <option value="Compass">🧭 Compass / Guidance</option>
+                      <option value="Briefcase">💼 Career / Public Service</option>
+                      <option value="Bookmark">🔖 Bookmark</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 600, fontSize: '0.8rem', color: 'var(--gray-700)' }}>
+                      Or Upload Custom Logo Image (Optional)
+                    </label>
+                    <AdminImageUpload
+                      value={st.logoUrl || ''}
+                      onChange={url => updateWallStat(i, 'logoUrl', url)}
+                      subFolderName="toppers_stats"
+                      hint="Square logo (e.g. 100x100px PNG/SVG)"
+                      aspectRatio="1/1"
+                      previewHeight={65}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={addWallStat}
+              className="btn"
+              style={{ marginBottom: '1.25rem', width: '100%', justifyContent: 'center', background: 'var(--gray-100)', color: 'var(--gray-700)', border: '1px dashed var(--gray-300)', padding: '0.75rem', fontWeight: 600 }}
+            >
+              <i className="fa-solid fa-plus" style={{ marginRight: '8px' }} /> Add Another Stat
+            </button>
+
+            <div className="ap-form-row">
+              <div className="ap-form-group">
+                <label>Sidebar Quote Text</label>
+                <input className="ap-input" value={wallSettings.quoteText || ''} onChange={e => setWallSettings(w => ({ ...w, quoteText: e.target.value }))} placeholder="The best investment I made for my future." />
+              </div>
+              <div className="ap-form-group">
+                <label>Sidebar Quote Author</label>
+                <input className="ap-input" value={wallSettings.quoteAuthor || ''} onChange={e => setWallSettings(w => ({ ...w, quoteAuthor: e.target.value }))} placeholder="— Nermai Student" />
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Card Labels */}
+          <div className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+            <h4 style={{ color: 'var(--maroon)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '1rem', borderBottom: '1px solid var(--gray-200)', paddingBottom: '0.5rem' }}>
+              <i className="fa-solid fa-tag" style={{ marginRight: '6px' }} /> 3. Achiever Card Badge &amp; Button Text
+            </h4>
+            <div className="ap-form-row">
+              <div className="ap-form-group">
+                <label>Default Speech Bubble / Badge Text on Photo</label>
+                <input className="ap-input" value={wallSettings.defaultBadge || ''} onChange={e => setWallSettings(w => ({ ...w, defaultBadge: e.target.value }))} placeholder="Guided by Nermai" />
+              </div>
+              <div className="ap-form-group">
+                <label>Card Button Text</label>
+                <input className="ap-input" value={wallSettings.readStoryBtnText || ''} onChange={e => setWallSettings(w => ({ ...w, readStoryBtnText: e.target.value }))} placeholder="Read Story" />
+              </div>
+            </div>
+          </div>
+
+          {/* 4. Bottom Highlights & CTA */}
+          <div className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--gray-200)', paddingBottom: '0.5rem' }}>
+              <h4 style={{ color: 'var(--maroon)', fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>
+                <i className="fa-solid fa-list-check" style={{ marginRight: '6px' }} /> 4. Bottom Feature Highlights &amp; CTA Button
+              </h4>
+              <button
+                type="button"
+                onClick={addWallFeature}
+                className="btn"
+                style={{ fontSize: '0.8rem', padding: '0.35rem 0.8rem', background: 'var(--maroon)', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+              >
+                <i className="fa-solid fa-plus" style={{ marginRight: '6px' }} /> Add Highlight
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
+              {(wallSettings.features || DEFAULT_TOPPERS_WALL.features).map((feat, i) => (
+                <div key={i} style={{ background: 'var(--gray-50)', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--gray-200)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--maroon)' }}>
+                      Highlight #{i + 1}
+                    </div>
+                    {(wallSettings.features || DEFAULT_TOPPERS_WALL.features).length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeWallFeature(i)}
+                        className="btn"
+                        style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #f87171', padding: '0.15rem 0.5rem', fontSize: '0.7rem', borderRadius: '4px' }}
+                        title="Remove Highlight"
+                      >
+                        <i className="fa-solid fa-trash" style={{ marginRight: '4px' }} /> Delete
+                      </button>
+                    )}
+                  </div>
+                  <div className="ap-form-group">
+                    <label>Title</label>
+                    <input className="ap-input" value={feat.title || ''} onChange={e => updateWallFeature(i, 'title', e.target.value)} placeholder="e.g. Diverse Backgrounds" />
+                  </div>
+                  <div className="ap-form-group">
+                    <label>Description</label>
+                    <input className="ap-input" value={feat.desc || ''} onChange={e => updateWallFeature(i, 'desc', e.target.value)} placeholder="e.g. Students from towns..." />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={addWallFeature}
+              className="btn"
+              style={{ marginBottom: '1.25rem', width: '100%', justifyContent: 'center', background: 'var(--gray-100)', color: 'var(--gray-700)', border: '1px dashed var(--gray-300)', padding: '0.6rem' }}
+            >
+              <i className="fa-solid fa-plus" style={{ marginRight: '8px' }} /> Add Another Highlight
+            </button>
+
+            <div className="ap-form-row">
+              <div className="ap-form-group">
+                <label>Bottom Button Text</label>
+                <input className="ap-input" value={wallSettings.ctaBtnText || ''} onChange={e => setWallSettings(w => ({ ...w, ctaBtnText: e.target.value }))} placeholder="View All Success Stories" />
+              </div>
+              <div className="ap-form-group">
+                <label>Bottom Button Link URL</label>
+                <input className="ap-input" value={wallSettings.ctaBtnLink || ''} onChange={e => setWallSettings(w => ({ ...w, ctaBtnLink: e.target.value }))} placeholder="/results" />
+              </div>
+            </div>
+          </div>
+
+          {/* Save Button */}
+          <div style={{ position: 'sticky', bottom: '1rem', zIndex: 10, marginTop: '1.5rem' }}>
+            <button
+              className="ap-btn ap-btn-primary"
+              onClick={handleSaveWall}
+              disabled={savingWall}
+              style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
+            >
+              {savingWall
+                ? <><i className="fa-solid fa-spinner fa-spin" /> Saving Card Texts...</>
+                : <><i className="fa-solid fa-floppy-disk" /> Save Homepage Card Texts</>
+              }
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 1: Achievers & Results */}
+      {subTab === 'achievers' && (
+        <>
+          {/* Helper Box */}
+          <div style={{ background: 'rgba(212, 175, 55, 0.08)', border: '1px solid rgba(212, 175, 55, 0.3)', borderRadius: '8px', padding: '0.9rem 1.25rem', marginBottom: '1.25rem', fontSize: '0.85rem', color: 'var(--ink)' }}>
+            <strong>Unified Data Source:</strong> Achievers added here appear across the website in both the <strong>Results Page (/results)</strong> and the <strong>Home Screen Toppers Wall</strong>. Check <em>"Show on Home Screen"</em> to spotlight them in the featured carousel.
+          </div>
+
       <div className="ap-card ap-topper-form-card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-          <div style={{ fontWeight: 700, fontSize: '0.95rem', color: editingId ? 'var(--saffron)' : 'var(--ink)' }}>
-            {editingId ? `✏️ Editing Topper: ${form.name || 'Student'}` : '➕ Add New Topper'}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+          <div style={{ fontWeight: 700, fontSize: '1rem', color: editingId ? 'var(--saffron)' : 'var(--ink)' }}>
+            {editingId ? `✏️ Editing Achiever: ${form.name || 'Student'}` : '➕ Add New Result & Topper'}
           </div>
           {editingId && (
             <button className="ap-btn ap-btn-ghost ap-btn-sm" onClick={handleCancelEdit}>
@@ -580,60 +985,116 @@ function ToppersSection({ toast }) {
 
         <div className="ap-form-row">
           <div className="ap-form-group">
-            <label>Name *</label>
-            <input className="ap-input" placeholder="Kavitha S." value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+            <label>Student Full Name *</label>
+            <input className="ap-input" placeholder="e.g. S. Priya" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
           </div>
           <div className="ap-form-group">
-            <label>Rank *</label>
-            <input className="ap-input" placeholder="1" value={form.rank} onChange={e => setForm(f => ({ ...f, rank: e.target.value }))} />
+            <label>Rank / AIR / Selection Rank *</label>
+            <input className="ap-input" placeholder="e.g. 1 or 12 or AIR 45" value={form.rank} onChange={e => setForm(f => ({ ...f, rank: e.target.value }))} />
           </div>
         </div>
+
         <div className="ap-form-row">
           <div className="ap-form-group">
-            <label>Exam</label>
-            <select className="ap-input ap-select" value={form.exam} onChange={e => setForm(f => ({ ...f, exam: e.target.value }))}>
-              {['TNPSC Group I', 'TNPSC Group II', 'TNPSC Group IV', 'UPSC CSE', 'TN Police SI', 'TN Police Constable', 'IBPS PO', 'SBI PO', 'Others'].map(e => (
-                <option key={e} value={e}>{e}</option>
-              ))}
+            <label>Exam Preset</label>
+            <select className="ap-input ap-select" value={form.exam} onChange={e => handleExamPresetChange(e.target.value)}>
+              <option value="TNPSC Group I">TNPSC Group I</option>
+              <option value="TNPSC Group II">TNPSC Group II</option>
+              <option value="TNPSC Group IV">TNPSC Group IV</option>
+              <option value="UPSC CSE">UPSC CSE</option>
+              <option value="Puducherry UDC/LDC">Puducherry UDC/LDC</option>
+              <option value="TN Police SI">TN Police SI</option>
+              <option value="TN Police Constable">TN Police Constable</option>
+              <option value="Banking (SBI PO)">Banking (SBI PO)</option>
+              <option value="Banking (IBPS PO)">Banking (IBPS PO)</option>
+              <option value="SSC CGL">SSC CGL</option>
+              <option value="Others">Others (Custom)</option>
             </select>
             {form.exam === 'Others' && (
               <input 
                 className="ap-input" 
                 style={{ marginTop: '0.5rem' }} 
-                placeholder="Specify exam manually..." 
+                placeholder="Type custom exam name..." 
                 value={form.customExam || ''} 
                 onChange={e => setForm(f => ({ ...f, customExam: e.target.value }))} 
               />
             )}
           </div>
+
           <div className="ap-form-group">
-            <label>Year</label>
+            <label>Category Filter Tag</label>
+            <select className="ap-input ap-select" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
+              <option value="upsc">UPSC</option>
+              <option value="tnpsc-g1">TNPSC Group I</option>
+              <option value="tnpsc-g2">TNPSC Group II</option>
+              <option value="tnpsc-g4">TNPSC Group IV</option>
+              <option value="puducherry">Puducherry Govt.</option>
+              <option value="police">Police (SI / Constable)</option>
+              <option value="banking">Banking</option>
+              <option value="ssc">SSC</option>
+              <option value="others">Others</option>
+            </select>
+          </div>
+
+          <div className="ap-form-group">
+            <label>Exam Year</label>
             <input className="ap-input" placeholder="2024" value={form.year} onChange={e => setForm(f => ({ ...f, year: e.target.value }))} />
           </div>
         </div>
+
+        {/* Feature & Visibility Toggles */}
+        <div style={{ display: 'flex', gap: '1.5rem', margin: '0.75rem 0 1.25rem 0', flexWrap: 'wrap', padding: '0.85rem', background: 'var(--gray-50, #f9fafb)', borderRadius: '6px', border: '1px solid var(--gray-200)' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', color: 'var(--ink)' }}>
+            <input 
+              type="checkbox" 
+              checked={form.isFeatured} 
+              onChange={e => setForm(f => ({ ...f, isFeatured: e.target.checked }))} 
+              style={{ width: 18, height: 18, accentColor: 'var(--maroon)' }}
+            />
+            <span>⭐ Feature on Home Screen (Top 6 Spotlight)</span>
+          </label>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', color: 'var(--ink)' }}>
+            <input 
+              type="checkbox" 
+              checked={form.visible} 
+              onChange={e => setForm(f => ({ ...f, visible: e.target.checked }))} 
+              style={{ width: 18, height: 18, accentColor: 'var(--maroon)' }}
+            />
+            <span>👁️ Publicly Visible</span>
+          </label>
+        </div>
+
         <AdminImageUpload
-          label="Topper Photo"
+          label="Student / Topper Photo"
           value={form.photo}
           onChange={val => setForm(f => ({ ...f, photo: val }))}
           subFolderName="nermai-toppers"
           maxWidth={800}
           aspectRatio="1/1"
-          hint="Square 1:1 • 600 × 600 px"
+          hint="Square 1:1 • 600 × 600 px (Upload file, paste Google Drive ID/link or image URL)"
           placeholder="Paste Google Drive URL / ID or Web photo link..."
           toast={toast}
         />
-        <div className="ap-form-group">
-          <label>Quote</label>
-          <textarea className="ap-input ap-textarea" placeholder="Guided by Nermai..." value={form.quote} onChange={e => setForm(f => ({ ...f, quote: e.target.value }))} />
+
+        <div className="ap-form-group" style={{ marginTop: '1rem' }}>
+          <label>Speech Bubble Quote / Short Highlight</label>
+          <input className="ap-input" placeholder='e.g. "Nermai gave me the right direction and confidence."' value={form.quote} onChange={e => setForm(f => ({ ...f, quote: e.target.value }))} />
         </div>
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+
+        <div className="ap-form-group">
+          <label>Detailed Preparation Journey &amp; Strategy (Shown in "Read Story" modal)</label>
+          <textarea className="ap-input ap-textarea" style={{ minHeight: '90px' }} placeholder="Detail the student's journey, preparation routine, and mentoring experience..." value={form.story} onChange={e => setForm(f => ({ ...f, story: e.target.value }))} />
+        </div>
+
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginTop: '1rem' }}>
           <button className="ap-btn ap-btn-primary" onClick={handleSaveOrAdd} disabled={saving}>
             {saving ? (
               <><i className="fa-solid fa-spinner fa-spin"></i> Saving...</>
             ) : editingId ? (
-              <><i className="fa-solid fa-floppy-disk" style={{ marginRight: '6px' }}></i> Update Topper</>
+              <><i className="fa-solid fa-floppy-disk" style={{ marginRight: '6px' }}></i> Update Achiever</>
             ) : (
-              <><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}><path d="M5 12h14"/><path d="M12 5v14"/></svg> Add Topper</>
+              <><i className="fa-solid fa-plus" style={{ marginRight: '6px' }}></i> Add Achiever to Wall</>
             )}
           </button>
           {editingId && (
@@ -644,67 +1105,146 @@ function ToppersSection({ toast }) {
         </div>
       </div>
 
+      {/* List Card */}
       <div className="ap-card">
-        <div style={{ fontWeight: 700, marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span>Toppers ({toppers.length})</span>
-          <span style={{ fontSize: '0.75rem', color: 'var(--gray-400)', fontWeight: 400 }}>Click edit (✏️) to fetch and update any topper</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
+          <div>
+            <span style={{ fontWeight: 700, fontSize: '1rem' }}>All Achievers &amp; Results ({filteredToppers.length})</span>
+            <div style={{ fontSize: '0.78rem', color: 'var(--gray-400)', marginTop: '2px' }}>
+              Showing {filteredToppers.length} of {toppers.length} total entries
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <input 
+              type="search" 
+              className="ap-input" 
+              placeholder="Search student or exam..." 
+              value={searchQuery} 
+              onChange={e => setSearchQuery(e.target.value)}
+              style={{ width: '220px', padding: '0.35rem 0.65rem', fontSize: '0.82rem' }}
+            />
+            <select 
+              className="ap-input ap-select" 
+              value={filterCat} 
+              onChange={e => setFilterCat(e.target.value)}
+              style={{ width: '150px', padding: '0.35rem 0.65rem', fontSize: '0.82rem' }}
+            >
+              <option value="all">All Categories</option>
+              <option value="featured">⭐ Featured Only</option>
+              <option value="upsc">UPSC</option>
+              <option value="tnpsc-g1">TNPSC G1</option>
+              <option value="tnpsc-g2">TNPSC G2</option>
+              <option value="tnpsc-g4">TNPSC G4</option>
+              <option value="puducherry">Puducherry</option>
+              <option value="police">Police</option>
+              <option value="banking">Banking</option>
+              <option value="ssc">SSC</option>
+              <option value="others">Others</option>
+            </select>
+          </div>
         </div>
-        {toppers.length === 0 ? (
+
+        {filteredToppers.length === 0 ? (
           <div className="ap-empty">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-            <p style={{ marginTop: '0.5rem' }}>No Toppers</p>
+            <i className="fa-solid fa-trophy" style={{ fontSize: '2rem', color: 'var(--gray-300)', marginBottom: '0.5rem' }}></i>
+            <p>No achievers match the filters</p>
           </div>
         ) : (
           <div className="ap-items-list">
-            {toppers.map(t => {
+            {filteredToppers.map(t => {
               const photoUrl = driveStorage.formatImageUrl(t.photo)
               const isHidden = t.visible === false
+              const isFeatured = t.isFeatured === true
               const isBeingEdited = editingId === t.id
+
               return (
-                <div key={t.id} className="ap-item" style={{ opacity: isHidden ? 0.6 : 1, border: isBeingEdited ? '2px solid var(--saffron)' : '1px solid var(--gray-100)', background: isBeingEdited ? 'rgba(212, 175, 55, 0.06)' : undefined }}>
+                <div 
+                  key={t.id} 
+                  className="ap-item" 
+                  style={{ 
+                    opacity: isHidden ? 0.6 : 1, 
+                    border: isBeingEdited ? '2px solid var(--saffron)' : '1px solid var(--gray-100)', 
+                    background: isBeingEdited ? 'rgba(212, 175, 55, 0.06)' : undefined 
+                  }}
+                >
                   {photoUrl ? (
-                    <img src={photoUrl} alt={t.name} className="ap-item-thumb" style={{ borderRadius: '50%', width: 44, height: 44 }} onError={e => { e.target.style.display = 'none' }} />
+                    <img src={photoUrl} alt={t.name} className="ap-item-thumb" style={{ borderRadius: '50%', width: 48, height: 48, objectFit: 'cover' }} onError={e => { e.target.style.display = 'none' }} />
                   ) : (
-                    <div className="ap-item-thumb" style={{ width: 44, height: 44, background: 'var(--gray-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'var(--gray-400)' }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <div className="ap-item-thumb" style={{ width: 48, height: 48, background: 'linear-gradient(135deg, #7b1b2e, #4a0e1c)', color: '#f5d061', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>
+                      {(t.name || '?')[0].toUpperCase()}
                     </div>
                   )}
+
                   <div style={{ flex: 1 }}>
-                    <div className="ap-item-title">
-                      {t.name} — Rank {t.rank}
-                      {isHidden && <span style={{ fontSize: '0.7rem', background: 'var(--gray-200)', padding: '2px 6px', borderRadius: '4px', marginLeft: '6px', color: 'var(--gray-600)' }}>Hidden</span>}
-                      {isBeingEdited && <span style={{ fontSize: '0.7rem', background: 'var(--saffron)', color: 'white', padding: '2px 6px', borderRadius: '4px', marginLeft: '6px' }}>Editing</span>}
+                    <div className="ap-item-title" style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                      <span style={{ fontWeight: 700 }}>{t.name}</span>
+                      <span style={{ fontSize: '0.75rem', background: 'var(--gold-light, #f5d061)', color: '#1A1008', padding: '1px 6px', borderRadius: '3px', fontWeight: 700 }}>
+                        Rank #{t.rank}
+                      </span>
+                      {isFeatured && (
+                        <span style={{ fontSize: '0.7rem', background: '#fef3c7', color: '#92400e', border: '1px solid #fcd34d', padding: '1px 6px', borderRadius: '3px', fontWeight: 600 }}>
+                          ⭐ Home Featured
+                        </span>
+                      )}
+                      {isHidden && (
+                        <span style={{ fontSize: '0.7rem', background: 'var(--gray-200)', padding: '1px 6px', borderRadius: '3px', color: 'var(--gray-600)' }}>
+                          Hidden
+                        </span>
+                      )}
+                      {isBeingEdited && (
+                        <span style={{ fontSize: '0.7rem', background: 'var(--saffron)', color: 'white', padding: '1px 6px', borderRadius: '3px' }}>
+                          Editing
+                        </span>
+                      )}
                     </div>
-                    <div className="ap-item-sub">{t.exam} · {t.year}</div>
+                    <div className="ap-item-sub" style={{ marginTop: '3px' }}>
+                      <strong>{t.exam}</strong> · {t.year} {t.category ? `(${t.category.toUpperCase()})` : ''}
+                      {t.quote && <div style={{ fontStyle: 'italic', fontSize: '0.75rem', color: 'var(--gray-500)', marginTop: '2px' }}>"{t.quote}"</div>}
+                    </div>
                   </div>
-                  <div className="ap-item-actions" style={{ display: 'flex', gap: '0.4rem' }}>
+
+                  <div className="ap-item-actions" style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
                     <button
                       className="ap-btn"
                       style={{ background: '#3b82f6', color: 'white', padding: '0.4rem 0.6rem' }}
                       onClick={() => handleStartEdit(t)}
-                      title="Edit Topper Details (Fetch data to form)"
+                      title="Edit Achiever Details"
                     >
                       <i className="fa-solid fa-pen-to-square"></i>
                     </button>
                     <button
                       className="ap-btn"
-                      style={{ background: isHidden ? 'var(--gray-200)' : '#10b981', color: isHidden ? 'var(--gray-600)' : 'white', padding: '0.4rem 0.6rem' }}
-                      onClick={() => handleToggleVisibility(t)}
-                      title={isHidden ? 'Show on Site' : 'Hide from Site'}
+                      style={{ 
+                        background: isFeatured ? '#f59e0b' : 'var(--gray-100)', 
+                        color: isFeatured ? 'white' : 'var(--gray-600)', 
+                        padding: '0.4rem 0.6rem',
+                        border: '1px solid var(--gray-300)'
+                      }}
+                      onClick={() => handleToggleFeatured(t)}
+                      title={isFeatured ? 'Remove from Home Screen Featured' : 'Feature on Home Screen (Top 6)'}
                     >
-                      {isHidden ? (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
-                      ) : (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                      )}
+                      <i className="fa-solid fa-star"></i>
+                    </button>
+                    <button
+                      className="ap-btn"
+                      style={{ 
+                        background: isHidden ? 'var(--gray-200)' : '#10b981', 
+                        color: isHidden ? 'var(--gray-600)' : 'white', 
+                        padding: '0.4rem 0.6rem' 
+                      }}
+                      onClick={() => handleToggleVisibility(t)}
+                      title={isHidden ? 'Show on Public Site' : 'Hide from Public Site'}
+                    >
+                      <i className={`fa-solid ${isHidden ? 'fa-eye-slash' : 'fa-eye'}`}></i>
                     </button>
                     <button
                       className="ap-btn ap-btn-danger"
                       style={{ padding: '0.4rem 0.6rem' }}
                       onClick={() => handleDelete(t.id)}
-                      title="Delete Topper"
+                      title="Delete Entry"
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                      <i className="fa-solid fa-trash"></i>
                     </button>
                   </div>
                 </div>
@@ -713,19 +1253,29 @@ function ToppersSection({ toast }) {
           </div>
         )}
       </div>
+      </>
+      )}
     </div>
   )
 }
 
 // ─── Section: Testimonials ────────────────────────────────────────────────────
 function TestimonialsSection({ toast }) {
+  const [subTab, setSubTab] = useState('reviews')
   const [items, setItems] = useState([])
   const [editingId, setEditingId] = useState(null)
-  const [form, setForm] = useState({ name: '', role: '', quote: '' })
+  const [form, setForm] = useState({ name: '', role: '', quote: '', imageUrl: '' })
   const [saving, setSaving] = useState(false)
+  const [savingTexts, setSavingTexts] = useState(false)
+  const [config, setConfig] = useState(DEFAULT_TESTIMONIALS_CONFIG)
 
   useEffect(() => {
     const unsub = fbFirestore.onTestimonialsChanged(setItems)
+    fbFirestore.getSettings().then(s => {
+      if (s?.homeContent?.testimonialsConfig) {
+        setConfig(prev => ({ ...DEFAULT_TESTIMONIALS_CONFIG, ...s.homeContent.testimonialsConfig }))
+      }
+    })
     return () => unsub()
   }, [])
 
@@ -734,14 +1284,16 @@ function TestimonialsSection({ toast }) {
     setForm({
       name: t.name || '',
       role: t.role || '',
-      quote: t.quote || ''
+      quote: t.quote || '',
+      imageUrl: t.imageUrl || t.avatar || t.photo || ''
     })
+    setSubTab('reviews')
     toast.info(`Editing review for ${t.name || 'student'}`)
   }
 
   const handleCancelEdit = () => {
     setEditingId(null)
-    setForm({ name: '', role: '', quote: '' })
+    setForm({ name: '', role: '', quote: '', imageUrl: '' })
   }
 
   const handleSaveOrAdd = async () => {
@@ -755,7 +1307,7 @@ function TestimonialsSection({ toast }) {
       } else {
         await fbFirestore.addTestimonial(form)
         toast.success('Testimonial added successfully!')
-        setForm({ name: '', role: '', quote: '' })
+        setForm({ name: '', role: '', quote: '', imageUrl: '' })
       }
     } catch (e) {
       toast.error(e.message)
@@ -775,78 +1327,253 @@ function TestimonialsSection({ toast }) {
     }
   }
 
+  const handleSaveTexts = async () => {
+    setSavingTexts(true)
+    try {
+      const s = await fbFirestore.getSettings()
+      const updatedHomeContent = { ...(s.homeContent || {}), testimonialsConfig: config }
+      await fbFirestore.updateSettings({ homeContent: updatedHomeContent })
+      toast.success('Review section titles & texts updated! Refresh home page to view live.')
+    } catch (e) {
+      toast.error(e.message)
+    } finally {
+      setSavingTexts(false)
+    }
+  }
+
   return (
     <div>
-      <h2 className="ap-section-title"><i className="fa-solid fa-quote-right"></i> Testimonials</h2>
+      <h2 className="ap-section-title"><i className="fa-solid fa-quote-right"></i> Reviews &amp; Testimonials</h2>
 
-      <div className="ap-card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-          <div style={{ fontWeight: 700, fontSize: '0.95rem', color: editingId ? 'var(--saffron)' : 'var(--ink)' }}>
-            {editingId ? `✏️ Editing Testimonial: ${form.name}` : '➕ Add New Testimonial'}
-          </div>
-          {editingId && (
-            <button className="ap-btn ap-btn-ghost ap-btn-sm" onClick={handleCancelEdit}>
-              <i className="fa-solid fa-xmark"></i> Cancel Edit
-            </button>
-          )}
-        </div>
+      {/* Sub-tab Navigation */}
+      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '2px solid var(--gray-200)', paddingBottom: '0.75rem' }}>
+        <button
+          type="button"
+          onClick={() => setSubTab('reviews')}
+          style={{
+            padding: '0.5rem 1.25rem',
+            border: subTab === 'reviews' ? '2px solid var(--maroon)' : '2px solid var(--gray-200)',
+            background: subTab === 'reviews' ? 'var(--maroon)' : 'var(--white)',
+            color: subTab === 'reviews' ? 'var(--white)' : 'var(--gray-600)',
+            fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: '0.5rem'
+          }}
+        >
+          <i className="fa-solid fa-comments" /> Student Reviews Cards ({items.length})
+        </button>
 
-        <div className="ap-form-group">
-          <label>Student Name *</label>
-          <input className="ap-input" placeholder="Anitha Devi" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-        </div>
-        <div className="ap-form-group">
-          <label>Role / Exam</label>
-          <input className="ap-input" placeholder="TNPSC Group IV Aspirant" value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))} />
-        </div>
-        <div className="ap-form-group">
-          <label>Quote *</label>
-          <textarea className="ap-input ap-textarea" placeholder="Studying at Nermai..." value={form.quote} onChange={e => setForm(f => ({ ...f, quote: e.target.value }))} />
-        </div>
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          <button className="ap-btn ap-btn-primary" onClick={handleSaveOrAdd} disabled={saving}>
-            {saving ? (
-              <><i className="fa-solid fa-spinner fa-spin"></i> Saving...</>
-            ) : editingId ? (
-              <><i className="fa-solid fa-floppy-disk"></i> Update Testimonial</>
-            ) : (
-              <><i className="fa-solid fa-plus"></i> Add Testimonial</>
-            )}
-          </button>
-          {editingId && (
-            <button className="ap-btn ap-btn-ghost" onClick={handleCancelEdit}>
-              Cancel
-            </button>
-          )}
-        </div>
+        <button
+          type="button"
+          onClick={() => setSubTab('sectionTexts')}
+          style={{
+            padding: '0.5rem 1.25rem',
+            border: subTab === 'sectionTexts' ? '2px solid var(--maroon)' : '2px solid var(--gray-200)',
+            background: subTab === 'sectionTexts' ? 'var(--maroon)' : 'var(--white)',
+            color: subTab === 'sectionTexts' ? 'var(--white)' : 'var(--gray-600)',
+            fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: '0.5rem'
+          }}
+        >
+          <i className="fa-solid fa-pen-to-square" /> Customize Section Texts (Every Word)
+        </button>
       </div>
 
-      <div className="ap-card">
-        <div style={{ fontWeight: 700, marginBottom: '1rem' }}>Testimonials ({items.length})</div>
-        {items.length === 0 ? (
-          <div className="ap-empty"><i className="fa-solid fa-comments"></i><p>No Testimonials</p></div>
-        ) : (
-          <div className="ap-items-list">
-            {items.map(t => (
-              <div key={t.id} className="ap-item">
-                <div style={{ flex: 1 }}>
-                  <div className="ap-item-title">{t.name}</div>
-                  <div className="ap-item-sub">{t.role}</div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--gray-500)', marginTop: '0.25rem', fontStyle: 'italic' }}>"{t.quote?.slice(0, 80)}{t.quote?.length > 80 ? '...' : ''}"</div>
-                </div>
-                <div className="ap-item-actions" style={{ display: 'flex', gap: '0.4rem' }}>
-                  <button className="ap-btn" style={{ background: '#3b82f6', color: 'white', padding: '0.4rem 0.6rem' }} onClick={() => handleStartEdit(t)} title="Edit Testimonial">
-                    <i className="fa-solid fa-pen-to-square"></i>
-                  </button>
-                  <button className="ap-btn ap-btn-danger" style={{ padding: '0.4rem 0.6rem' }} onClick={() => handleDelete(t.id)} title="Delete Testimonial">
-                    <i className="fa-solid fa-trash"></i>
-                  </button>
-                </div>
+      {/* TAB 1: Individual Reviews Manager */}
+      {subTab === 'reviews' && (
+        <>
+          <div className="ap-card" style={{ marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.95rem', color: editingId ? 'var(--saffron)' : 'var(--ink)' }}>
+                {editingId ? `✏️ Editing Testimonial: ${form.name}` : '➕ Add New Testimonial'}
               </div>
-            ))}
+              {editingId && (
+                <button type="button" className="ap-btn ap-btn-ghost ap-btn-sm" onClick={handleCancelEdit}>
+                  <i className="fa-solid fa-xmark"></i> Cancel Edit
+                </button>
+              )}
+            </div>
+
+            <div className="ap-form-row">
+              <div className="ap-form-group">
+                <label>Student Name *</label>
+                <input className="ap-input" placeholder="Anitha Devi" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+              </div>
+              <div className="ap-form-group">
+                <label>Role / Exam / Subtitle</label>
+                <input className="ap-input" placeholder="TNPSC Group IV Aspirant" value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))} />
+              </div>
+            </div>
+
+            <div className="ap-form-group">
+              <label>Quote / Honest Review *</label>
+              <textarea className="ap-input ap-textarea" rows={3} placeholder="Studying at Nermai made complex topics simple..." value={form.quote} onChange={e => setForm(f => ({ ...f, quote: e.target.value }))} />
+            </div>
+
+            <div style={{ marginBottom: '1.25rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: 600, fontSize: '0.8rem', color: 'var(--gray-700)' }}>
+                Student Photo / Avatar (Optional)
+              </label>
+              <AdminImageUpload
+                value={form.imageUrl || ''}
+                onChange={url => setForm(f => ({ ...f, imageUrl: url }))}
+                subFolderName="testimonials"
+                hint="Square 1:1 ratio (e.g. 200x200px)"
+                aspectRatio="1/1"
+                previewHeight={70}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+              <button type="button" className="ap-btn ap-btn-primary" onClick={handleSaveOrAdd} disabled={saving}>
+                {saving ? (
+                  <><i className="fa-solid fa-spinner fa-spin"></i> Saving...</>
+                ) : editingId ? (
+                  <><i className="fa-solid fa-floppy-disk"></i> Update Testimonial</>
+                ) : (
+                  <><i className="fa-solid fa-plus"></i> Add Testimonial</>
+                )}
+              </button>
+              {editingId && (
+                <button type="button" className="ap-btn ap-btn-ghost" onClick={handleCancelEdit}>
+                  Cancel
+                </button>
+              )}
+            </div>
           </div>
-        )}
-      </div>
+
+          <div className="ap-card">
+            <div style={{ fontWeight: 700, marginBottom: '1rem', fontSize: '1rem' }}>All Student Reviews ({items.length})</div>
+            {items.length === 0 ? (
+              <div className="ap-empty"><i className="fa-solid fa-comments"></i><p>No Testimonials</p></div>
+            ) : (
+              <div className="ap-items-list">
+                {items.map(t => {
+                  const avatarUrl = t.imageUrl || t.avatar || t.photo ? driveStorage.formatImageUrl(t.imageUrl || t.avatar || t.photo) : null
+                  return (
+                    <div key={t.id} className="ap-item" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      {avatarUrl ? (
+                        <img src={avatarUrl} alt={t.name} style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none' }} />
+                      ) : (
+                        <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'var(--maroon)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>
+                          {(t.name || 'A')[0].toUpperCase()}
+                        </div>
+                      )}
+                      <div style={{ flex: 1 }}>
+                        <div className="ap-item-title" style={{ fontWeight: 700 }}>{t.name}</div>
+                        <div className="ap-item-sub" style={{ color: 'var(--gray-500)', fontSize: '0.8rem' }}>{t.role}</div>
+                        <div style={{ fontSize: '0.78rem', color: 'var(--gray-600)', marginTop: '0.25rem', fontStyle: 'italic' }}>"{t.quote?.slice(0, 95)}{t.quote?.length > 95 ? '...' : ''}"</div>
+                      </div>
+                      <div className="ap-item-actions" style={{ display: 'flex', gap: '0.4rem' }}>
+                        <button type="button" className="ap-btn" style={{ background: '#3b82f6', color: 'white', padding: '0.4rem 0.6rem' }} onClick={() => handleStartEdit(t)} title="Edit Testimonial">
+                          <i className="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button type="button" className="ap-btn ap-btn-danger" style={{ padding: '0.4rem 0.6rem' }} onClick={() => handleDelete(t.id)} title="Delete Testimonial">
+                          <i className="fa-solid fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      {/* TAB 2: Section Texts Customizer */}
+      {subTab === 'sectionTexts' && (
+        <div>
+          <p style={{ fontSize: '0.85rem', color: 'var(--gray-500)', marginBottom: '1.5rem' }}>
+            Customize each and every word of the <strong>"Hear What They Say" (Student Reviews)</strong> homepage section.
+          </p>
+
+          {/* 1. Header */}
+          <div className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+            <h4 style={{ color: 'var(--maroon)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '1rem', borderBottom: '1px solid var(--gray-200)', paddingBottom: '0.5rem' }}>
+              <i className="fa-solid fa-heading" style={{ marginRight: '6px' }} /> 1. Section Header &amp; Top Tag
+            </h4>
+            <div className="ap-form-row">
+              <div className="ap-form-group">
+                <label>Top Eyebrow Badge (e.g. STUDENT REVIEWS)</label>
+                <input className="ap-input" value={config.eyebrow || ''} onChange={e => setConfig(c => ({ ...c, eyebrow: e.target.value }))} placeholder="STUDENT REVIEWS" />
+              </div>
+              <div className="ap-form-group">
+                <label>Main Section Title (e.g. Hear What They Say)</label>
+                <input className="ap-input" value={config.title || ''} onChange={e => setConfig(c => ({ ...c, title: e.target.value }))} placeholder="Hear What They Say" />
+              </div>
+            </div>
+            <div className="ap-form-group">
+              <label>Subtitle Description</label>
+              <input className="ap-input" value={config.subtitle || ''} onChange={e => setConfig(c => ({ ...c, subtitle: e.target.value }))} placeholder="Honest feedback from successful Nermai students." />
+            </div>
+          </div>
+
+          {/* 2. Left Accent Note */}
+          <div className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+            <h4 style={{ color: 'var(--maroon)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '1rem', borderBottom: '1px solid var(--gray-200)', paddingBottom: '0.5rem' }}>
+              <i className="fa-solid fa-quote-left" style={{ marginRight: '6px' }} /> 2. Far Left Callout Note (Beside Carousel)
+            </h4>
+            <div className="ap-form-row">
+              <div className="ap-form-group">
+                <label>Line 1 Text</label>
+                <input className="ap-input" value={config.leftNoteLine1 || ''} onChange={e => setConfig(c => ({ ...c, leftNoteLine1: e.target.value }))} placeholder="Same Dedication." />
+              </div>
+              <div className="ap-form-group">
+                <label>Line 2 Subtitle</label>
+                <input className="ap-input" value={config.leftNoteLine2 || ''} onChange={e => setConfig(c => ({ ...c, leftNoteLine2: e.target.value }))} placeholder="A Brighter Tomorrow." />
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Right Handwritten Script */}
+          <div className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+            <h4 style={{ color: 'var(--maroon)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '1rem', borderBottom: '1px solid var(--gray-200)', paddingBottom: '0.5rem' }}>
+              <i className="fa-solid fa-signature" style={{ marginRight: '6px' }} /> 3. Far Right Handwritten Script (Tilted Script)
+            </h4>
+            <div className="ap-form-row">
+              <div className="ap-form-group">
+                <label>Line 1</label>
+                <input className="ap-input" value={config.rightScriptLine1 || ''} onChange={e => setConfig(c => ({ ...c, rightScriptLine1: e.target.value }))} placeholder="Real Aspirants" />
+              </div>
+              <div className="ap-form-group">
+                <label>Line 2</label>
+                <input className="ap-input" value={config.rightScriptLine2 || ''} onChange={e => setConfig(c => ({ ...c, rightScriptLine2: e.target.value }))} placeholder="Real Stories" />
+              </div>
+              <div className="ap-form-group">
+                <label>Line 3 (Underlined)</label>
+                <input className="ap-input" value={config.rightScriptLine3 || ''} onChange={e => setConfig(c => ({ ...c, rightScriptLine3: e.target.value }))} placeholder="Real Success" />
+              </div>
+            </div>
+          </div>
+
+          {/* 4. Bottom Meta Tagline */}
+          <div className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+            <h4 style={{ color: 'var(--maroon)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '1rem', borderBottom: '1px solid var(--gray-200)', paddingBottom: '0.5rem' }}>
+              <i className="fa-solid fa-font" style={{ marginRight: '6px' }} /> 4. Bottom Right Tagline
+            </h4>
+            <div className="ap-form-group">
+              <label>Tagline Text (All Caps)</label>
+              <input className="ap-input" value={config.bottomTagline || ''} onChange={e => setConfig(c => ({ ...c, bottomTagline: e.target.value }))} placeholder="THOUSANDS OF DREAMS. A STRONGER INDIA." />
+            </div>
+          </div>
+
+          {/* Save Button */}
+          <div style={{ position: 'sticky', bottom: '1rem', zIndex: 10, marginTop: '1.5rem' }}>
+            <button
+              type="button"
+              className="ap-btn ap-btn-primary"
+              onClick={handleSaveTexts}
+              disabled={savingTexts}
+              style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
+            >
+              {savingTexts
+                ? <><i className="fa-solid fa-spinner fa-spin" /> Saving Section Texts...</>
+                : <><i className="fa-solid fa-floppy-disk" /> Save Section Texts</>
+              }
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -959,14 +1686,368 @@ function GallerySection({ toast }) {
   )
 }
 
+// ─── Section: Results ─────────────────────────────────────────────────────────
+const EXAM_CATEGORY_OPTIONS = [
+  { value: 'upsc',     label: 'UPSC' },
+  { value: 'tnpsc-g1', label: 'TNPSC Group I' },
+  { value: 'tnpsc-g2', label: 'TNPSC Group II' },
+  { value: 'tnpsc-g4', label: 'TNPSC Group IV' },
+  { value: 'police',   label: 'Police' },
+  { value: 'banking',  label: 'Banking' },
+  { value: 'ssc',      label: 'SSC' },
+]
+
+function ResultsSection({ toast }) {
+  const [results, setResults] = useState([])
+  const [form, setForm] = useState({
+    name: '', rank: '', exam: '', year: new Date().getFullYear().toString(),
+    photo: '', quote: '', category: 'upsc', isFeatured: false
+  })
+  const [editingId, setEditingId] = useState(null)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    const unsub = fbFirestore.onResultsChanged(setResults)
+    return () => unsub()
+  }, [])
+
+  const handleStartEdit = (r) => {
+    setEditingId(r.id)
+    setForm({ name: r.name||'', rank: r.rank||'', exam: r.exam||'', year: r.year||'', photo: r.photo||'', quote: r.quote||'', category: r.category||'upsc', isFeatured: !!r.isFeatured })
+  }
+  const handleCancelEdit = () => {
+    setEditingId(null)
+    setForm({ name: '', rank: '', exam: '', year: new Date().getFullYear().toString(), photo: '', quote: '', category: 'upsc', isFeatured: false })
+  }
+
+  const handleSave = async () => {
+    if (!form.name.trim()) { toast.error('Student name is required'); return }
+    setSaving(true)
+    try {
+      if (editingId) {
+        await fbFirestore.updateResult(editingId, form)
+        toast.success('Result updated!')
+        handleCancelEdit()
+      } else {
+        await fbFirestore.addResult(form)
+        toast.success('Result added!')
+        setForm({ name: '', rank: '', exam: '', year: new Date().getFullYear().toString(), photo: '', quote: '', category: 'upsc', isFeatured: false })
+      }
+    } catch (e) { toast.error(e.message) }
+    finally { setSaving(false) }
+  }
+
+  const handleDelete = async (id) => {
+    if (!confirm('Delete this result entry?')) return
+    try { await fbFirestore.deleteResult(id); toast.success('Deleted') }
+    catch (e) { toast.error(e.message) }
+  }
+
+  const handleToggleFeatured = async (r) => {
+    try {
+      await fbFirestore.updateResult(r.id, { isFeatured: !r.isFeatured })
+      toast.success(r.isFeatured ? 'Removed from featured' : 'Marked as featured')
+    } catch (e) { toast.error(e.message) }
+  }
+
+  return (
+    <div>
+      <h2 className="ap-section-title"><i className="fa-solid fa-medal" /> Results Manager</h2>
+      <div style={{ marginBottom: '0.75rem', padding: '0.65rem 1rem', background: 'rgba(123,27,46,0.07)', borderRadius: 6, fontSize: '0.82rem', color: 'var(--maroon)', borderLeft: '3px solid var(--maroon)' }}>
+        <i className="fa-solid fa-circle-info" style={{ marginRight: 6 }} />
+        Entries added here appear on the <strong>/results</strong> page. Mark up to 5 as <strong>Featured</strong> to appear in the top showcase.
+      </div>
+
+      <div className="ap-card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <div style={{ fontWeight: 700, fontSize: '0.95rem', color: editingId ? 'var(--saffron)' : 'var(--ink)' }}>
+            {editingId ? `✏️ Editing: ${form.name}` : '➕ Add New Result'}
+          </div>
+          {editingId && (
+            <button className="ap-btn ap-btn-ghost ap-btn-sm" onClick={handleCancelEdit}>
+              <i className="fa-solid fa-xmark" /> Cancel Edit
+            </button>
+          )}
+        </div>
+
+        <div className="ap-form-row">
+          <div className="ap-form-group">
+            <label>Student Name *</label>
+            <input className="ap-input" placeholder="Arjun Kumar" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+          </div>
+          <div className="ap-form-group">
+            <label>Rank</label>
+            <input className="ap-input" placeholder="1" value={form.rank} onChange={e => setForm(f => ({ ...f, rank: e.target.value }))} />
+          </div>
+        </div>
+
+        <div className="ap-form-row">
+          <div className="ap-form-group">
+            <label>Exam Category</label>
+            <select className="ap-input ap-select" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
+              {EXAM_CATEGORY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div className="ap-form-group">
+            <label>Exam Name (display text)</label>
+            <input className="ap-input" placeholder="UPSC Civil Services - 2026" value={form.exam} onChange={e => setForm(f => ({ ...f, exam: e.target.value }))} />
+          </div>
+          <div className="ap-form-group">
+            <label>Year</label>
+            <input className="ap-input" placeholder="2026" value={form.year} onChange={e => setForm(f => ({ ...f, year: e.target.value }))} />
+          </div>
+        </div>
+
+        <AdminImageUpload
+          label="Student Photo (optional)"
+          value={form.photo}
+          onChange={val => setForm(f => ({ ...f, photo: val }))}
+          subFolderName="nermai-results"
+          maxWidth={400}
+          aspectRatio="1/1"
+          hint="400 × 400 px • Square portrait photo"
+          placeholder="Paste Google Drive URL / ID or image link..."
+          toast={toast}
+        />
+
+        <div className="ap-form-group">
+          <label>Quote / Message (optional)</label>
+          <textarea className="ap-input ap-textarea" rows={2} placeholder="A journey of discipline leads to a life of purpose." value={form.quote} onChange={e => setForm(f => ({ ...f, quote: e.target.value }))} />
+        </div>
+
+        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', marginBottom: '1rem', fontWeight: 600, fontSize: '0.88rem' }}>
+          <input
+            type="checkbox" checked={form.isFeatured}
+            onChange={e => setForm(f => ({ ...f, isFeatured: e.target.checked }))}
+            style={{ width: 16, height: 16, accentColor: 'var(--maroon)' }}
+          />
+          Mark as Featured Achiever (appears in top showcase section)
+        </label>
+
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <button className="ap-btn ap-btn-primary" onClick={handleSave} disabled={saving}>
+            {saving ? <><i className="fa-solid fa-spinner fa-spin" /> Saving...</> : editingId ? <><i className="fa-solid fa-floppy-disk" /> Update Result</> : <><i className="fa-solid fa-plus" /> Add Result</>}
+          </button>
+          {editingId && <button className="ap-btn ap-btn-ghost" onClick={handleCancelEdit}>Cancel</button>}
+        </div>
+      </div>
+
+      <div className="ap-card">
+        <div style={{ fontWeight: 700, marginBottom: '1rem' }}>Results ({results.length})</div>
+        {results.length === 0 ? (
+          <div className="ap-empty"><i className="fa-solid fa-trophy" /><p>No results yet. Add the first entry above.</p></div>
+        ) : (
+          <div className="ap-items-list">
+            {results.map(r => (
+              <div key={r.id} className="ap-item">
+                <div style={{ flex: 1 }}>
+                  <div className="ap-item-title">
+                    {r.name}
+                    {r.isFeatured && <span style={{ marginLeft: 6, background: '#f5d061', color: '#4a0e1c', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: 3 }}>★ FEATURED</span>}
+                  </div>
+                  <div className="ap-item-sub">
+                    {r.exam || r.category} · Rank {r.rank || '–'} · {r.year}
+                  </div>
+                  {r.quote && <div style={{ fontSize: '0.75rem', color: 'var(--gray-400)', fontStyle: 'italic', marginTop: 2 }}>"{r.quote?.slice(0, 70)}{r.quote?.length > 70 ? '...' : ''}"</div>}
+                </div>
+                <div className="ap-item-actions" style={{ display: 'flex', gap: '0.4rem', flexShrink: 0 }}>
+                  <button
+                    className="ap-btn ap-btn-sm"
+                    style={{ background: r.isFeatured ? '#f5d061' : 'var(--gray-100)', color: r.isFeatured ? '#4a0e1c' : 'var(--gray-500)', padding: '0.4rem 0.6rem', border: '1px solid var(--gray-200)' }}
+                    onClick={() => handleToggleFeatured(r)}
+                    title={r.isFeatured ? 'Remove from featured' : 'Mark as featured'}
+                  >
+                    <i className="fa-solid fa-star" />
+                  </button>
+                  <button className="ap-btn" style={{ background: '#3b82f6', color: 'white', padding: '0.4rem 0.6rem' }} onClick={() => handleStartEdit(r)} title="Edit">
+                    <i className="fa-solid fa-pen-to-square" />
+                  </button>
+                  <button className="ap-btn ap-btn-danger" style={{ padding: '0.4rem 0.6rem' }} onClick={() => handleDelete(r.id)} title="Delete">
+                    <i className="fa-solid fa-trash" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ─── Section: Drive Config ────────────────────────────────────────────────────
 function DriveSection({ toast }) {
   const [config, setConfig] = useState(driveStorage.getConfig())
   const [pastedUrl, setPastedUrl] = useState('')
   const [convertedUrl, setConvertedUrl] = useState('')
   const [passcode, setPasscode] = useState('')
-
+  const [copiedScript, setCopiedScript] = useState(false)
   const [isTesting, setIsTesting] = useState(false)
+
+  const APPS_SCRIPT_TEMPLATE = `// @OnlyCurrentDoc false
+// NERMAI IAS Academy — Google Apps Script v3.0
+// ─────────────────────────────────────────────────────────────────────────────
+// Deploy: Extensions → Apps Script → Deploy → New Deployment → Web App
+//   • Execute as: Me   • Who has access: Anyone
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Page → Drive subfolder mapping (images are organised by section)
+var PAGE_FOLDER_MAP = {
+  "nermai-hero":         "nermai-home",
+  "nermai-home":         "nermai-home",
+  "nermai-about":        "nermai-home",
+  "nermai-gallery":      "nermai-gallery",
+  "nermai-results":      "nermai-results",
+  "nermai-toppers":      "nermai-results",
+  "nermai-topper":       "nermai-results",
+  "nermai-success":      "nermai-results",
+  "nermai-courses":      "nermai-courses",
+  "nermai-course":       "nermai-courses",
+  "nermai-testimonials": "nermai-testimonials",
+  "nermai-reviews":      "nermai-testimonials",
+  "nermai-topbar":       "nermai-topbar",
+  "nermai-contact":      "nermai-contact",
+  "nermai-resources":    "nermai-resources",
+  "nermai-pdfs":         "nermai-resources",
+  "nermai-materials":    "nermai-resources",
+  "nermai-why":          "nermai-why"
+};
+
+function sanitiseName(name, maxLen) {
+  if (!name) return "";
+  var safe = name.toString().replace(/[\\//:*?"<>|]/g, "").trim();
+  return maxLen ? safe.substring(0, maxLen) : safe;
+}
+
+function getOrCreateSubfolder(parentFolder, subName) {
+  var it = parentFolder.getFoldersByName(subName);
+  if (it.hasNext()) return it.next();
+  var f = parentFolder.createFolder(subName);
+  try { f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW); } catch(e){}
+  return f;
+}
+
+function getRootFolder(rawId) {
+  var id = (rawId || "").toString().trim();
+  var match = id.match(/[-\\w]{25,}/);
+  var clean = match ? match[0] : id;
+  if (clean) { try { return DriveApp.getFolderById(clean); } catch(e){} }
+  return DriveApp.getRootFolder();
+}
+
+function resolveTargetFolder(rootFolder, rawSub) {
+  var sub = sanitiseName(rawSub, 80);
+  if (!sub) return rootFolder;
+  var bucket = "nermai-misc";
+  var longestMatch = 0;
+  var keys = Object.keys(PAGE_FOLDER_MAP);
+  for (var i = 0; i < keys.length; i++) {
+    var prefix = keys[i];
+    if (sub === prefix || sub.indexOf(prefix) === 0) {
+      if (prefix.length > longestMatch) { longestMatch = prefix.length; bucket = PAGE_FOLDER_MAP[prefix]; }
+    }
+  }
+  var bucketFolder = getOrCreateSubfolder(rootFolder, bucket);
+  return (sub !== bucket) ? getOrCreateSubfolder(bucketFolder, sub) : bucketFolder;
+}
+
+function buildFileUrls(fileId, mimeType) {
+  var isPdf = mimeType === "application/pdf";
+  var isImg = (mimeType || "").indexOf("image/") === 0;
+  return {
+    url:         isImg ? "https://lh3.googleusercontent.com/d/" + fileId + "=w1600"
+                       : "https://drive.google.com/thumbnail?id=" + fileId + "&sz=w800",
+    viewUrl:     "https://drive.google.com/file/d/" + fileId + "/view",
+    directUrl:   "https://drive.google.com/uc?export=view&id=" + fileId,
+    previewUrl:  "https://drive.google.com/file/d/" + fileId + "/preview",
+    downloadUrl: "https://drive.google.com/uc?export=download&id=" + fileId,
+    isPdf: isPdf, mimeType: mimeType || ""
+  };
+}
+
+function jsonOut(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doGet(e) {
+  return jsonOut({ status: "success", app: "NERMAI Drive Service v3.0", message: "Web App is active!" });
+}
+
+function doPost(e) {
+  try {
+    if (!e || !e.postData || !e.postData.contents)
+      return jsonOut({ status: "error", message: "No POST payload received" });
+
+    var data;
+    try { data = JSON.parse(e.postData.contents); }
+    catch(pe) { return jsonOut({ status: "error", message: "Invalid JSON: " + pe.toString() }); }
+
+    // Accept both folderId (frontend) and rootFolderId (LMS reference)
+    var rootFolder = getRootFolder(data.folderId || data.rootFolderId || "");
+
+    // ── ACTION: test connection
+    if (data.test) {
+      return jsonOut({
+        status: "success",
+        message: "Google Drive connected! Folder: \\"" + rootFolder.getName() + "\\"",
+        folderName: rootFolder.getName(),
+        folderId:   rootFolder.getId()
+      });
+    }
+
+    // ── ACTION: delete file
+    if (data.action === "delete") {
+      if (!data.fileId) return jsonOut({ status: "error", message: "fileId required for delete" });
+      try {
+        DriveApp.getFileById(data.fileId).setTrashed(true);
+        return jsonOut({ status: "success", message: "File deleted", fileId: data.fileId });
+      } catch(de) { return jsonOut({ status: "error", message: "Delete failed: " + de.toString() }); }
+    }
+
+    // ── ACTION: upload file
+    if (!data.base64) return jsonOut({ status: "error", message: '"base64" field required' });
+
+    var mimeType = (data.mimeType || "image/jpeg").toString().trim();
+    // Accept both "filename" (frontend) and "fileName" (LMS reference)
+    var fileName = sanitiseName(data.filename || data.fileName || ("upload_" + Date.now()), 200);
+    if (mimeType === "application/pdf" && fileName.indexOf(".") === -1) fileName += ".pdf";
+
+    var targetFolder = resolveTargetFolder(rootFolder, (data.subFolderName || data.subPath || "").toString());
+    var decoded = Utilities.base64Decode(data.base64);
+    var file    = targetFolder.createFile(Utilities.newBlob(decoded, mimeType, fileName));
+
+    try { file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW); } catch(se){}
+
+    var fileId = file.getId();
+    var urls   = buildFileUrls(fileId, mimeType);
+
+    return jsonOut({
+      status:      "success",
+      fileId:      fileId,
+      fileName:    fileName,
+      folder:      targetFolder.getName(),
+      url:         urls.url,
+      viewUrl:     urls.viewUrl,
+      directUrl:   urls.directUrl,
+      previewUrl:  urls.previewUrl,
+      downloadUrl: urls.downloadUrl,
+      isPdf:       urls.isPdf,
+      mimeType:    mimeType,
+      // Secondary redirect link — echoes caller value or defaults to viewUrl
+      redirectLink: (data.redirectLink || "").toString().trim() || urls.viewUrl
+    });
+
+  } catch(err) {
+    return jsonOut({ status: "error", message: err.toString() });
+  }
+}`
+
+  const handleCopyScript = () => {
+    navigator.clipboard?.writeText(APPS_SCRIPT_TEMPLATE)
+    setCopiedScript(true)
+    setTimeout(() => setCopiedScript(false), 2500)
+    toast.success('Apps Script code copied to clipboard!')
+  }
 
   const handleSaveDrive = async () => {
     driveStorage.saveConfig(config)
@@ -982,13 +2063,15 @@ function DriveSection({ toast }) {
     try {
       const res = await fetch(config.appsScriptUrl, {
         method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({ test: true, folderId: config.folderId })
       })
       const data = await res.json()
       if (data.status === 'success') {
-        toast.success(data.message || 'Connection successful!')
+        toast.success(data.message || 'Google Drive connection successful!')
       } else {
-        toast.error(data.message || 'Connection failed.')
+        toast.error(data.message || 'Google Drive returned an error.')
       }
     } catch (e) {
       toast.error('Failed to connect: ' + e.message)
@@ -1008,57 +2091,95 @@ function DriveSection({ toast }) {
 
   return (
     <div>
-      <h2 className="ap-section-title"><i className="fa-brands fa-google-drive"></i> Drive & Settings</h2>
+      <h2 className="ap-section-title"><i className="fa-brands fa-google-drive"></i> Drive &amp; Storage Settings</h2>
+
+      {/* Info Notice */}
+      <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '1rem 1.25rem', marginBottom: '1.25rem', fontSize: '0.85rem', color: '#166534' }}>
+        <strong>💡 Direct Uploads are Supported Out of the Box:</strong> You do <em>not</em> need to configure Google Drive to upload photos. On any image upload field, you can simply click <strong>"📁 Click to Browse or Drag Photo Here"</strong> to upload and compress photos directly from your device!
+      </div>
 
       {/* Drive Config */}
       <div className="ap-card">
-        <div style={{ fontWeight: 700, color: 'var(--ink)', marginBottom: '1rem' }}>
-          <i className="fa-brands fa-google-drive" style={{ color: '#4285F4', marginRight: '8px' }}></i>
-          Google Drive Configuration
+        <div style={{ fontWeight: 700, color: 'var(--ink)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <i className="fa-brands fa-google-drive" style={{ color: '#4285F4', fontSize: '1.2rem' }}></i>
+          Google Drive Auto-Upload Integration (Optional)
         </div>
+        
+        <p style={{ fontSize: '0.82rem', color: 'var(--gray-500)', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+          Connect your Google Drive so that photos uploaded in the admin panel are automatically stored in your Google Drive folder and served through fast CDN links.
+        </p>
+
         <div className="ap-form-group">
           <label>Apps Script Web App URL</label>
-          <input className="ap-input" placeholder="https://script.google.com/macros/s/..." value={config.appsScriptUrl} onChange={e => setConfig(c => ({ ...c, appsScriptUrl: e.target.value }))} />
+          <input className="ap-input" placeholder="https://script.google.com/macros/s/.../exec" value={config.appsScriptUrl} onChange={e => setConfig(c => ({ ...c, appsScriptUrl: e.target.value.trim() }))} />
           <div style={{ fontSize: '0.72rem', color: 'var(--gray-400)', marginTop: '4px' }}>
-            Google Apps Script → Deploy as web app → Paste URL here
+            Google Apps Script → Deploy → New deployment → Web app → Execute as: <strong>Me</strong>, Access: <strong>Anyone</strong>
           </div>
         </div>
+
         <div className="ap-form-row">
           <div className="ap-form-group">
-            <label>Drive Folder ID</label>
-            <input className="ap-input" placeholder="1ABC...xyz" value={config.folderId} onChange={e => setConfig(c => ({ ...c, folderId: e.target.value }))} />
-          </div>
-          <div className="ap-form-group">
-            <label>OAuth Access Token (optional)</label>
-            <input type="password" className="ap-input" placeholder="ya29...." value={config.accessToken} onChange={e => setConfig(c => ({ ...c, accessToken: e.target.value }))} />
+            <label>Drive Folder ID (optional - target folder in Drive)</label>
+            <input className="ap-input" placeholder="1ABC...xyz (from Google Drive folder URL)" value={config.folderId} onChange={e => setConfig(c => ({ ...c, folderId: e.target.value.trim() }))} />
           </div>
         </div>
+
         <div
           className={`ap-drive-status ${config.appsScriptUrl ? 'ap-drive-ok' : 'ap-drive-warn'}`}
+          style={{ marginBottom: '1rem' }}
         >
           <i className={`fa-solid ${config.appsScriptUrl ? 'fa-circle-check' : 'fa-triangle-exclamation'}`}></i>
-          {config.appsScriptUrl ? 'Apps Script configured — uploads go to Google Drive' : 'No Apps Script URL — uploads stored as base64 in Firestore'}
+          {config.appsScriptUrl ? 'Apps Script configured — uploads automatically go to your Google Drive' : 'No Apps Script URL configured — uploads are stored locally with instant compression'}
         </div>
-        <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+
+        <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', flexWrap: 'wrap' }}>
           <button className="ap-btn ap-btn-primary" onClick={handleSaveDrive}>
             <i className="fa-solid fa-floppy-disk"></i> Save Drive Config
           </button>
           <button className="ap-btn ap-btn-outline" onClick={handleTestConnection} disabled={isTesting}>
             <i className={`fa-solid ${isTesting ? 'fa-spinner fa-spin' : 'fa-network-wired'}`}></i> 
-            {isTesting ? ' Testing...' : ' Test Connection'}
+            {isTesting ? ' Testing Connection...' : ' Test Connection'}
           </button>
         </div>
+      </div>
+
+      {/* 3-Step Setup Guide */}
+      <div className="ap-card">
+        <div style={{ fontWeight: 700, color: 'var(--ink)', marginBottom: '0.75rem' }}>
+          <i className="fa-solid fa-book-open" style={{ color: 'var(--maroon)', marginRight: '8px' }}></i>
+          How to Setup Google Drive Auto-Upload (3 Minutes):
+        </div>
+
+        <div style={{ fontSize: '0.82rem', color: 'var(--ink)', lineHeight: 1.6 }}>
+          <ol style={{ paddingLeft: '1.25rem', margin: '0.5rem 0' }}>
+            <li>Go to <a href="https://script.google.com/home/start" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--maroon)', fontWeight: 700, textDecoration: 'underline' }}>Google Apps Script</a> and click <strong>New Project</strong>.</li>
+            <li>Delete any code in the editor, click <strong>"Copy Apps Script Code"</strong> below, and paste it into the editor.</li>
+            <li>Click <strong>Deploy → New deployment</strong> (top right). Select type <strong>Web app</strong>:
+              <ul style={{ paddingLeft: '1.25rem', marginTop: '0.25rem' }}>
+                <li>Description: <code>Nermai Image Uploader</code></li>
+                <li>Execute as: <strong>Me (your email)</strong></li>
+                <li>Who has access: <strong>Anyone</strong> (critical for browser upload)</li>
+              </ul>
+            </li>
+            <li>Click <strong>Deploy</strong>, authorize the permissions, and copy the <strong>Web App URL</strong> ending in <code>/exec</code> into the field above!</li>
+          </ol>
+        </div>
+
+        <button className="ap-btn ap-btn-outline" onClick={handleCopyScript} style={{ marginTop: '0.75rem' }}>
+          <i className={`fa-solid ${copiedScript ? 'fa-check' : 'fa-copy'}`}></i>
+          {copiedScript ? ' Copied Script to Clipboard!' : ' Copy Google Apps Script Code'}
+        </button>
       </div>
 
       {/* Drive URL Converter */}
       <div className="ap-card">
         <div style={{ fontWeight: 700, color: 'var(--ink)', marginBottom: '0.5rem' }}>Drive URL → CDN Converter</div>
         <p style={{ fontSize: '0.82rem', color: 'var(--gray-500)', marginBottom: '1rem' }}>
-          Convert any Google Drive share link to a fast CDN URL.
+          Convert any Google Drive share link to an embeddable image URL.
         </p>
         <input
           className="ap-input"
-          placeholder="https://drive.google.com/file/d/1qsiYJd.../view"
+          placeholder="https://drive.google.com/file/d/117XHcc-KsaOzXczLLqMsBKV9wdoiEkwv/view"
           value={pastedUrl}
           onChange={e => {
             setPastedUrl(e.target.value)
@@ -1067,12 +2188,14 @@ function DriveSection({ toast }) {
           }}
         />
         {convertedUrl && (
-          <div>
-            <div className="ap-url-converter-result">{convertedUrl}</div>
+          <div style={{ marginTop: '0.75rem' }}>
+            <div className="ap-url-converter-result" style={{ wordBreak: 'break-all', fontSize: '0.78rem', background: '#f8fafc', padding: '0.5rem', borderRadius: '4px', border: '1px solid #e2e8f0' }}>
+              {convertedUrl}
+            </div>
             <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
               <img src={convertedUrl} alt="CDN Preview" style={{ width: 80, height: 56, objectFit: 'cover', borderRadius: 6, border: '1px solid var(--gray-200)' }} onError={e => { e.target.style.display = 'none' }} />
               <button className="ap-btn ap-btn-ghost" onClick={() => { navigator.clipboard?.writeText(convertedUrl); toast.success('Copied!') }}>
-                <i className="fa-solid fa-copy"></i> Copy CDN URL
+                <i className="fa-solid fa-copy"></i> Copy Embed URL
               </button>
             </div>
           </div>
@@ -1174,13 +2297,17 @@ function SiteInfoSection({ toast }) {
 // ─── Main Admin Portal (floating button — hidden on /admin pages) ─────────────
 const SECTIONS = [
   { id: 'homecontent',   label: 'Home Content', icon: 'fa-house' },
+  { id: 'topbar',        label: 'Top Bar',      icon: 'fa-heading' },
   { id: 'hero',          label: 'Hero Slides',  icon: 'fa-images' },
   { id: 'notices',       label: 'Notices',      icon: 'fa-bell' },
   { id: 'resources',     label: 'Resources',    icon: 'fa-book-open' },
   { id: 'toppers',       label: 'Toppers',      icon: 'fa-trophy' },
   { id: 'testimonials',  label: 'Reviews',      icon: 'fa-quote-right' },
+  { id: 'results',       label: 'Results',      icon: 'fa-medal' },
   { id: 'gallery',       label: 'Gallery',      icon: 'fa-images' },
   { id: 'siteinfo',      label: 'Site Info',    icon: 'fa-circle-info' },
+  { id: 'courses',       label: 'Courses & Programs', icon: 'fa-graduation-cap' },
+  { id: 'officeLocs',    label: 'Office Locations', icon: 'fa-map-location-dot' },
   { id: 'footer',        label: 'Footer',       icon: 'fa-shoe-prints' },
   { id: 'drive',         label: 'Drive',        icon: 'fa-brands fa-google-drive' }
 ]
@@ -1190,13 +2317,17 @@ export function AdminPanelContent({ activeSection, toast }) {
   return (
     <>
       {activeSection === 'homecontent'  && <HomeContentSection toast={toast} />}
+      {activeSection === 'topbar'       && <TopBarAdminSection toast={toast} />}
       {activeSection === 'hero'         && <HeroSection toast={toast} />}
       {activeSection === 'notices'      && <NoticesSection toast={toast} />}
       {activeSection === 'resources'    && <ResourceManager toast={toast} />}
       {activeSection === 'toppers'      && <ToppersSection toast={toast} />}
       {activeSection === 'testimonials' && <TestimonialsSection toast={toast} />}
+      {activeSection === 'results'      && <ResultsSection toast={toast} />}
       {activeSection === 'gallery'      && <GallerySection toast={toast} />}
       {activeSection === 'siteinfo'     && <SiteInfoSection toast={toast} />}
+      {activeSection === 'courses'      && <CourseContentSection toast={toast} />}
+      {activeSection === 'officeLocs'   && <OfficeLocationsSection toast={toast} />}
       {activeSection === 'footer'       && <FooterContentSection toast={toast} />}
       {activeSection === 'drive'        && <DriveSection toast={toast} />}
     </>
@@ -1344,13 +2475,17 @@ export default function AdminPortal() {
             {/* Body */}
             <div className="ap-body">
               {activeSection === 'homecontent'  && <HomeContentSection toast={toast} />}
+              {activeSection === 'topbar'       && <TopBarAdminSection toast={toast} />}
               {activeSection === 'hero'         && <HeroSection toast={toast} />}
               {activeSection === 'notices'      && <NoticesSection toast={toast} />}
               {activeSection === 'resources'    && <ResourceManager toast={toast} />}
               {activeSection === 'toppers'      && <ToppersSection toast={toast} />}
               {activeSection === 'testimonials' && <TestimonialsSection toast={toast} />}
+              {activeSection === 'results'      && <ResultsSection toast={toast} />}
               {activeSection === 'gallery'      && <GallerySection toast={toast} />}
               {activeSection === 'siteinfo'     && <SiteInfoSection toast={toast} />}
+              {activeSection === 'courses'      && <CourseContentSection toast={toast} />}
+              {activeSection === 'officeLocs'   && <OfficeLocationsSection toast={toast} />}
               {activeSection === 'footer'       && <FooterContentSection toast={toast} />}
               {activeSection === 'drive'        && <DriveSection toast={toast} />}
             </div>

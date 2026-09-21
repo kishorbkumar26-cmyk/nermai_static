@@ -393,24 +393,7 @@ export default function CourseDetailPage() {
               <aside className="cdp-sidebar">
                 <div className="cdp-sidebar-sticky">
 
-                  {/* Enroll Card */}
-                  <div className="cdp-sidebar-card cdp-enroll-card">
-                    <p className="cdp-enroll-card-label">Ready to join?</p>
-                    <h3 className="cdp-enroll-card-title">Start Your Journey Today</h3>
-                    <a
-                      href={content.ctaLink || LMS_URL}
-                      className="cdp-hero-enroll-btn"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ marginBottom: '0.75rem' }}
-                    >
-                      {content.ctaText || 'Enroll Now'}
-                      <i className="fa-solid fa-arrow-right" />
-                    </a>
-                    <Link to="/contact" className="cdp-hero-contact-link">
-                      <i className="fa-solid fa-comments" /> Ask a Counsellor
-                    </Link>
-                  </div>
+
 
                   {/* Key Features */}
                   {hasKeyFeatures && (

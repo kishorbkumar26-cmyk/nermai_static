@@ -6,6 +6,9 @@ import ResultsGallerySection from '../components/admin/ResultsGallerySection'
 import FooterContentSection from '../components/admin/FooterContentSection'
 import OfficeLocationsSection from '../components/admin/OfficeLocationsSection'
 import FaqAdminSection from '../components/admin/FaqAdminSection'
+import TopBarAdminSection from '../components/admin/TopBarAdminSection'
+import WhyNermaiAdminSection from '../components/admin/WhyNermaiAdminSection'
+import ContactAdminSection from '../components/admin/ContactAdminSection'
 import { fbFirestore } from '../firebase/firestore'
 
 /* ─── Toast ─────────────────────────────────────────────────────────────── */
@@ -22,16 +25,19 @@ function useToast() {
 /* ─── All Sections ───────────────────────────────────────────────────────── */
 const SECTIONS = [
   { id: 'homecontent',  label: 'Home Content',   icon: 'fa-solid fa-house',                group: 'Content' },
+  { id: 'contact',      label: 'Contact Page',   icon: 'fa-solid fa-address-book',         group: 'Content' },
+  { id: 'topbar',       label: 'Top Bar / Header', icon: 'fa-solid fa-heading',            group: 'Content' },
   { id: 'resources',    label: 'Resources Desk', icon: 'fa-solid fa-book-open',            group: 'Content' },
   { id: 'footer',       label: 'Footer Editor',  icon: 'fa-solid fa-shoe-prints',          group: 'Content' },
   { id: 'officeLocs',   label: 'Office Locations',icon: 'fa-solid fa-map-location-dot',    group: 'Content' },
+  { id: 'toppers',      label: 'Toppers & Results',icon: 'fa-solid fa-trophy',             group: 'Content' },
+  { id: 'whynermai',    label: 'Why Nermai Card', icon: 'fa-solid fa-chess-king',          group: 'Content' },
   { id: 'courses',      label: 'Course Pages',   icon: 'fa-solid fa-graduation-cap',       group: 'Content' },
   { id: 'faq',          label: 'FAQ Manager',    icon: 'fa-solid fa-circle-question',      group: 'Content' },
-  { id: 'results',      label: 'Results Gallery',icon: 'fa-solid fa-images',               group: 'Content' },
+  { id: 'results',      label: 'Results Posters',icon: 'fa-solid fa-images',               group: 'Content' },
   { id: 'hero',         label: 'Hero Slides',    icon: 'fa-solid fa-film',                 group: 'Media' },
   { id: 'gallery',      label: 'Gallery',        icon: 'fa-solid fa-camera',               group: 'Media' },
   { id: 'notices',      label: 'Notices',        icon: 'fa-solid fa-bell',                 group: 'Updates' },
-  { id: 'toppers',      label: 'Toppers',        icon: 'fa-solid fa-trophy',                group: 'Updates' },
   { id: 'testimonials', label: 'Reviews',        icon: 'fa-solid fa-quote-right',           group: 'Updates' },
   { id: 'siteinfo',     label: 'Site Info',      icon: 'fa-solid fa-circle-info',           group: 'Settings' },
   { id: 'siteVisibility',label:'Site Visibility', icon: 'fa-solid fa-eye',                 group: 'Settings' },
@@ -288,6 +294,9 @@ export default function AdminDashboard() {
         {/* Content */}
         <div className="dash-content">
           {/* Custom sections */}
+          {active === 'contact'  && <ContactAdminSection toast={toast} />}
+          {active === 'topbar'   && <TopBarAdminSection toast={toast} />}
+          {active === 'whynermai' && <WhyNermaiAdminSection toast={toast} />}
           {active === 'courses'  && <CourseContentSection toast={toast} />}
           {active === 'faq'      && <FaqAdminSection toast={toast} />}
           {active === 'results'  && <ResultsGallerySection toast={toast} />}
@@ -297,7 +306,7 @@ export default function AdminDashboard() {
           {active === 'settings' && <SettingsSection toast={toast} />}
 
           {/* Reused from AdminPortal (via named export) */}
-          {!['courses', 'faq', 'results', 'footer', 'officeLocs', 'siteVisibility', 'settings'].includes(active) && (
+          {!['contact', 'topbar', 'whynermai', 'courses', 'faq', 'results', 'footer', 'officeLocs', 'siteVisibility', 'settings'].includes(active) && (
             <AdminPanelContent activeSection={active} toast={toast} />
           )}
         </div>

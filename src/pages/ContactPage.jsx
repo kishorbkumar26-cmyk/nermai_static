@@ -2,8 +2,70 @@ import { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import OfficeLocations from '../components/OfficeLocations'
-import { useReveal } from '../hooks/useReveal'
-import { CONTACT, LMS_URL } from '../constants'
+import { fbFirestore } from '../firebase/firestore'
+import { CONTACT } from '../constants'
+import './ContactPage.css'
+
+export const DEFAULT_CONTACT_PAGE_SETTINGS = {
+  // Hero Banner
+  heroEyebrow: 'CONTACT US',
+  heroTitlePrefix: "Begin It's First Step to",
+  heroTitleHighlight: 'Success',
+  heroSubtitle: "Contact us for registration, seat availability, feedback or complaints. We'll respond within one working day.",
+  heroScriptText: 'Your Civil Services Journey Starts Here',
+  heroPillar1: 'LEARN',
+  heroPillar2: 'PREPARE',
+  heroPillar3: 'SUCCEED',
+  showHeroScript: true,
+  showPillars: true,
+
+  // Left Column - Get In Touch
+  infoEyebrow: 'GET IN TOUCH',
+  infoTitlePrefix: "We're Here",
+  infoTitleHighlight: 'to Help You',
+  infoDesc: "Have a question about our courses, admissions or anything else? Reach out to us — we're happy to assist you.",
+
+  // Contact Info Items
+  addressLabel: 'ADDRESS',
+  addressText: 'No. 156 / 3, (1st & 2nd Floor),\nNanbargal Nagar, Pondy – Villianur Main Road,\nOulgaret, Puducherry – 605 010',
+
+  phoneLabel: 'PHONE',
+  phones: ['+91 89035 189000', '+91 89033 289000', '+91 96435 539043'],
+
+  emailLabel: 'EMAIL',
+  emailText: 'nermaiiasacademy@gmail.com',
+
+  // WhatsApp CTA
+  whatsappBtnText: 'CHAT ON WHATSAPP',
+  whatsappNumber: '+91 89035 189000',
+
+  // Form Card
+  formTitle: 'Send a Message',
+  formBadgeText: "We'll get back to you soon",
+  fieldNameLabel: 'YOUR NAME *',
+  fieldNamePlaceholder: 'Enter your name',
+  fieldPhoneLabel: 'PHONE NUMBER *',
+  fieldPhonePlaceholder: '+91 98765 43210',
+  fieldEmailLabel: 'EMAIL ADDRESS *',
+  fieldEmailPlaceholder: 'your@email.com',
+  fieldSubjectLabel: 'SUBJECT *',
+  fieldSubjectPlaceholder: 'Select a subject',
+  subjectOptions: [
+    'Admissions & Batch Enquiry',
+    'UPSC Coaching Information',
+    'TNPSC (Group I, II, IV) Enquiry',
+    'Puducherry Govt Exams (UDC / LDC)',
+    'Test Series & Mentorship Program',
+    'General Enquiry / Feedback'
+  ],
+  fieldMessageLabel: 'MESSAGE *',
+  fieldMessagePlaceholder: 'Tell us about the course you\'re interested in, your background, and any questions...',
+  submitBtnText: 'SEND MESSAGE',
+  securityNoteText: 'Your information is safe with us.',
+
+  showFaq: true,
+  showLocations: true
+}
 
 const FAQ_ITEMS = [
   { q: 'What exams does Nermai IAS Academy coach for?', a: 'We provide coaching for UPSC Civil Services (IAS/IPS/IFS), TNPSC Group I, II, IV & VAO, TN Police, Banking (IBPS/SBI/RBI), Puducherry Government Exams (UDC, LDC, Deputy Tahsildar, Sub-Inspector), SSC, and more.' },
@@ -21,23 +83,23 @@ function FaqAccordion() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
       {FAQ_ITEMS.map((item, i) => (
-        <div key={i} style={{ border: '1px solid var(--gray-200)', borderRadius: '8px', overflow: 'hidden' }}>
+        <div key={i} style={{ border: '1px solid #E5DCCE', borderRadius: '10px', overflow: 'hidden', background: '#FFFFFF' }}>
           <button
             onClick={() => setOpen(open === i ? null : i)}
             style={{
-              width: '100%', textAlign: 'left', padding: '1rem 1.25rem',
-              background: open === i ? 'var(--cream)' : 'var(--white)',
+              width: '100%', textAlign: 'left', padding: '1.15rem 1.35rem',
+              background: open === i ? '#FDF8F0' : '#FFFFFF',
               border: 'none', cursor: 'pointer',
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              fontWeight: 600, fontSize: '0.95rem', color: 'var(--ink)',
+              fontWeight: 700, fontSize: '0.98rem', color: '#1A1008',
               gap: '1rem',
             }}
           >
             <span>{item.q}</span>
-            <i className={`fa-solid fa-chevron-${open === i ? 'up' : 'down'}`} style={{ flexShrink: 0, color: 'var(--maroon)', fontSize: '0.8rem' }} />
+            <i className={`fa-solid fa-chevron-${open === i ? 'up' : 'down'}`} style={{ flexShrink: 0, color: '#7B1B2E', fontSize: '0.85rem' }} />
           </button>
           {open === i && (
-            <div style={{ padding: '0.75rem 1.25rem 1rem', fontSize: '0.92rem', color: 'var(--gray-600)', lineHeight: 1.7, borderTop: '1px solid var(--gray-100)' }}>
+            <div style={{ padding: '0.85rem 1.35rem 1.15rem', fontSize: '0.95rem', color: '#4E4034', lineHeight: 1.7, borderTop: '1px solid #F0E6D8' }}>
               {item.a}
             </div>
           )}
@@ -48,238 +110,422 @@ function FaqAccordion() {
 }
 
 export default function ContactPage() {
+  const [settings, setSettings] = useState(DEFAULT_CONTACT_PAGE_SETTINGS)
+  const [sent, setSent] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [form, setForm] = useState({ name: '', phone: '', email: '', subject: '', message: '' })
+
   useEffect(() => {
     window.scrollTo(0, 0)
-    // If navigated to #faq, scroll to it after render
     if (window.location.hash === '#faq') {
       setTimeout(() => {
         document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' })
       }, 300)
     }
+
+    // Fetch live settings from Firestore
+    fbFirestore.getSettings().then(s => {
+      if (s?.contactPage) {
+        setSettings(prev => ({ ...prev, ...s.contactPage }))
+      }
+    }).catch(err => {
+      console.warn('Could not fetch contactPage settings, using defaults', err)
+    })
+
+    const unsub = fbFirestore.onSettingsChanged?.(s => {
+      if (s?.contactPage) {
+        setSettings(prev => ({ ...prev, ...s.contactPage }))
+      }
+    })
+
+    return () => unsub && unsub()
   }, [])
-  useReveal()
-  const [sent, setSent] = useState(false)
-  const [form, setForm] = useState({ name: '', phone: '', email: '', subject: '', message: '' })
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    const body = encodeURIComponent(
-      `Name: ${form.name}\nPhone: ${form.phone}\nEmail: ${form.email}\n\n${form.message}`
+    if (!form.name.trim() || !form.message.trim()) {
+      alert('Please enter your name and message.')
+      return
+    }
+
+    setSubmitting(true)
+    const targetEmail = settings.emailText || CONTACT.email || 'nermaiiasacademy@gmail.com'
+    const emailSubject = encodeURIComponent(form.subject || 'Enquiry from Nermai Website')
+    const emailBody = encodeURIComponent(
+      `Name: ${form.name}\nPhone: ${form.phone || 'N/A'}\nEmail: ${form.email || 'N/A'}\nSubject: ${form.subject || 'General'}\n\nMessage:\n${form.message}`
     )
-    window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent(form.subject || 'Enquiry from website')}&body=${body}`
+
+    // Trigger user's default email client
+    window.location.href = `mailto:${targetEmail}?subject=${emailSubject}&body=${emailBody}`
+    setSubmitting(false)
     setSent(true)
   }
 
-  return (
-    <>
-      <Header />
-      <main style={{ paddingTop: '80px' }}>
+  // Extract values with strict nullish checks so empty string "" correctly removes/hides the element
+  const heroEyebrow = settings.heroEyebrow !== undefined ? settings.heroEyebrow : DEFAULT_CONTACT_PAGE_SETTINGS.heroEyebrow
+  const heroTitlePrefix = settings.heroTitlePrefix !== undefined ? settings.heroTitlePrefix : DEFAULT_CONTACT_PAGE_SETTINGS.heroTitlePrefix
+  const heroTitleHighlight = settings.heroTitleHighlight !== undefined ? settings.heroTitleHighlight : DEFAULT_CONTACT_PAGE_SETTINGS.heroTitleHighlight
+  const heroSubtitle = settings.heroSubtitle !== undefined ? settings.heroSubtitle : DEFAULT_CONTACT_PAGE_SETTINGS.heroSubtitle
+  const showHeroScript = settings.showHeroScript !== false
+  const heroScriptText = settings.heroScriptText !== undefined ? settings.heroScriptText : DEFAULT_CONTACT_PAGE_SETTINGS.heroScriptText
+  const hasHeroScript = showHeroScript && Boolean((heroScriptText ?? '').trim())
 
-        {/* Page hero */}
-        <section className="page-hero" style={{ backgroundColor: 'var(--maroon)', color: 'var(--white)' }}>
-          <div className="container">
-            <div className="page-hero-inner">
-              <span className="eyebrow" style={{ color: 'var(--saffron)', marginBottom: '1rem', display: 'block' }}>
-                CONTACT US
-              </span>
-              <h1 className="display-large" style={{ color: 'var(--white)', marginBottom: '1rem' }}>
-                Begin It's First Step to Success
-              </h1>
-              <p style={{ color: 'rgba(255,255,255,0.8)', maxWidth: '540px', lineHeight: 1.8 }}>
-                Contact us for registration, seat availability, feedback or complaints.
-                We'll respond within one working day.
-              </p>
+  const showPillars = settings.showPillars !== false
+  const p1 = settings.heroPillar1 !== undefined ? settings.heroPillar1 : DEFAULT_CONTACT_PAGE_SETTINGS.heroPillar1
+  const p2 = settings.heroPillar2 !== undefined ? settings.heroPillar2 : DEFAULT_CONTACT_PAGE_SETTINGS.heroPillar2
+  const p3 = settings.heroPillar3 !== undefined ? settings.heroPillar3 : DEFAULT_CONTACT_PAGE_SETTINGS.heroPillar3
+  const hasPillars = showPillars && Boolean((p1 ?? '').trim() || (p2 ?? '').trim() || (p3 ?? '').trim())
+
+  const infoEyebrow = settings.infoEyebrow !== undefined ? settings.infoEyebrow : DEFAULT_CONTACT_PAGE_SETTINGS.infoEyebrow
+  const infoTitlePrefix = settings.infoTitlePrefix !== undefined ? settings.infoTitlePrefix : DEFAULT_CONTACT_PAGE_SETTINGS.infoTitlePrefix
+  const infoTitleHighlight = settings.infoTitleHighlight !== undefined ? settings.infoTitleHighlight : DEFAULT_CONTACT_PAGE_SETTINGS.infoTitleHighlight
+  const infoDesc = settings.infoDesc !== undefined ? settings.infoDesc : DEFAULT_CONTACT_PAGE_SETTINGS.infoDesc
+
+  const addressLabel = settings.addressLabel !== undefined ? settings.addressLabel : DEFAULT_CONTACT_PAGE_SETTINGS.addressLabel
+  const addressText = settings.addressText !== undefined ? settings.addressText : DEFAULT_CONTACT_PAGE_SETTINGS.addressText
+
+  const phoneLabel = settings.phoneLabel !== undefined ? settings.phoneLabel : DEFAULT_CONTACT_PAGE_SETTINGS.phoneLabel
+  const emailLabel = settings.emailLabel !== undefined ? settings.emailLabel : DEFAULT_CONTACT_PAGE_SETTINGS.emailLabel
+  const emailText = settings.emailText !== undefined ? settings.emailText : DEFAULT_CONTACT_PAGE_SETTINGS.emailText
+
+  const whatsappBtnText = settings.whatsappBtnText !== undefined ? settings.whatsappBtnText : DEFAULT_CONTACT_PAGE_SETTINGS.whatsappBtnText
+  const formTitle = settings.formTitle !== undefined ? settings.formTitle : DEFAULT_CONTACT_PAGE_SETTINGS.formTitle
+  const formBadgeText = settings.formBadgeText !== undefined ? settings.formBadgeText : DEFAULT_CONTACT_PAGE_SETTINGS.formBadgeText
+
+  // Helper to extract phone numbers array
+  const phoneList = Array.isArray(settings.phones)
+    ? settings.phones.map(p => (typeof p === 'string' ? p : '').trim()).filter(Boolean)
+    : (typeof settings.phones === 'string' && settings.phones.trim() ? settings.phones.split(/[\n,;]+/).map(p => p.trim()).filter(Boolean) : (settings.phones === undefined ? DEFAULT_CONTACT_PAGE_SETTINGS.phones : []))
+
+  const whatsappCleanNumber = (settings.whatsappNumber || phoneList[0] || '+91 89035 189000').replace(/\D/g, '')
+
+  return (
+    <div className="cp-page-wrapper">
+      <Header activePath="/contact" />
+      <main style={{ paddingTop: '72px' }}>
+
+        {/* ── 1. Hero Banner ──────────────────────────────────────────────── */}
+        <section className="cp-hero">
+          <div className="cp-hero-bg-overlay" aria-hidden="true" />
+
+          <div className="cp-hero-container">
+            <div className="cp-hero-grid">
+              {/* Left Column: Eyebrow, Main Title, Subtitle */}
+              <div className="cp-hero-left">
+                {Boolean((heroEyebrow ?? '').trim()) && (
+                  <div className="cp-eyebrow-wrap">
+                    <span>{heroEyebrow}</span>
+                    <span className="cp-eyebrow-line" />
+                  </div>
+                )}
+
+                {(Boolean((heroTitlePrefix ?? '').trim()) || Boolean((heroTitleHighlight ?? '').trim())) && (
+                  <h1 className="cp-hero-title">
+                    {Boolean((heroTitlePrefix ?? '').trim()) && <>{heroTitlePrefix} </>}
+                    {Boolean((heroTitleHighlight ?? '').trim()) && <span className="cp-title-gold">{heroTitleHighlight}</span>}
+                  </h1>
+                )}
+
+                {Boolean((heroSubtitle ?? '').trim()) && (
+                  <p className="cp-hero-sub" style={{ color: '#FFFFFF' }}>
+                    {heroSubtitle}
+                  </p>
+                )}
+              </div>
+
+              {/* Middle Column: Handwritten Cursive Accent */}
+              {hasHeroScript && (
+                <div className="cp-hero-script-wrap">
+                  <div className="cp-hero-script">
+                    {heroScriptText}
+                    <span className="cp-hero-script-line" />
+                  </div>
+                </div>
+              )}
+
+              {/* Right Column: Pillar Tags (Hidden completely if toggled off or kept empty) */}
+              {hasPillars && (
+                <div className="cp-pillar-wrap">
+                  {Boolean((p1 ?? '').trim()) && <span className="cp-pillar-item">{p1}</span>}
+                  {Boolean((p2 ?? '').trim()) && <span className="cp-pillar-item">{p2}</span>}
+                  {Boolean((p3 ?? '').trim()) && <span className="cp-pillar-item active">{p3}</span>}
+                </div>
+              )}
             </div>
           </div>
         </section>
 
-        {/* Contact content */}
-        <section className="section" style={{ backgroundColor: 'var(--cream)' }}>
-          <div className="container">
-            <div className="contact-grid">
+        {/* ── 2. Main Content (Get in Touch & Send a Message Card) ─────────── */}
+        <section className="cp-main-section">
+          <div className="cp-container">
+            <div className="cp-layout-grid">
 
-              {/* Info column */}
-              <div className="contact-info reveal">
-                <h2 className="section-title" style={{ marginBottom: '2rem' }}>Get in Touch</h2>
-
-                <div className="contact-info-card">
-                  <div className="contact-info-icon">
-                    <i className="fa-solid fa-location-dot" />
-                  </div>
-                  <div>
-                    <div className="contact-info-label">Address</div>
-                    <div className="contact-info-value">
-                      No. 156 / 3, (1st &amp; 2nd Floor),<br />
-                      Nanbargal Nagar, Pondy – Villianur Main Road,<br />
-                      Oulgaret, Puducherry – 605 010
+              {/* Left Column: Get In Touch Info */}
+              <div className="cp-info-col">
+                <div>
+                  {Boolean((infoEyebrow ?? '').trim()) && (
+                    <div className="cp-info-eyebrow">
+                      <span>{infoEyebrow}</span>
+                      <span className="cp-info-eyebrow-line" />
                     </div>
-                  </div>
+                  )}
+
+                  {(Boolean((infoTitlePrefix ?? '').trim()) || Boolean((infoTitleHighlight ?? '').trim())) && (
+                    <h2 className="cp-info-title">
+                      {Boolean((infoTitlePrefix ?? '').trim()) && <>{infoTitlePrefix} </>}
+                      {Boolean((infoTitleHighlight ?? '').trim()) && <span className="cp-title-maroon">{infoTitleHighlight}</span>}
+                    </h2>
+                  )}
+
+                  {Boolean((infoDesc ?? '').trim()) && (
+                    <p className="cp-info-desc" style={{ marginTop: '0.85rem' }}>
+                      {infoDesc}
+                    </p>
+                  )}
                 </div>
 
-                <div className="contact-info-card">
-                  <div className="contact-info-icon">
-                    <i className="fa-solid fa-phone" />
-                  </div>
-                  <div>
-                    <div className="contact-info-label">Phone</div>
-                    {CONTACT.phones.map(ph => (
-                      <div key={ph}>
-                        <a href={`tel:${ph.replace(/\s/g, '')}`} className="contact-info-value contact-link">
-                          {ph}
-                        </a>
+                <div className="cp-info-list">
+                  {/* Address */}
+                  {Boolean((addressText ?? '').trim()) && (
+                    <div className="cp-info-item">
+                      <div className="cp-info-icon-box">
+                        <i className="fa-solid fa-location-dot" />
                       </div>
-                    ))}
-                  </div>
+                      <div className="cp-info-text-wrap">
+                        {Boolean((addressLabel ?? '').trim()) && <div className="cp-info-label">{addressLabel}</div>}
+                        <div className="cp-info-value" style={{ whiteSpace: 'pre-line' }}>
+                          {addressText}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Phone(s) */}
+                  {phoneList.length > 0 && (
+                    <div className="cp-info-item">
+                      <div className="cp-info-icon-box">
+                        <i className="fa-solid fa-phone" />
+                      </div>
+                      <div className="cp-info-text-wrap">
+                        {Boolean((phoneLabel ?? '').trim()) && <div className="cp-info-label">{phoneLabel}</div>}
+                        <div className="cp-info-value">
+                          {phoneList.map((ph, idx) => (
+                            <a key={idx} href={`tel:${ph.replace(/\s+/g, '')}`} className="cp-info-link">
+                              {ph}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Email */}
+                  {Boolean((emailText ?? '').trim()) && (
+                    <div className="cp-info-item">
+                      <div className="cp-info-icon-box">
+                        <i className="fa-solid fa-envelope" />
+                      </div>
+                      <div className="cp-info-text-wrap">
+                        {Boolean((emailLabel ?? '').trim()) && <div className="cp-info-label">{emailLabel}</div>}
+                        <div className="cp-info-value">
+                          <a href={`mailto:${emailText}`} className="cp-info-link">
+                            {emailText}
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                <div className="contact-info-card">
-                  <div className="contact-info-icon">
-                    <i className="fa-solid fa-envelope" />
-                  </div>
-                  <div>
-                    <div className="contact-info-label">Email</div>
-                    <a href={`mailto:${CONTACT.email}`} className="contact-info-value contact-link">
-                      {CONTACT.email}
-                    </a>
-                  </div>
-                </div>
-
-                {/* WhatsApp CTA */}
-                <a
-                  href={`https://wa.me/${CONTACT.phones[0].replace(/\D/g, '')}`}
-                  className="btn btn-primary"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ marginTop: '1rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
-                  id="contact-whatsapp-btn"
-                >
-                  <i className="fa-brands fa-whatsapp" />
-                  Chat on WhatsApp
-                </a>
-
-                {/* Enroll CTA */}
-                <div style={{ marginTop: '1.5rem', padding: '1.25rem', backgroundColor: 'var(--maroon)', borderRadius: 'var(--radius-md)', color: 'var(--white)' }}>
-                  <div style={{ fontWeight: 700, marginBottom: '0.5rem' }}>Ready to Enroll?</div>
-                  <div style={{ fontSize: '0.875rem', opacity: 0.8, marginBottom: '1rem' }}>
-                    Join the LMS platform directly to access all courses, materials and tests.
-                  </div>
-                  <a href={LMS_URL} className="btn btn-lg" style={{ backgroundColor: 'var(--white)', color: 'var(--maroon)', width: '100%', justifyContent: 'center' }} id="contact-enroll-btn">
-                    Enroll / Login
-                    <i className="fa-solid fa-arrow-right" style={{ marginLeft: '8px' }} />
+                {/* WhatsApp Action Button */}
+                {Boolean((whatsappBtnText ?? '').trim()) && (
+                  <a
+                    href={`https://wa.me/${whatsappCleanNumber}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="cp-whatsapp-btn"
+                  >
+                    <i className="fa-brands fa-whatsapp" style={{ fontSize: '1.25rem' }} />
+                    <span>{whatsappBtnText}</span>
+                    <i className="fa-solid fa-arrow-right" style={{ fontSize: '0.85rem' }} />
                   </a>
-                </div>
+                )}
               </div>
 
-              {/* Form column */}
-              <div className="contact-form-wrap reveal">
+              {/* Right Column: Send a Message Form Card */}
+              <div className="cp-form-card">
+                <div className="cp-form-header">
+                  <h3 className="cp-form-title">{formTitle || 'Send a Message'}</h3>
+                  {Boolean((formBadgeText ?? '').trim()) && (
+                    <div className="cp-form-badge">
+                      <span className="cp-form-badge-line" />
+                      <span>{formBadgeText}</span>
+                    </div>
+                  )}
+                </div>
+
                 {sent ? (
-                  <div className="contact-success">
-                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✅</div>
-                    <h3>Message Sent!</h3>
-                    <p style={{ color: 'var(--gray-500)' }}>
-                      Your email client should have opened with a pre-filled message.
-                      We'll get back to you shortly.
+                  <div className="cp-success-box">
+                    <div className="cp-success-icon">
+                      <i className="fa-solid fa-check" />
+                    </div>
+                    <h4 className="cp-success-title">Thank you for reaching out!</h4>
+                    <p className="cp-success-desc">
+                      Your message has been initiated in your email client. Our academic counselling team will respond within 24 hours.
                     </p>
                     <button
-                      className="btn btn-outline"
-                      style={{ marginTop: '1.5rem' }}
-                      onClick={() => setSent(false)}
+                      type="button"
+                      className="cp-reset-btn"
+                      onClick={() => {
+                        setSent(false)
+                        setForm({ name: '', phone: '', email: '', subject: '', message: '' })
+                      }}
                     >
-                      Send Another
+                      <i className="fa-solid fa-arrow-rotate-left" style={{ marginRight: '6px' }} />
+                      Send Another Message
                     </button>
                   </div>
                 ) : (
-                  <form className="contact-form" onSubmit={handleSubmit} noValidate>
-                    <h3 style={{ marginBottom: '1.5rem', color: 'var(--maroon)' }}>Send a Message</h3>
+                  <form className="cp-form" onSubmit={handleSubmit}>
+                    {/* Row 1: Name & Phone */}
+                    <div className="cp-form-row">
+                      <div className="cp-field-group">
+                        <label className="cp-field-label">
+                          {settings.fieldNameLabel || 'YOUR NAME *'}
+                        </label>
+                        <div className="cp-input-wrap">
+                          <i className="fa-regular fa-user cp-input-icon" />
+                          <input
+                            type="text"
+                            className="cp-input"
+                            placeholder={settings.fieldNamePlaceholder || 'Enter your name'}
+                            required
+                            value={form.name}
+                            onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                          />
+                        </div>
+                      </div>
 
-                    <div className="contact-form-row">
-                      <div className="ap-form-group">
-                        <label htmlFor="cf-name">Your Name *</label>
+                      <div className="cp-field-group">
+                        <label className="cp-field-label">
+                          {settings.fieldPhoneLabel || 'PHONE NUMBER *'}
+                        </label>
+                        <div className="cp-input-wrap">
+                          <i className="fa-solid fa-phone cp-input-icon" />
+                          <input
+                            type="tel"
+                            className="cp-input"
+                            placeholder={settings.fieldPhonePlaceholder || '+91 98765 43210'}
+                            value={form.phone}
+                            onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Row 2: Email */}
+                    <div className="cp-field-group">
+                      <label className="cp-field-label">
+                        {settings.fieldEmailLabel || 'EMAIL ADDRESS *'}
+                      </label>
+                      <div className="cp-input-wrap">
+                        <i className="fa-regular fa-envelope cp-input-icon" />
                         <input
-                          id="cf-name"
-                          className="ap-input"
-                          placeholder="Kavitha S."
+                          type="email"
+                          className="cp-input"
+                          placeholder={settings.fieldEmailPlaceholder || 'your@email.com'}
+                          value={form.email}
+                          onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Row 3: Subject Dropdown */}
+                    <div className="cp-field-group">
+                      <label className="cp-field-label">
+                        {settings.fieldSubjectLabel || 'SUBJECT *'}
+                      </label>
+                      <div className="cp-input-wrap">
+                        <i className="fa-regular fa-folder cp-input-icon" />
+                        <select
+                          className="cp-select"
+                          value={form.subject}
+                          onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
+                        >
+                          <option value="">{settings.fieldSubjectPlaceholder || 'Select a subject'}</option>
+                          {(settings.subjectOptions || DEFAULT_CONTACT_PAGE_SETTINGS.subjectOptions).map((opt, i) => (
+                            <option key={i} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Row 4: Message */}
+                    <div className="cp-field-group">
+                      <label className="cp-field-label">
+                        {settings.fieldMessageLabel || 'MESSAGE *'}
+                      </label>
+                      <div className="cp-input-wrap">
+                        <i className="fa-regular fa-comment-dots cp-input-icon cp-textarea-icon" />
+                        <textarea
+                          className="cp-textarea"
+                          rows={4}
+                          placeholder={settings.fieldMessagePlaceholder || 'Tell us about the course you\'re interested in, your background, and any questions...'}
                           required
-                          value={form.name}
-                          onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                        />
-                      </div>
-                      <div className="ap-form-group">
-                        <label htmlFor="cf-phone">Phone Number</label>
-                        <input
-                          id="cf-phone"
-                          className="ap-input"
-                          placeholder="+91 98765 43210"
-                          type="tel"
-                          value={form.phone}
-                          onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                          value={form.message}
+                          onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
                         />
                       </div>
                     </div>
 
-                    <div className="ap-form-group">
-                      <label htmlFor="cf-email">Email Address</label>
-                      <input
-                        id="cf-email"
-                        className="ap-input"
-                        type="email"
-                        placeholder="you@email.com"
-                        value={form.email}
-                        onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                      />
-                    </div>
+                    {/* Submit Row */}
+                    <div className="cp-form-footer">
+                      <button
+                        type="submit"
+                        className="cp-submit-btn"
+                        disabled={submitting}
+                      >
+                        <span>{settings.submitBtnText || 'SEND MESSAGE'}</span>
+                        <i className="fa-solid fa-arrow-right" />
+                      </button>
 
-                    <div className="ap-form-group">
-                      <label htmlFor="cf-subject">Subject</label>
-                      <input
-                        id="cf-subject"
-                        className="ap-input"
-                        placeholder="UPSC Coaching Enquiry"
-                        value={form.subject}
-                        onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
-                      />
+                      <div className="cp-security-note">
+                        <i className="fa-solid fa-lock" />
+                        <span>{settings.securityNoteText || 'Your information is safe with us.'}</span>
+                      </div>
                     </div>
-
-                    <div className="ap-form-group">
-                      <label htmlFor="cf-message">Message *</label>
-                      <textarea
-                        id="cf-message"
-                        className="ap-input ap-textarea"
-                        placeholder="Tell us about the course you're interested in, your background, and any questions..."
-                        required
-                        rows={5}
-                        value={form.message}
-                        onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
-                      />
-                    </div>
-
-                    <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%', justifyContent: 'center' }} id="contact-send-btn">
-                      <i className="fa-solid fa-paper-plane" style={{ marginRight: '8px' }} />
-                      Send Message
-                    </button>
                   </form>
                 )}
               </div>
+
             </div>
           </div>
         </section>
 
-        {/* Office Locations */}
-        <OfficeLocations />
+        {/* ── 3. Office Locations Component ────────────────────────────────── */}
+        {settings.showLocations !== false && (
+          <OfficeLocations />
+        )}
 
-        {/* ── FAQ Section ── */}
-        <section id="faq" className="section" style={{ backgroundColor: 'var(--white)' }}>
-          <div className="container-narrow">
-            <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-              <span className="eyebrow" style={{ display: 'block', marginBottom: '1rem' }}>FREQUENTLY ASKED QUESTIONS</span>
-              <h2 className="section-title">Everything you need to know about Nermai IAS Academy</h2>
+        {/* ── 4. Frequently Asked Questions ────────────────────────────────── */}
+        {settings.showFaq !== false && (
+          <section id="faq" style={{ padding: '4.5rem 0', backgroundColor: '#FFFFFF', borderTop: '1px solid #EFE8DE' }}>
+            <div className="cp-container" style={{ maxWidth: '840px' }}>
+              <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+                <span className="cp-info-eyebrow" style={{ justifyContent: 'center' }}>
+                  <span>FREQUENTLY ASKED QUESTIONS</span>
+                </span>
+                <h2 style={{ fontFamily: 'var(--font-display, Georgia, serif)', fontSize: '2.25rem', fontWeight: 700, color: '#1A1008', margin: '0.5rem 0 0' }}>
+                  Everything you need to know about Nermai IAS Academy
+                </h2>
+              </div>
+              <FaqAccordion />
             </div>
-            <FaqAccordion />
-          </div>
-        </section>
+          </section>
+        )}
 
       </main>
       <Footer />
-    </>
+    </div>
   )
 }

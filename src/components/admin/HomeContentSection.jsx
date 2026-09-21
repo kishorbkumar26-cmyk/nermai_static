@@ -67,18 +67,18 @@ function VisibilityEditor({ visibility = {}, onChange }) {
 }
 
 /* ── Stats Editor ─────────────────────────────────────────────────────────── */
-function StatsEditor({ stats, onChange }) {
+function StatsEditor({ stats = [], onChange }) {
   const update = (i, key, val) => {
     const next = stats.map((s, idx) => idx === i ? { ...s, [key]: val } : s)
     onChange(next)
   }
-  const add = () => onChange([...stats, { num: '', label: '', sublabel: '' }])
+  const add = () => onChange([...stats, { num: '', label: '', sublabel: '', visible: true }])
   const remove = (i) => onChange(stats.filter((_, idx) => idx !== i))
 
   return (
     <div>
       <p style={{ fontSize: '0.82rem', color: 'var(--gray-400)', marginBottom: '1.25rem' }}>
-        Edit the stat numbers shown in the orange banner below the hero image.
+        Edit the impact stats and success terms (e.g. 5000+, 15+, 28+, Highest) displayed in the maroon card on the homepage.
       </p>
       {stats.map((stat, i) => (
         <div key={i} className="ap-card" style={{ marginBottom: '0.75rem', padding: '1rem', position: 'relative' }}>
@@ -102,10 +102,10 @@ function StatsEditor({ stats, onChange }) {
             )}
           </div>
           <div className="ap-form-row">
-            <Field label="Number (e.g. 2400+)" value={stat.num}      onChange={v => update(i, 'num', v)} placeholder="2400+" />
-            <Field label="English Label"        value={stat.label}    onChange={v => update(i, 'label', v)} placeholder="Students" />
+            <Field label="Number / Value (e.g. 5000+ or Highest)" value={stat.num} onChange={v => update(i, 'num', v)} placeholder="e.g. 5000+ or Highest" />
+            <Field label="Label" value={stat.label} onChange={v => update(i, 'label', v)} placeholder="e.g. Students or Success" />
           </div>
-          <Field label="Tamil Sub-Label" value={stat.sublabel} onChange={v => update(i, 'sublabel', v)} placeholder="Trained people" />
+          <Field label="Sub-Label / Description" value={stat.sublabel} onChange={v => update(i, 'sublabel', v)} placeholder="e.g. Consistent results, brighter futures" />
         </div>
       ))}
       <button 
@@ -120,55 +120,469 @@ function StatsEditor({ stats, onChange }) {
   )
 }
 
-/* ── Features Editor ─────────────────────────────────────────────────────── */
-function FeaturesEditor({ features, onChange }) {
-  const update = (i, key, val) => onChange(features.map((f, idx) => idx === i ? { ...f, [key]: val } : f))
-  const add = () => onChange([...features, { icon: 'Star', title: '', desc: '', imageUrl: '', visible: true }])
-  const remove = (i) => onChange(features.filter((_, idx) => idx !== i))
+/* ── Features Editor (Class Platform / Everything You Need to Succeed) ────── */
+const DEFAULT_FEATURES_CONFIG = {
+  eyebrow: 'NERMAI CLASS PLATFORM',
+  title: 'Everything You Need to Succeed',
+  subtitle: 'A complete learning ecosystem designed for Tamil-medium aspirants, with expert guidance, structured preparation and continuous support.',
+  highlights: [
+    { icon: 'Tv', title: 'Live + Recorded', sub: 'FLEXIBLE LEARNING' },
+    { icon: 'GraduationCap', title: 'Expert Faculty', sub: '15+ YEARS EXPERIENCE' },
+    { icon: 'ShieldCheck', title: 'Exam Focused', sub: 'RESULT ORIENTED' },
+    { icon: 'Globe', title: 'Tamil & English', sub: 'BILINGUAL SUPPORT' }
+  ]
+}
+
+const DEFAULT_FEATURE_DETAILS = [
+  {
+    number: '01',
+    icon: 'GraduationCap',
+    title: 'Structured Classes',
+    subtitle: 'Daily scheduled classes with expert faculty in Tamil & English medium.',
+    tag: 'FEATURE 01',
+    caption: 'Learn from the best, at your own pace.',
+    desc: 'Daily scheduled classes covering the complete syllabus with expert faculty in Tamil and English medium. Includes live interactive sessions, recorded classes, doubt clearing and revision sessions.',
+    checkpoints: [
+      'Expert faculty with years of experience',
+      'Live + recorded classes',
+      'Tamil & English medium',
+      'Exam-oriented teaching approach',
+      'Doubt clearing sessions'
+    ],
+    primaryCta: 'EXPLORE CLASSES',
+    primaryCtaLink: '',
+    secondaryCta: 'View Sample Class',
+    secondaryCtaLink: '',
+    imageUrl: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop',
+    calloutNote: 'Your classroom anywhere, anytime',
+    quote: 'Well-structured classes made it easy for me to understand complex topics.',
+    author: '— M. Karthik, TNPSC Group II (2024)',
+    visible: true
+  },
+  {
+    number: '02',
+    icon: 'BookOpen',
+    title: 'Study Materials',
+    subtitle: 'Comprehensive study notes and question banks aligned to exam pattern.',
+    tag: 'FEATURE 02',
+    caption: 'Comprehensive notes tailored for civil service exams.',
+    desc: 'Access structured study materials, topic-wise PDFs, hand-curated question banks, and standard reference materials updated according to the latest exam pattern.',
+    checkpoints: [
+      'Comprehensive Tamil & English PDF notes',
+      'Topic-wise previous year questions',
+      'Curated standard textbook summaries',
+      'Regular current affairs updates',
+      'Downloadable for offline learning'
+    ],
+    primaryCta: 'GET STUDY MATERIALS',
+    primaryCtaLink: '',
+    secondaryCta: 'View Sample PDF',
+    secondaryCtaLink: '',
+    imageUrl: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=1200&auto=format&fit=crop',
+    calloutNote: 'Curated for Tamil Medium',
+    quote: 'The study materials provided by Nermai were concise, exam-focused, and easy to review.',
+    author: '— S. Priyadharshini, TNPSC Group I Selected',
+    visible: true
+  },
+  {
+    number: '03',
+    icon: 'PenTool',
+    title: 'Mock Tests',
+    subtitle: 'Weekly full-length tests and sectional tests with detailed analysis.',
+    tag: 'FEATURE 03',
+    caption: 'Simulate the real exam experience before test day.',
+    desc: 'Take weekly full-length mock tests and sectional practice tests. Get instant performance analytics, detailed solutions, and rank comparisons.',
+    checkpoints: [
+      'Weekly full-length exam simulations',
+      'Sectional and subject-wise test series',
+      'Detailed answer keys & explanations',
+      'All-Puducherry & Tamil Nadu rank tracking',
+      'Personalized weak-area analysis'
+    ],
+    primaryCta: 'TAKE MOCK TEST',
+    primaryCtaLink: '',
+    secondaryCta: 'View Test Schedule',
+    secondaryCtaLink: '',
+    imageUrl: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=1200&auto=format&fit=crop',
+    calloutNote: 'Real Exam Simulation',
+    quote: 'Weekly mock tests helped me eliminate exam fear and manage my time effectively.',
+    author: '— R. Vimal, TNPSC Group II Rank 14',
+    visible: true
+  },
+  {
+    number: '04',
+    icon: 'LineChart',
+    title: 'Progress Tracking',
+    subtitle: 'Personal performance dashboard to monitor strengths and weaknesses.',
+    tag: 'FEATURE 04',
+    caption: 'Data-driven insights for smarter preparation.',
+    desc: 'Monitor your study hours, score trends, and subject mastery over time with our intuitive student analytics dashboard.',
+    checkpoints: [
+      'Subject-wise mastery percentages',
+      'Time management & speed analytics',
+      'Score trend graphs over weeks',
+      'Personalized study plan recommendations',
+      'Direct feedback from course mentors'
+    ],
+    primaryCta: 'VIEW DASHBOARD',
+    primaryCtaLink: '',
+    secondaryCta: 'Learn More',
+    secondaryCtaLink: '',
+    imageUrl: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1200&auto=format&fit=crop',
+    calloutNote: 'AI-Powered Insights',
+    quote: 'Tracking my weekly scores helped me focus exactly where I was losing marks.',
+    author: '— A. Soundarya, Sub-Inspector Exam 2024',
+    visible: true
+  },
+  {
+    number: '05',
+    icon: 'CalendarCheck',
+    title: 'Class Schedule',
+    subtitle: 'Flexible batch timings for students, working professionals and rural aspirants.',
+    tag: 'FEATURE 05',
+    caption: 'Study on your timeline without compromising quality.',
+    desc: 'Choose from weekday regular batches, weekend batches for working professionals, or evening online sessions designed for maximum flexibility.',
+    checkpoints: [
+      'Morning & Evening live batch timings',
+      'Special weekend batches for professionals',
+      '24/7 access to recorded lectures',
+      'Flexible batch transfer options',
+      'Structured weekly timetable updates'
+    ],
+    primaryCta: 'VIEW TIMETABLE',
+    primaryCtaLink: '',
+    secondaryCta: 'Batch Details',
+    secondaryCtaLink: '',
+    imageUrl: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=1200&auto=format&fit=crop',
+    calloutNote: 'Weekday & Weekend Batches',
+    quote: 'As a working professional, the flexible weekend schedule made my preparation possible.',
+    author: '— K. Venkatesh, VAO Selected',
+    visible: true
+  },
+  {
+    number: '06',
+    icon: 'UserCircle',
+    title: 'Academic Guidance',
+    subtitle: 'One-on-one mentoring sessions with IAS/IPS selected alumni faculty.',
+    tag: 'FEATURE 06',
+    caption: 'Direct 1-on-1 mentorship throughout your journey.',
+    desc: 'Get guidance from selected officers, experienced faculty, and subject experts to clear strategy doubts, stay motivated, and refine your approach.',
+    checkpoints: [
+      '1-on-1 personal mentorship sessions',
+      'Strategy planning with selected alumni',
+      'Regular progress reviews & feedback',
+      'Answer writing evaluation & review',
+      'Motivation and stress management support'
+    ],
+    primaryCta: 'BOOK MENTOR SESSION',
+    primaryCtaLink: '',
+    secondaryCta: 'Our Faculty',
+    secondaryCtaLink: '',
+    imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop',
+    calloutNote: '1-on-1 Officer Guidance',
+    quote: 'One-on-one sessions with faculty kept me focused during tough phases of preparation.',
+    author: '— P. Divya, TNPSC Group I Mains Aspirant',
+    visible: true
+  }
+]
+
+function FeaturesEditor({ config, details, onChangeConfig, onChangeDetails, toast }) {
+  const [activeTab, setActiveTab] = useState(0)
+
+  const cfg = { ...DEFAULT_FEATURES_CONFIG, ...(config || {}) }
+  const feats = Array.isArray(details) && details.length > 0 ? details : DEFAULT_FEATURE_DETAILS
+
+  const updateCfg = (key, val) => {
+    onChangeConfig({ ...cfg, [key]: val })
+  }
+
+  const updateHighlight = (idx, key, val) => {
+    const list = [...(cfg.highlights || DEFAULT_FEATURES_CONFIG.highlights)]
+    list[idx] = { ...list[idx], [key]: val }
+    onChangeConfig({ ...cfg, highlights: list })
+  }
+
+  const updateFeat = (i, key, val) => {
+    const next = feats.map((f, idx) => idx === i ? { ...f, [key]: val } : f)
+    onChangeDetails(next)
+  }
+
+  const updateCheckpoint = (featIdx, checkIdx, val) => {
+    const next = feats.map((f, idx) => {
+      if (idx !== featIdx) return f
+      const cps = [...(f.checkpoints || [])]
+      cps[checkIdx] = val
+      return { ...f, checkpoints: cps }
+    })
+    onChangeDetails(next)
+  }
+
+  const addCheckpoint = (featIdx) => {
+    const next = feats.map((f, idx) => {
+      if (idx !== featIdx) return f
+      return { ...f, checkpoints: [...(f.checkpoints || []), 'New key highlight / benefit'] }
+    })
+    onChangeDetails(next)
+  }
+
+  const removeCheckpoint = (featIdx, checkIdx) => {
+    const next = feats.map((f, idx) => {
+      if (idx !== featIdx) return f
+      return { ...f, checkpoints: (f.checkpoints || []).filter((_, ci) => ci !== checkIdx) }
+    })
+    onChangeDetails(next)
+  }
+
+  const addFeat = () => {
+    const newIdx = feats.length + 1
+    const newFeat = {
+      number: String(newIdx).padStart(2, '0'),
+      icon: 'GraduationCap',
+      title: `Feature ${newIdx}`,
+      subtitle: 'Feature subtitle description',
+      tag: `FEATURE ${String(newIdx).padStart(2, '0')}`,
+      caption: 'Feature highlight caption tagline',
+      desc: 'Detailed description of this platform feature.',
+      checkpoints: ['Key point 1', 'Key point 2', 'Key point 3'],
+      primaryCta: 'LEARN MORE',
+      primaryCtaLink: '',
+      secondaryCta: 'View Details',
+      secondaryCtaLink: '',
+      imageUrl: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop',
+      calloutNote: 'Classroom note',
+      quote: 'Student quote praising this feature.',
+      author: '— Student Name',
+      visible: true
+    }
+    onChangeDetails([...feats, newFeat])
+    setActiveTab(feats.length)
+  }
+
+  const removeFeat = (i) => {
+    if (feats.length <= 1) return
+    const next = feats.filter((_, idx) => idx !== i)
+    onChangeDetails(next)
+    if (activeTab >= next.length) setActiveTab(next.length - 1)
+  }
+
+  const curFeat = feats[activeTab] || feats[0]
+
+  const ICON_OPTIONS = [
+    'GraduationCap', 'BookOpen', 'PenTool', 'LineChart', 
+    'CalendarCheck', 'UserCircle', 'Tv', 'ShieldCheck', 
+    'Globe', 'Star', 'Trophy', 'Users', 'Target', 
+    'Lightbulb', 'Zap', 'Rocket', 'CheckCircle', 'FileText', 
+    'Monitor', 'Bookmark', 'Award', 'Clock', 'Compass', 'Heart'
+  ]
 
   return (
     <div>
       <p style={{ fontSize: '0.82rem', color: 'var(--gray-400)', marginBottom: '1.25rem' }}>
-        Edit the 6 feature cards. Provide either an Icon Name or an Image URL.
+        Fully customize all words, titles, interactive tabs, bullet points, CTA buttons, images, quotes, and highlights in the "Class Platform / Everything You Need to Succeed" section.
       </p>
-      {features.map((feat, i) => (
-        <div key={i} className="ap-card" style={{ marginBottom: '0.75rem', padding: '1rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--maroon)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                Feature {i + 1}
-              </div>
-              <Toggle label="Visible" checked={feat.visible !== false} onChange={v => update(i, 'visible', v)} />
-            </div>
-            {features.length > 1 && (
-              <button onClick={() => remove(i)} className="btn" style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #f87171', padding: '0.25rem 0.75rem', fontSize: '0.75rem', borderRadius: '4px' }}>
-                <i className="fa-solid fa-trash" style={{ marginRight: '6px' }} /> Delete
-              </button>
-            )}
-          </div>
-          <div className="ap-form-row">
-            <Field 
-              label="Select Icon" 
-              type="select" 
-              value={feat.icon} 
-              onChange={v => update(i, 'icon', v)} 
-              options={[
-                'GraduationCap', 'BookOpen', 'PenTool', 'LineChart', 
-                'CalendarCheck', 'UserCircle', 'Star', 'Trophy', 
-                'Users', 'Shield', 'Target', 'Lightbulb', 
-                'Zap', 'Rocket', 'CheckCircle', 'FileText', 
-                'Monitor', 'Bookmark'
-              ]} 
-            />
-            <Field label="Image URL (Overrides Icon)" value={feat.imageUrl} onChange={v => update(i, 'imageUrl', v)} placeholder="https://..." />
-          </div>
-          <Field label="Title" value={feat.title} onChange={v => update(i, 'title', v)} placeholder="Structured Classes" />
-          <Field label="Description" value={feat.desc} onChange={v => update(i, 'desc', v)} type="textarea" placeholder="Daily scheduled classes with expert faculty..." />
+
+      {/* ── 1. Section Header ── */}
+      <div className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+        <h4 style={{ color: 'var(--maroon)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '1rem', borderBottom: '1px solid var(--gray-200)', paddingBottom: '0.5rem' }}>
+          <i className="fa-solid fa-heading" style={{ marginRight: '6px' }} /> 1. Section Header (Top Titles)
+        </h4>
+        <div className="ap-form-row">
+          <Field
+            label="Eyebrow Tag (e.g. NERMAI CLASS PLATFORM)"
+            value={cfg.eyebrow}
+            onChange={v => updateCfg('eyebrow', v)}
+            placeholder="NERMAI CLASS PLATFORM"
+          />
+          <Field
+            label="Main Section Heading (e.g. Everything You Need to Succeed)"
+            value={cfg.title}
+            onChange={v => updateCfg('title', v)}
+            placeholder="Everything You Need to Succeed"
+          />
         </div>
-      ))}
-      <button onClick={add} className="btn" style={{ marginTop: '0.5rem', width: '100%', justifyContent: 'center', background: 'var(--gray-100)', color: 'var(--gray-700)', border: '1px dashed var(--gray-300)' }}>
-        <i className="fa-solid fa-plus" style={{ marginRight: '8px' }} /> Add Feature
-      </button>
+        <Field
+          label="Subtitle / Description Paragraph"
+          value={cfg.subtitle}
+          onChange={v => updateCfg('subtitle', v)}
+          type="textarea"
+          placeholder="A complete learning ecosystem designed for Tamil-medium aspirants..."
+        />
+      </div>
+
+      {/* ── 2. Interactive Feature Cards (01 to 06) ── */}
+      <div className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--gray-200)', paddingBottom: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <h4 style={{ color: 'var(--maroon)', fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>
+            <i className="fa-solid fa-layer-group" style={{ marginRight: '6px' }} /> 2. Interactive Feature Cards (01 to 06)
+          </h4>
+          <button type="button" onClick={addFeat} className="btn btn-secondary" style={{ fontSize: '0.78rem', padding: '0.35rem 0.75rem' }}>
+            <i className="fa-solid fa-plus" style={{ marginRight: '4px' }} /> Add New Feature
+          </button>
+        </div>
+
+        {/* Feature Sub-Tabs Selector */}
+        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
+          {feats.map((f, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setActiveTab(i)}
+              style={{
+                padding: '0.45rem 0.85rem',
+                borderRadius: '8px',
+                border: activeTab === i ? '2px solid var(--maroon)' : '1px solid var(--gray-300)',
+                background: activeTab === i ? 'var(--maroon)' : '#FFFFFF',
+                color: activeTab === i ? '#FFFFFF' : 'var(--gray-800)',
+                fontWeight: 700,
+                fontSize: '0.8rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              <span>{f.number || String(i + 1).padStart(2, '0')}.</span>
+              <span>{f.title || `Feature ${i + 1}`}</span>
+              {f.visible === false && <span style={{ opacity: 0.6 }}>(Hidden)</span>}
+            </button>
+          ))}
+        </div>
+
+        {/* Active Feature Edit Card */}
+        {curFeat && (
+          <div style={{ background: 'var(--gray-50)', padding: '1.25rem', borderRadius: '12px', border: '1px solid var(--gray-200)' }}>
+            
+            {/* Top Toolbar */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid var(--gray-200)', paddingBottom: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <span style={{ fontWeight: 800, color: 'var(--maroon)', fontSize: '0.95rem' }}>
+                  Editing Feature {curFeat.number || String(activeTab + 1).padStart(2, '0')}: {curFeat.title}
+                </span>
+                <Toggle label="Visible" checked={curFeat.visible !== false} onChange={v => updateFeat(activeTab, 'visible', v)} />
+              </div>
+              {feats.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeFeat(activeTab)}
+                  className="btn"
+                  style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #f87171', padding: '0.25rem 0.75rem', fontSize: '0.75rem', borderRadius: '4px' }}
+                >
+                  <i className="fa-solid fa-trash" style={{ marginRight: '6px' }} /> Delete Feature
+                </button>
+              )}
+            </div>
+
+            {/* Basic Info */}
+            <div className="ap-form-row">
+              <Field label="Feature Number (e.g. 01)" value={curFeat.number} onChange={v => updateFeat(activeTab, 'number', v)} placeholder="01" />
+              <Field label="Icon" type="select" value={curFeat.icon} onChange={v => updateFeat(activeTab, 'icon', v)} options={ICON_OPTIONS} />
+              <Field label="Tag Badge (e.g. FEATURE 01)" value={curFeat.tag} onChange={v => updateFeat(activeTab, 'tag', v)} placeholder="FEATURE 01" />
+            </div>
+
+            <div className="ap-form-row">
+              <Field label="Title (e.g. Structured Classes)" value={curFeat.title} onChange={v => updateFeat(activeTab, 'title', v)} placeholder="Structured Classes" />
+              <Field label="Left Tab Subtitle / Short Summary" value={curFeat.subtitle} onChange={v => updateFeat(activeTab, 'subtitle', v)} placeholder="Daily scheduled classes with expert faculty..." />
+            </div>
+
+            <Field label="Middle Caption / Tagline" value={curFeat.caption} onChange={v => updateFeat(activeTab, 'caption', v)} placeholder="Learn from the best, at your own pace." />
+            
+            <Field label="Full Detailed Description Paragraph" value={curFeat.desc} onChange={v => updateFeat(activeTab, 'desc', v)} type="textarea" placeholder="Daily scheduled classes covering the complete syllabus..." />
+
+            {/* Checkpoints / Bullet Points */}
+            <div style={{ marginTop: '1rem', marginBottom: '1.25rem', background: '#FFFFFF', padding: '1rem', borderRadius: '8px', border: '1px solid var(--gray-200)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <label style={{ fontWeight: 700, fontSize: '0.82rem', margin: 0 }}>
+                  <i className="fa-solid fa-circle-check" style={{ color: 'var(--maroon)', marginRight: '6px' }} /> Checkpoints / Key Highlights Bullet List
+                </label>
+                <button type="button" onClick={() => addCheckpoint(activeTab)} className="btn btn-secondary" style={{ fontSize: '0.75rem', padding: '0.25rem 0.65rem' }}>
+                  + Add Point
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {(curFeat.checkpoints || []).map((cp, ci) => (
+                  <div key={ci} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '0.5rem', alignItems: 'center' }}>
+                    <input
+                      type="text"
+                      className="ap-input"
+                      value={cp}
+                      onChange={e => updateCheckpoint(activeTab, ci, e.target.value)}
+                      placeholder={`Key highlight ${ci + 1}...`}
+                      style={{ fontSize: '0.85rem' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeCheckpoint(activeTab, ci)}
+                      className="btn"
+                      style={{ background: '#fee2e2', color: '#dc2626', padding: '0.45rem 0.65rem', border: 'none', borderRadius: '6px' }}
+                      title="Delete point"
+                    >
+                      <i className="fa-solid fa-trash" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Buttons / CTA */}
+            <div className="ap-form-row">
+              <Field label="Primary Button Text" value={curFeat.primaryCta} onChange={v => updateFeat(activeTab, 'primaryCta', v)} placeholder="EXPLORE CLASSES" />
+              <Field label="Primary Button Link URL (Optional)" value={curFeat.primaryCtaLink} onChange={v => updateFeat(activeTab, 'primaryCtaLink', v)} placeholder="Leave blank for LMS link" />
+            </div>
+
+            <div className="ap-form-row">
+              <Field label="Secondary Button Text (Optional)" value={curFeat.secondaryCta} onChange={v => updateFeat(activeTab, 'secondaryCta', v)} placeholder="View Sample Class" />
+              <Field label="Secondary Button Link URL (Optional)" value={curFeat.secondaryCtaLink} onChange={v => updateFeat(activeTab, 'secondaryCtaLink', v)} placeholder="Leave blank for LMS link" />
+            </div>
+
+            {/* Image, Floating Badge & Testimonial Quote */}
+            <div style={{ marginTop: '1rem', background: '#FFFFFF', padding: '1rem', borderRadius: '8px', border: '1px solid var(--gray-200)' }}>
+              <label style={{ fontWeight: 700, fontSize: '0.82rem', marginBottom: '0.5rem', display: 'block' }}>
+                Right-Side Mockup Image & Floating Badges
+              </label>
+              
+              <AdminImageUpload
+                value={curFeat.imageUrl || ''}
+                onChange={url => updateFeat(activeTab, 'imageUrl', url)}
+                label="Feature Mockup / Card Image"
+                subFolderName="nermai-features"
+                previewHeight={140}
+                toast={toast}
+              />
+
+              <div style={{ marginTop: '1rem' }}>
+                <Field label="Top-Right Floating Note" value={curFeat.calloutNote} onChange={v => updateFeat(activeTab, 'calloutNote', v)} placeholder="e.g. Your classroom anywhere, anytime" />
+              </div>
+
+              <div className="ap-form-row">
+                <Field label="Bottom Testimonial Quote Text" value={curFeat.quote} onChange={v => updateFeat(activeTab, 'quote', v)} placeholder="Well-structured classes made it easy..." />
+                <Field label="Testimonial Author" value={curFeat.author} onChange={v => updateFeat(activeTab, 'author', v)} placeholder="— M. Karthik, TNPSC Group II" />
+              </div>
+            </div>
+
+          </div>
+        )}
+      </div>
+
+      {/* ── 3. Bottom 4 Highlights Bar ── */}
+      <div className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+        <h4 style={{ color: 'var(--maroon)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '1rem', borderBottom: '1px solid var(--gray-200)', paddingBottom: '0.5rem' }}>
+          <i className="fa-solid fa-bolt" style={{ marginRight: '6px' }} /> 3. Bottom 4 Feature Highlights Bar
+        </h4>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+          {(cfg.highlights || DEFAULT_FEATURES_CONFIG.highlights).map((hl, hi) => (
+            <div key={hi} style={{ background: 'var(--gray-50)', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--gray-200)' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.75rem', color: 'var(--maroon)', marginBottom: '0.5rem' }}>
+                Highlight #{hi + 1}
+              </div>
+              <Field label="Icon" type="select" value={hl.icon} onChange={v => updateHighlight(hi, 'icon', v)} options={ICON_OPTIONS} />
+              <Field label="Title" value={hl.title} onChange={v => updateHighlight(hi, 'title', v)} placeholder="Live + Recorded" />
+              <Field label="Subtitle / Tag" value={hl.sub} onChange={v => updateHighlight(hi, 'sub', v)} placeholder="FLEXIBLE LEARNING" />
+            </div>
+          ))}
+        </div>
+      </div>
+
     </div>
   )
 }
@@ -251,6 +665,61 @@ function CoursesEditor({ courses = [], config = {}, categories = [], onChangeCou
     update(courseIdx, 'features', nextFeatures)
   }
 
+  const handleCustomCategoryChange = (courseIdx, val) => {
+    const nextCourses = courses.map((c, idx) => {
+      if (idx === courseIdx) {
+        return { ...c, customCategoryName: val }
+      }
+      return c
+    })
+    onChangeCourses(nextCourses)
+  }
+
+  const handleSaveCustomCategory = (courseIdx, rawCatName) => {
+    const catName = (rawCatName || '').trim()
+    if (!catName) return
+
+    // Generate clean slug ID e.g. "puducherry-govt"
+    const slug = catName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '') || ('cat-' + Date.now())
+
+    // Check if category already exists in categories list
+    const existing = categories.find(c => 
+      c.id.toLowerCase() === slug || 
+      (c.name && c.name.toLowerCase() === catName.toLowerCase()) ||
+      (c.shortName && c.shortName.toLowerCase() === catName.toLowerCase())
+    )
+
+    const finalCatId = existing ? existing.id : slug
+
+    // If new category, add to categories list for future addition
+    if (!existing) {
+      const newCat = {
+        id: slug,
+        name: catName,
+        shortName: catName,
+        iconUrl: '',
+        isVisible: true
+      }
+      onChangeCategories([...categories, newCat])
+    }
+
+    // Update current course categoryId to this category
+    const nextCourses = courses.map((c, idx) => {
+      if (idx === courseIdx) {
+        return {
+          ...c,
+          categoryId: finalCatId,
+          customCategoryName: catName
+        }
+      }
+      return c
+    })
+    onChangeCourses(nextCourses)
+  }
+
   return (
     <div>
       <div className="ap-card" style={{ marginBottom: '2rem', padding: '1.5rem', background: 'var(--gray-50)' }}>
@@ -265,34 +734,116 @@ function CoursesEditor({ courses = [], config = {}, categories = [], onChangeCou
       <p style={{ fontSize: '0.82rem', color: 'var(--gray-400)', marginBottom: '1.25rem' }}>
         Manage the individual course cards. Assign them to categories to make the filtering work.
       </p>
-      {courses.map((course, i) => (
-        <div key={course.id || i} className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.5rem', borderLeft: '4px solid var(--color-primary, var(--maroon))' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--gray-200)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--color-primary, var(--maroon))' }}>
-                Course: {course.title || `Item ${i + 1}`}
-              </div>
-              <Toggle label="Active" checked={course.isActive !== false} onChange={v => update(i, 'isActive', v)} />
-            </div>
-            <button onClick={() => remove(i)} className="btn" style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #f87171', padding: '0.25rem 0.75rem', fontSize: '0.75rem', borderRadius: '4px' }}>
-              <i className="fa-solid fa-trash" style={{ marginRight: '6px' }} /> Delete Course
-            </button>
-          </div>
+      {courses.map((course, i) => {
+        const isCustomCat = course.categoryId === 'others' || (Boolean(course.categoryId) && course.categoryId !== 'all' && !categories.some(c => c.id === course.categoryId))
+        const activeCustomVal = course.customCategoryName || (isCustomCat && course.categoryId !== 'others' ? course.categoryId : '')
 
-          <div className="ap-form-row">
-            <Field label="Course Title" value={course.title} onChange={v => update(i, 'title', v)} placeholder="e.g. UPSC Offline Course" />
-            <Field 
-              label="Category" 
-              type="select" 
-              value={course.categoryId || 'all'} 
-              onChange={v => update(i, 'categoryId', v)} 
-              options={[ 
-                { value: 'all', label: 'All Courses (Default)' }, 
-                ...categories.map(c => ({ value: c.id, label: c.name || c.shortName })),
-                ...(categories.some(c => c.id === 'others') ? [] : [{ value: 'others', label: 'Other Courses' }])
-              ]} 
-            />
-          </div>
+        return (
+          <div key={course.id || i} className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.5rem', borderLeft: '4px solid var(--color-primary, var(--maroon))' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--gray-200)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--color-primary, var(--maroon))' }}>
+                  Course: {course.title || `Item ${i + 1}`}
+                </div>
+                <Toggle label="Active" checked={course.isActive !== false} onChange={v => update(i, 'isActive', v)} />
+              </div>
+              <button onClick={() => remove(i)} className="btn" style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #f87171', padding: '0.25rem 0.75rem', fontSize: '0.75rem', borderRadius: '4px' }}>
+                <i className="fa-solid fa-trash" style={{ marginRight: '6px' }} /> Delete Course
+              </button>
+            </div>
+
+            <div className="ap-form-row">
+              <Field label="Course Title" value={course.title} onChange={v => update(i, 'title', v)} placeholder="e.g. UPSC Offline Course" />
+              <Field 
+                label="Category" 
+                type="select" 
+                value={course.categoryId || 'all'} 
+                onChange={v => {
+                  update(i, 'categoryId', v)
+                }} 
+                options={[ 
+                  { value: 'all', label: 'All Courses (Default)' }, 
+                  ...categories
+                    .filter(c => c.id !== 'all' && c.id !== 'others')
+                    .map(c => ({ value: c.id, label: c.name || c.shortName || c.id })),
+                  ...(isCustomCat && course.categoryId !== 'others'
+                    ? [{ value: course.categoryId, label: `${course.customCategoryName || course.categoryId} (Custom)` }]
+                    : []),
+                  { value: 'others', label: 'Other Courses / + Specify New Category...' }
+                ]} 
+              />
+            </div>
+
+            {/* Manual Category Specification Block (shown when 'others' is selected or custom category is active) */}
+            {isCustomCat && (
+              <div style={{
+                marginTop: '0.85rem',
+                padding: '0.95rem 1.15rem',
+                background: '#fffdf7',
+                border: '1.5px dashed #f59e0b',
+                borderRadius: '8px',
+                boxShadow: '0 2px 8px rgba(245, 158, 11, 0.08)'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <label style={{ fontWeight: 700, fontSize: '0.82rem', color: '#92400e', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <i className="fa-solid fa-tag" style={{ color: '#d97706' }} /> Specify Category Name (Manually):
+                  </label>
+                  <span style={{ fontSize: '0.72rem', color: '#b45309', background: '#fef3c7', padding: '2px 8px', borderRadius: '4px', fontWeight: 600, border: '1px solid #fde68a' }}>
+                    <i className="fa-solid fa-sparkles" style={{ marginRight: '4px' }} /> Will be added for future addition
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.55rem', alignItems: 'center' }}>
+                  <input
+                    type="text"
+                    className="ap-input"
+                    style={{
+                      flex: 1,
+                      background: '#ffffff',
+                      border: '1.5px solid #fcd34d',
+                      padding: '0.55rem 0.85rem',
+                      fontSize: '0.88rem'
+                    }}
+                    value={activeCustomVal}
+                    placeholder="e.g. Puducherry Govt, Police SI/PC, Railways, TN Forest..."
+                    onChange={e => handleCustomCategoryChange(i, e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        handleSaveCustomCategory(i, e.target.value)
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleSaveCustomCategory(i, activeCustomVal)}
+                    disabled={!activeCustomVal.trim()}
+                    style={{
+                      padding: '0.55rem 1.15rem',
+                      background: activeCustomVal.trim()
+                        ? 'var(--color-primary, var(--maroon))'
+                        : '#cbd5e1',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontWeight: 700,
+                      fontSize: '0.82rem',
+                      cursor: activeCustomVal.trim() ? 'pointer' : 'not-allowed',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      whiteSpace: 'nowrap',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
+                    }}
+                  >
+                    <i className="fa-solid fa-plus-circle" /> Add Category to List
+                  </button>
+                </div>
+                <p style={{ margin: '0.45rem 0 0 0', fontSize: '0.75rem', color: '#78350f', lineHeight: 1.4 }}>
+                  Specify the category name and click <strong>Add Category to List</strong> (or save changes). It will be saved into the Category list so you can easily select it for future courses.
+                </p>
+              </div>
+            )}
 
           <div className="ap-form-row" style={{ marginTop: '1rem' }}>
             <div style={{ flex: 1 }}>
@@ -352,7 +903,8 @@ function CoursesEditor({ courses = [], config = {}, categories = [], onChangeCou
             <Field label="Price Label" value={course.priceLabel} onChange={v => update(i, 'priceLabel', v)} placeholder="Course Price" />
           </div>
         </div>
-      ))}
+      )
+    })}
       <button onClick={add} className="btn" style={{ marginTop: '0.5rem', width: '100%', justifyContent: 'center', background: 'var(--gray-100)', color: 'var(--gray-700)', border: '1px dashed var(--gray-300)', padding: '1rem' }}>
         <i className="fa-solid fa-plus" style={{ marginRight: '8px' }} /> Add Course
       </button>
@@ -555,10 +1107,144 @@ function TickerEditor({ ticker = { visible: true, items: [] }, onChange }) {
 }
 
 
+/* ── Toppers Wall / Unified Success Stories & Testimonials Card Editor ──── */
+function ToppersWallEditor({ data = {}, onChange }) {
+  const cfg = {
+    eyebrow: data.eyebrow ?? 'STUDENT SUCCESS STORIES',
+    titlePrefix: data.titlePrefix ?? 'From Aspirants to',
+    titleHighlight: data.titleHighlight ?? 'Achievers',
+    subtitle: data.subtitle ?? 'Real journeys. Real people. Real results. Be inspired by our students who turned their dreams into reality with Nermai.',
+    scriptTopLeft: data.scriptTopLeft ?? 'Learn\nPrepare\nSucceed',
+
+    toppersSubheading: data.toppersSubheading ?? 'OUR TOPPERS',
+    toppersDesc: data.toppersDesc ?? 'Meet our achievers who made it happen with dedication, guidance and the Nermai way.',
+    toppersViewAllText: data.toppersViewAllText ?? 'View All Toppers',
+    toppersViewAllLink: data.toppersViewAllLink ?? '/results',
+
+    feature1Icon: data.feature1Icon ?? 'fa-trophy',
+    feature1Title: data.feature1Title ?? 'Expert Guidance',
+    feature1Desc: data.feature1Desc ?? 'By experienced faculty and mentors',
+    feature2Icon: data.feature2Icon ?? 'fa-book-open',
+    feature2Title: data.feature2Title ?? 'Structured Learning',
+    feature2Desc: data.feature2Desc ?? 'From basics to advanced',
+    feature3Icon: data.feature3Icon ?? 'fa-chart-line',
+    feature3Title: data.feature3Title ?? 'Proven Results',
+    feature3Desc: data.feature3Desc ?? 'Across competitive exams',
+
+    testimonialsHeading: data.testimonialsHeading ?? 'TESTIMONIALS',
+    testimonialsSubtitle: data.testimonialsSubtitle ?? 'Honest feedback from our students.',
+    testimonialsScript: data.testimonialsScript ?? 'Real Stories\nReal Impact',
+
+    showScriptTopLeft: data.showScriptTopLeft !== false,
+    showBottomFeatures: data.showBottomFeatures !== false,
+    showTestimonials: data.showTestimonials !== false,
+    ...data
+  }
+
+  const update = (key, val) => onChange({ ...cfg, [key]: val })
+
+  return (
+    <div>
+      <p style={{ fontSize: '0.85rem', color: 'var(--gray-500)', marginBottom: '1.5rem' }}>
+        Customize every heading, cursive accent, feature highlight, topper label, and testimonial text on the homepage <strong>"From Aspirants to Achievers"</strong> unified heritage card.
+      </p>
+
+      {/* 1. Main Header & Top-Left Cursive Script */}
+      <div className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--gray-200)', paddingBottom: '0.5rem' }}>
+          <h4 style={{ color: 'var(--maroon)', fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>
+            <i className="fa-solid fa-heading" style={{ marginRight: '6px' }} /> 1. Section Header & Cursive Accent
+          </h4>
+          <Toggle label="Show Top-Left Cursive Accent" checked={cfg.showScriptTopLeft} onChange={v => update('showScriptTopLeft', v)} />
+        </div>
+
+        <div className="ap-form-row">
+          <Field label="Eyebrow Badge Pill" value={cfg.eyebrow} onChange={v => update('eyebrow', v)} placeholder="STUDENT SUCCESS STORIES" />
+          <Field label="Top-Left Cursive Script (Enter for new lines)" value={cfg.scriptTopLeft} onChange={v => update('scriptTopLeft', v)} type="textarea" placeholder="Learn&#10;Prepare&#10;Succeed" />
+        </div>
+
+        <div className="ap-form-row">
+          <Field label="Main Heading Prefix" value={cfg.titlePrefix} onChange={v => update('titlePrefix', v)} placeholder="From Aspirants to" />
+          <Field label="Highlighted Gold Word" value={cfg.titleHighlight} onChange={v => update('titleHighlight', v)} placeholder="Achievers" />
+        </div>
+
+        <Field label="Subtitle / Description Paragraph" value={cfg.subtitle} onChange={v => update('subtitle', v)} type="textarea" placeholder="Real journeys. Real people. Real results..." />
+      </div>
+
+      {/* 2. Left Column: Toppers Sub-Header & Link */}
+      <div className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+        <h4 style={{ color: 'var(--maroon)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '1rem', borderBottom: '1px solid var(--gray-200)', paddingBottom: '0.5rem' }}>
+          <i className="fa-solid fa-crown" style={{ marginRight: '6px' }} /> 2. Our Toppers Carousel Header
+        </h4>
+        <div className="ap-form-row">
+          <Field label="Toppers Subheading" value={cfg.toppersSubheading} onChange={v => update('toppersSubheading', v)} placeholder="OUR TOPPERS" />
+          <Field label="View All Button Text" value={cfg.toppersViewAllText} onChange={v => update('toppersViewAllText', v)} placeholder="View All Toppers" />
+          <Field label="View All Link URL" value={cfg.toppersViewAllLink} onChange={v => update('toppersViewAllLink', v)} placeholder="/results" />
+        </div>
+        <Field label="Toppers Description Line" value={cfg.toppersDesc} onChange={v => update('toppersDesc', v)} placeholder="Meet our achievers who made it happen with dedication..." />
+      </div>
+
+      {/* 3. Bottom 3 Feature Highlights Bar */}
+      <div className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--gray-200)', paddingBottom: '0.5rem' }}>
+          <h4 style={{ color: 'var(--maroon)', fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>
+            <i className="fa-solid fa-layer-group" style={{ marginRight: '6px' }} /> 3. Bottom 3 Feature Highlights
+          </h4>
+          <Toggle label="Show Bottom Feature Highlights" checked={cfg.showBottomFeatures} onChange={v => update('showBottomFeatures', v)} />
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+          {/* Feature 1 */}
+          <div style={{ background: 'var(--gray-50)', padding: '0.85rem', borderRadius: '8px', border: '1px solid var(--gray-200)' }}>
+            <div style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--maroon)', marginBottom: '0.5rem' }}>🏆 Feature 1</div>
+            <Field label="Title" value={cfg.feature1Title} onChange={v => update('feature1Title', v)} placeholder="Expert Guidance" />
+            <Field label="Description" value={cfg.feature1Desc} onChange={v => update('feature1Desc', v)} placeholder="By experienced faculty and mentors" />
+          </div>
+
+          {/* Feature 2 */}
+          <div style={{ background: 'var(--gray-50)', padding: '0.85rem', borderRadius: '8px', border: '1px solid var(--gray-200)' }}>
+            <div style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--maroon)', marginBottom: '0.5rem' }}>📖 Feature 2</div>
+            <Field label="Title" value={cfg.feature2Title} onChange={v => update('feature2Title', v)} placeholder="Structured Learning" />
+            <Field label="Description" value={cfg.feature2Desc} onChange={v => update('feature2Desc', v)} placeholder="From basics to advanced" />
+          </div>
+
+          {/* Feature 3 */}
+          <div style={{ background: 'var(--gray-50)', padding: '0.85rem', borderRadius: '8px', border: '1px solid var(--gray-200)' }}>
+            <div style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--maroon)', marginBottom: '0.5rem' }}>📈 Feature 3</div>
+            <Field label="Title" value={cfg.feature3Title} onChange={v => update('feature3Title', v)} placeholder="Proven Results" />
+            <Field label="Description" value={cfg.feature3Desc} onChange={v => update('feature3Desc', v)} placeholder="Across competitive exams" />
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Right Column: Testimonials Stack Card */}
+      <div className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid var(--gray-200)', paddingBottom: '0.5rem' }}>
+          <h4 style={{ color: 'var(--maroon)', fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>
+            <i className="fa-solid fa-comments" style={{ marginRight: '6px' }} /> 4. Right Column Testimonials Card
+          </h4>
+          <Toggle label="Show Testimonials Column" checked={cfg.showTestimonials} onChange={v => update('showTestimonials', v)} />
+        </div>
+
+        <div className="ap-form-row">
+          <Field label="Testimonials Header" value={cfg.testimonialsHeading} onChange={v => update('testimonialsHeading', v)} placeholder="TESTIMONIALS" />
+          <Field label="Subtitle" value={cfg.testimonialsSubtitle} onChange={v => update('testimonialsSubtitle', v)} placeholder="Honest feedback from our students." />
+          <Field label="Top-Right Cursive Script (Enter for new lines)" value={cfg.testimonialsScript} onChange={v => update('testimonialsScript', v)} type="textarea" placeholder="Real Stories&#10;Real Impact" />
+        </div>
+
+        <p style={{ fontSize: '0.8rem', color: 'var(--gray-400)', marginTop: '0.5rem' }}>
+          💡 <em>Note: Candidate testimonials themselves are managed in the <strong>Testimonials</strong> admin tab and automatically sync here!</em>
+        </p>
+      </div>
+    </div>
+  )
+}
+
 /* ── Main HomeContentSection ─────────────────────────────────────────────── */
 const TABS = [
   { id: 'visibility', icon: 'fa-eye',           label: 'Visibility' },
   { id: 'ticker',     icon: 'fa-bullhorn',      label: 'Top Ticker' },
+  { id: 'toppersWall',icon: 'fa-trophy',        label: 'Success Stories Card' },
   { id: 'stats',      icon: 'fa-chart-simple',  label: 'Stats Bar' },
   { id: 'features',   icon: 'fa-bolt',          label: 'Features' },
   { id: 'courses',    icon: 'fa-book-bookmark', label: 'Courses' },
@@ -570,14 +1256,45 @@ const TABS = [
 const DEFAULTS = {
   visibility: { stats: true, about: true, features: true, courses: true, steps: true, results: true, gallery: true, testimonials: true, faq: true, events: true, toppers: true },
   ticker: { visible: true, speed: 35, items: [] },
+  toppersWall: {
+    eyebrow: 'STUDENT SUCCESS STORIES',
+    titlePrefix: 'From Aspirants to',
+    titleHighlight: 'Achievers',
+    subtitle: 'Real journeys. Real people. Real results. Be inspired by our students who turned their dreams into reality with Nermai.',
+    scriptTopLeft: 'Learn\nPrepare\nSucceed',
+
+    toppersSubheading: 'OUR TOPPERS',
+    toppersDesc: 'Meet our achievers who made it happen with dedication, guidance and the Nermai way.',
+    toppersViewAllText: 'View All Toppers',
+    toppersViewAllLink: '/results',
+
+    feature1Icon: 'fa-trophy',
+    feature1Title: 'Expert Guidance',
+    feature1Desc: 'By experienced faculty and mentors',
+    feature2Icon: 'fa-book-open',
+    feature2Title: 'Structured Learning',
+    feature2Desc: 'From basics to advanced',
+    feature3Icon: 'fa-chart-line',
+    feature3Title: 'Proven Results',
+    feature3Desc: 'Across competitive exams',
+
+    testimonialsHeading: 'TESTIMONIALS',
+    testimonialsSubtitle: 'Honest feedback from our students.',
+    testimonialsScript: 'Real Stories\nReal Impact',
+
+    showScriptTopLeft: true,
+    showBottomFeatures: true,
+    showTestimonials: true,
+    showToppers: true
+  },
   events: [
     { date: '2026-08-31', title: 'Short NIQ', subtitle: 'for construction of Selfie Point - Last date', url: '', visible: true },
   ],
   stats: [
-    { num: '2400+', label: 'Students',  sublabel: 'Trained Students' },
-    { num: '14+',   label: 'Years',     sublabel: 'Years of Experience' },
-    { num: '28+',   label: 'Batches',   sublabel: 'Successful Batches' },
-    { num: '98%',   label: 'Success',   sublabel: 'Success Rate' },
+    { num: '5000+', label: 'Students',  sublabel: 'From towns, cities and rural communities', visible: true },
+    { num: '15+',   label: 'Years',     sublabel: 'Of academic excellence and trust', visible: true },
+    { num: '28+',   label: 'Batches',   sublabel: 'Across competitive examinations', visible: true },
+    { num: 'Highest', label: 'Success', sublabel: 'Consistent results, brighter futures', visible: true },
   ],
   features: [
     { icon: 'fa-solid fa-graduation-cap', title: 'Structured Classes',  desc: 'Daily scheduled classes with expert faculty.' },
@@ -587,6 +1304,8 @@ const DEFAULTS = {
     { icon: 'fa-regular fa-calendar-check', title: 'Class Schedule',    desc: 'Flexible batch timings.' },
     { icon: 'fa-solid fa-user-tie',       title: 'Academic Guidance',   desc: 'One-on-one mentoring sessions.' },
   ],
+  featuresConfig: DEFAULT_FEATURES_CONFIG,
+  featureDetails: DEFAULT_FEATURE_DETAILS,
   courseCategories: [
     { id: 'all', name: 'All Courses', shortName: 'ALL', iconUrl: '', isVisible: true },
     { id: 'upsc', name: 'UPSC & Civil Services', shortName: 'UPSC', iconUrl: '', isVisible: true },
@@ -741,11 +1460,23 @@ export default function HomeContentSection({ toast }) {
           events:     s.homeContent.events     || prev.events,
           stats:      s.homeContent.stats      || prev.stats,
           features:   s.homeContent.features   || prev.features,
+          featuresConfig: s.homeContent.featuresConfig || prev.featuresConfig,
+          featureDetails: s.homeContent.featureDetails || prev.featureDetails,
           courseCategories: s.homeContent.courseCategories || prev.courseCategories,
           coursesConfig: s.homeContent.coursesConfig || prev.coursesConfig,
           courses:    s.homeContent.courses    || prev.courses,
           about:      { ...prev.about, ...s.homeContent.about },
-          journeySteps: s.homeContent.journeySteps || prev.journeySteps,
+          toppersWall: { ...prev.toppersWall, ...(s.homeContent.toppersWall || {}) },
+          journeySteps: (s.homeContent.journeySteps || prev.journeySteps).map((step, idx) => {
+            const def = prev.journeySteps[idx % prev.journeySteps.length] || { title: 'Step', description: '' }
+            const cleanTitle = (step.title && /[\u0B80-\u0BFF]/.test(step.title)) ? def.title : (step.title || def.title)
+            const cleanDesc = (step.description && /[\u0B80-\u0BFF]/.test(step.description)) ? def.description : (step.description || def.description)
+            return {
+              ...step,
+              title: cleanTitle,
+              description: cleanDesc
+            }
+          }),
         }))
       }
       setLoading(false)
@@ -755,7 +1486,42 @@ export default function HomeContentSection({ toast }) {
   const handleSave = async () => {
     setSaving(true)
     try {
-      await fbFirestore.updateSettings({ homeContent: content })
+      // Automatically register any manually specified custom categories into courseCategories for future use
+      let updatedCategories = [...(content.courseCategories || [])]
+      let categoriesChanged = false
+
+      const updatedCourses = (content.courses || []).map(course => {
+        const customName = (course.customCategoryName || '').trim()
+        if (customName && (course.categoryId === 'others' || !course.categoryId || course.categoryId === 'all' || !updatedCategories.some(c => c.id === course.categoryId))) {
+          const slug = customName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || ('cat-' + Date.now())
+          const exists = updatedCategories.find(c => 
+            c.id.toLowerCase() === slug || 
+            (c.name && c.name.toLowerCase() === customName.toLowerCase()) ||
+            (c.shortName && c.shortName.toLowerCase() === customName.toLowerCase())
+          )
+          if (!exists) {
+            updatedCategories.push({
+              id: slug,
+              name: customName,
+              shortName: customName,
+              iconUrl: '',
+              isVisible: true
+            })
+            categoriesChanged = true
+          }
+          return { ...course, categoryId: exists ? exists.id : slug }
+        }
+        return course
+      })
+
+      const finalContent = {
+        ...content,
+        courses: updatedCourses,
+        courseCategories: updatedCategories
+      }
+
+      await fbFirestore.updateSettings({ homeContent: finalContent })
+      setContent(finalContent)
       toast.success('Home content saved! Please refresh the page.')
     } catch (e) {
       toast.error(e.message)
@@ -800,8 +1566,17 @@ export default function HomeContentSection({ toast }) {
       {/* Tab content */}
       {activeTab === 'visibility' && <VisibilityEditor visibility={content.visibility} onChange={v => setContent(c => ({ ...c, visibility: v }))} />}
       {activeTab === 'ticker'   && <TickerEditor   ticker={content.ticker}       onChange={v => setContent(c => ({ ...c, ticker: v }))} />}
+      {activeTab === 'toppersWall' && <ToppersWallEditor data={content.toppersWall} onChange={v => setContent(c => ({ ...c, toppersWall: v }))} />}
       {activeTab === 'stats'    && <StatsEditor    stats={content.stats}         onChange={v => setContent(c => ({ ...c, stats: v }))} />}
-      {activeTab === 'features' && <FeaturesEditor features={content.features}   onChange={v => setContent(c => ({ ...c, features: v }))} />}
+      {activeTab === 'features' && (
+        <FeaturesEditor 
+          config={content.featuresConfig} 
+          details={content.featureDetails} 
+          onChangeConfig={v => setContent(c => ({ ...c, featuresConfig: v }))} 
+          onChangeDetails={v => setContent(c => ({ ...c, featureDetails: v }))} 
+          toast={toast} 
+        />
+      )}
       {activeTab === 'courseCategories' && <CourseCategoriesEditor categories={content.courseCategories} onChange={v => setContent(c => ({ ...c, courseCategories: v }))} />}
       {activeTab === 'courses'  && <CoursesEditor  courses={content.courses} config={content.coursesConfig} categories={content.courseCategories} onChangeCourses={v => setContent(c => ({ ...c, courses: v }))} onChangeConfig={v => setContent(c => ({ ...c, coursesConfig: v }))} onChangeCategories={v => setContent(c => ({ ...c, courseCategories: v }))} />}
       {activeTab === 'events'   && <EventsEditor   events={content.events}       onChange={v => setContent(c => ({ ...c, events: v }))} />}

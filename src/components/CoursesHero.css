@@ -1,0 +1,383 @@
+/* ==========================================================================
+   COURSES PAGE HERO BANNER - REPLICATED PRESTIGIOUS ACADEMIC DESIGN
+   ========================================================================== */
+
+.courses-hero-banner {
+  position: relative;
+  background-color: #3D0814;
+  color: #FFFFFF;
+  padding-top: 3.5rem;
+  padding-bottom: 0;
+  overflow: hidden;
+  font-family: var(--font-sans, 'DM Sans', sans-serif);
+}
+
+/* Full-bleed artwork background image */
+.courses-hero-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center right;
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Dark gradient overlay for text legibility - stronger on left, fades right */
+.courses-hero-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    linear-gradient(100deg,
+      rgba(45, 8, 15, 0.97) 0%,
+      rgba(60, 10, 20, 0.88) 38%,
+      rgba(45, 8, 15, 0.55) 65%,
+      rgba(30, 5, 10, 0.15) 100%
+    ),
+    radial-gradient(ellipse at 15% 55%, rgba(139, 30, 45, 0.45) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.courses-hero-container {
+  position: relative;
+  z-index: 2;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 3rem 2rem 2.5rem 2rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 460px;
+  align-items: center;
+}
+
+/* ── Left Content Column ── */
+.courses-hero-content {
+  max-width: 680px;
+  position: relative;
+  z-index: 3;
+  /* Stay on the left ~55% of the banner so artwork is visible on right */
+  width: min(100%, 55vw);
+}
+
+/* Top Decorative Eyebrow Badge */
+.courses-hero-eyebrow-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.courses-hero-eyebrow-line {
+  height: 1.5px;
+  width: 50px;
+  background: linear-gradient(90deg, transparent, rgba(245, 208, 97, 0.7));
+}
+
+.courses-hero-eyebrow-line.right {
+  background: linear-gradient(90deg, rgba(245, 208, 97, 0.7), transparent);
+}
+
+.courses-hero-eyebrow-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.4rem 1.25rem;
+  background: rgba(45, 8, 15, 0.6);
+  border: 1.5px solid rgba(245, 208, 97, 0.65);
+  border-radius: 100px;
+  color: #F5D061;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+}
+
+.courses-hero-eyebrow-badge i {
+  color: #F5D061;
+  font-size: 0.85rem;
+}
+
+/* Main Heading */
+.courses-hero-title {
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: #FFFFFF;
+  margin: 0 0 1.25rem 0;
+  letter-spacing: -0.015em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.courses-hero-title .title-gold {
+  color: #F5D061;
+  display: block;
+  font-style: italic;
+  font-weight: 700;
+  text-shadow: 0 0 25px rgba(245, 208, 97, 0.35);
+}
+
+/* Subtitle Description */
+.courses-hero-subtitle {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.88);
+  max-width: 720px;
+  margin-bottom: 2rem;
+  font-weight: 400;
+}
+
+/* ── 3 Feature Highlight Pills (Horizontal Row) ── */
+.courses-hero-features-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.courses-hero-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: rgba(35, 6, 12, 0.55);
+  border: 1px solid rgba(245, 208, 97, 0.25);
+  padding: 0.65rem 1.15rem;
+  border-radius: 100px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  transition: all 0.25s ease;
+}
+
+.courses-hero-feature-item:hover {
+  border-color: rgba(245, 208, 97, 0.6);
+  transform: translateY(-2px);
+  background: rgba(45, 8, 16, 0.75);
+}
+
+.courses-hero-feature-icon-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(245, 208, 97, 0.15);
+  border: 1px solid rgba(245, 208, 97, 0.4);
+  color: #F5D061;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.courses-hero-feature-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.courses-hero-feature-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1.2;
+}
+
+.courses-hero-feature-sub {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.2;
+}
+
+/* ── Floating Script Notes: hidden (removed per design) ── */
+.courses-hero-script-left,
+.courses-hero-script-right {
+  display: none;
+}
+
+/* ── Right Artwork Column: hidden — artwork now used as full background ── */
+.courses-hero-artwork {
+  display: none;
+}
+
+/* Glowing Dome Architecture Silhouette Background */
+.courses-artwork-dome-svg {
+  position: absolute;
+  top: -10px;
+  right: 30px;
+  width: 320px;
+  height: 300px;
+  opacity: 0.35;
+  pointer-events: none;
+  filter: drop-shadow(0 0 15px rgba(245, 208, 97, 0.4));
+}
+
+/* Golden Chess King */
+.courses-artwork-chess-king {
+  position: absolute;
+  left: 20px;
+  bottom: 15px;
+  width: 105px;
+  height: 250px;
+  z-index: 4;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.7));
+  transition: transform 0.4s ease;
+}
+
+.courses-hero-artwork:hover .courses-artwork-chess-king {
+  transform: translateY(-4px) rotate(-1deg);
+}
+
+/* Stacked 4 Leather Hardcover Books */
+.courses-artwork-bookstack {
+  position: absolute;
+  right: 0;
+  bottom: 15px;
+  width: 270px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 3;
+}
+
+.courses-leather-book {
+  height: 46px;
+  border-radius: 6px 12px 12px 6px;
+  padding: 0 1.25rem 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 
+    0 6px 16px rgba(0, 0, 0, 0.6),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.4);
+  cursor: default;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.courses-leather-book:hover {
+  transform: translateX(-6px) scale(1.02);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.8);
+}
+
+/* Book Spine Ribs on Left */
+.courses-leather-book::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 4px;
+  bottom: 4px;
+  width: 4px;
+  background: rgba(0, 0, 0, 0.35);
+  border-right: 1px solid rgba(245, 208, 97, 0.3);
+  border-radius: 2px;
+}
+
+/* Gold Embossed Spine Text */
+.courses-book-spine-text {
+  font-family: 'Cinzel', 'Crimson Pro', Georgia, serif;
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: #F8DC81;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 0 8px rgba(245, 208, 97, 0.3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Book Individual Leather Themes */
+.courses-leather-book.book-1 {
+  background: linear-gradient(90deg, #1A0D09 0%, #3D1C13 40%, #52271B 80%, #29120B 100%);
+  border: 1px solid rgba(245, 208, 97, 0.4);
+}
+
+.courses-leather-book.book-2 {
+  background: linear-gradient(90deg, #2D0812 0%, #5C1324 40%, #7A1D32 80%, #3D0A17 100%);
+  border: 1px solid rgba(245, 208, 97, 0.45);
+}
+
+.courses-leather-book.book-3 {
+  background: linear-gradient(90deg, #2B150A 0%, #592B15 40%, #75391D 80%, #3B1C0E 100%);
+  border: 1px solid rgba(245, 208, 97, 0.4);
+}
+
+.courses-leather-book.book-4 {
+  background: linear-gradient(90deg, #0A1B1F 0%, #15383F 40%, #1F4E58 80%, #0E2429 100%);
+  border: 1px solid rgba(245, 208, 97, 0.45);
+}
+
+/* ── Smooth Organic Wave Bottom Shape Divider ── */
+.courses-hero-wave-divider {
+  position: relative;
+  width: 100%;
+  line-height: 0;
+  z-index: 3;
+  margin-top: -10px;
+}
+
+.courses-hero-wave-divider svg {
+  display: block;
+  width: 100%;
+  height: 90px;
+}
+
+/* ── Responsive Behavior ── */
+@media (max-width: 1200px) {
+  .courses-hero-container {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  .courses-hero-content {
+    max-width: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .courses-hero-eyebrow-wrapper {
+    justify-content: center;
+  }
+  .courses-hero-features-row {
+    justify-content: center;
+  }
+  .courses-hero-bg-img {
+    object-position: 75% center;
+  }
+}
+
+@media (max-width: 768px) {
+  .courses-hero-banner {
+    padding-top: 2rem;
+  }
+  .courses-hero-script-left,
+  .courses-hero-script-right {
+    display: none; /* Hide floating cursive notes on mobile to avoid clutter */
+  }
+  .courses-hero-title {
+    font-size: 2.2rem;
+  }
+  .courses-hero-features-row {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.75rem;
+  }
+  .courses-hero-feature-item {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .courses-hero-artwork {
+    display: none; /* Keep clean layout on mobile screens */
+  }
+}

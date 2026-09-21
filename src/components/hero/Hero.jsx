@@ -7,12 +7,27 @@ import { driveStorage } from '../../services/driveStorage';
 import HeroCinematicDefault from './HeroCinematicDefault';
 
 export default function Hero({ autoPlayInterval = 6000 }) {
-  const [banners, setBanners] = useState([]);
+  const [banners, setBanners] = useState(() => {
+    try {
+      const cached = localStorage.getItem('nermai_hero_banners_cache');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [loading, setLoading] = useState(() => {
+    try {
+      const cached = localStorage.getItem('nermai_hero_banners_cache');
+      return !cached || JSON.parse(cached).length === 0;
+    } catch {
+      return true;
+    }
+  });
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const unsub = fbFirestore.onHeroSlidesChanged(items => {
-      const formattedBanners = items.map(item => {
+      const formattedBanners = (items || []).map(item => {
         const desktopUrl = driveStorage.formatImageUrl(item.urlDesktop || item.url);
         const mobileUrl = driveStorage.formatImageUrl(item.urlMobile || item.urlDesktop || item.url);
         return {
@@ -23,6 +38,12 @@ export default function Hero({ autoPlayInterval = 6000 }) {
         };
       });
       setBanners(formattedBanners);
+      setLoading(false);
+      try {
+        localStorage.setItem('nermai_hero_banners_cache', JSON.stringify(formattedBanners));
+      } catch (e) {
+        console.error(e);
+      }
     });
     return () => unsub();
   }, []);
@@ -34,6 +55,14 @@ export default function Hero({ autoPlayInterval = 6000 }) {
     }, autoPlayInterval);
     return () => clearInterval(timer);
   }, [banners.length, autoPlayInterval]);
+
+  if (loading && banners.length === 0) {
+    return (
+      <section className="hero-banner-container" style={{ position: 'relative', overflow: 'hidden', backgroundColor: '#1a0a0a' }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #2b0b0e 0%, #150507 100%)' }} />
+      </section>
+    );
+  }
 
   if (!banners || banners.length === 0) {
     return <HeroCinematicDefault />;

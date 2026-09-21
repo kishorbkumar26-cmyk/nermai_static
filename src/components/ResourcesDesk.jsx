@@ -1,6 +1,28 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { fbFirestore } from '../firebase/firestore'
 
+// ── Format metadata helper ────────────────────────────────────────────────────
+function getFormatMeta(format) {
+  const f = (format || 'PDF').toUpperCase()
+  if (f === 'PDF')  return { icon: 'fa-file-pdf',        color: '#c0392b', bg: 'rgba(192,57,43,0.1)',  label: 'PDF'  }
+  if (f === 'DOCX' || f === 'DOC')  return { icon: 'fa-file-word',  color: '#2563eb', bg: 'rgba(37,99,235,0.1)',  label: f }
+  if (f === 'PPTX' || f === 'PPT')  return { icon: 'fa-file-powerpoint', color: '#d97706', bg: 'rgba(217,119,6,0.1)', label: f }
+  if (f === 'XLSX' || f === 'XLS')  return { icon: 'fa-file-excel', color: '#16a34a', bg: 'rgba(22,163,74,0.1)',  label: f }
+  if (f === 'ZIP')  return { icon: 'fa-file-zipper',     color: '#7c3aed', bg: 'rgba(124,58,237,0.1)', label: 'ZIP' }
+  return { icon: 'fa-file-lines', color: 'var(--gray-600)', bg: 'var(--gray-100)', label: f }
+}
+
+// ── Smart view URL — Word/PPT need Google Docs Viewer to render in-browser ────
+function getViewUrl(url, format) {
+  if (!url) return '#'
+  const f = (format || '').toUpperCase()
+  const needsViewer = ['DOC','DOCX','PPT','PPTX','XLS','XLSX'].includes(f)
+  if (needsViewer) {
+    return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=false`
+  }
+  return url
+}
+
 export default function ResourcesDesk({ isWidget = false }) {
   const [resources, setResources] = useState([])
   const [activeTab, setActiveTab] = useState('ALL')
@@ -170,18 +192,27 @@ export default function ResourcesDesk({ isWidget = false }) {
                   
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginTop: '0.5rem' }}>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
-                      <span style={{ 
-                        background: 'rgba(123, 27, 46, 0.08)', 
-                        color: 'var(--maroon)', 
-                        fontSize: '0.75rem', 
-                        fontWeight: 700, 
-                        padding: '0.2rem 0.6rem', 
-                        borderRadius: '6px', 
-                        letterSpacing: '0.05em',
-                        fontFamily: 'var(--font-mono)'
-                      }}>
-                        {res.format || 'PDF'}
-                      </span>
+                      {(() => {
+                        const meta = getFormatMeta(res.format)
+                        return (
+                          <span style={{ 
+                            background: meta.bg,
+                            color: meta.color,
+                            fontSize: '0.75rem', 
+                            fontWeight: 700, 
+                            padding: '0.2rem 0.6rem', 
+                            borderRadius: '6px', 
+                            letterSpacing: '0.05em',
+                            fontFamily: 'var(--font-mono)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.3rem'
+                          }}>
+                            <i className={`fa-solid ${meta.icon}`} style={{ fontSize: '0.7rem' }} />
+                            {meta.label}
+                          </span>
+                        )
+                      })()}
                       {res.sizeBytes && (
                         <span style={{ color: 'var(--gray-500)', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
                           <i className="fa-solid fa-file" style={{ fontSize: '0.75rem', color: 'var(--gray-400)' }} />
@@ -197,7 +228,7 @@ export default function ResourcesDesk({ isWidget = false }) {
                     </div>
 
                     <a 
-                      href={res.url} 
+                      href={getViewUrl(res.url, res.format)} 
                       target="_blank" 
                       rel="noreferrer"
                       className="resource-view-btn"
@@ -217,7 +248,8 @@ export default function ResourcesDesk({ isWidget = false }) {
                         boxShadow: '0 2px 6px rgba(123, 27, 46, 0.15)'
                       }}
                     >
-                      VIEW <i className="fa-solid fa-arrow-right" style={{ fontSize: '0.75rem' }} />
+                      {['DOC','DOCX','PPT','PPTX'].includes((res.format||'').toUpperCase()) ? 'OPEN' : 'VIEW'}
+                      <i className="fa-solid fa-arrow-right" style={{ fontSize: '0.75rem' }} />
                     </a>
                   </div>
                 </div>

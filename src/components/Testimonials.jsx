@@ -4,8 +4,21 @@ import { fbFirestore } from '../firebase/firestore'
 import { driveStorage } from '../services/driveStorage'
 import './Testimonials.css'
 
-export default function Testimonials() {
+export const DEFAULT_TESTIMONIALS_CONFIG = {
+  eyebrow: 'STUDENT REVIEWS',
+  title: 'Hear What They Say',
+  subtitle: 'Honest feedback from successful Nermai students.',
+  leftNoteLine1: 'Same Dedication.',
+  leftNoteLine2: 'A Brighter Tomorrow.',
+  rightScriptLine1: 'Real Aspirants',
+  rightScriptLine2: 'Real Stories',
+  rightScriptLine3: 'Real Success',
+  bottomTagline: 'THOUSANDS OF DREAMS. A STRONGER INDIA.'
+}
+
+export default function Testimonials({ customConfig }) {
   const [testimonials, setTestimonials] = useState([])
+  const [config, setConfig] = useState(customConfig || DEFAULT_TESTIMONIALS_CONFIG)
   const [activeIdx, setActiveIdx] = useState(0)
   const [perView, setPerView] = useState(3)
 
@@ -17,7 +30,23 @@ export default function Testimonials() {
         fbFirestore.getTestimonials().then(res => setTestimonials(res || []))
       }
     })
-    return () => unsub && unsub()
+
+    fbFirestore.getSettings().then(s => {
+      if (s?.homeContent?.testimonialsConfig) {
+        setConfig(prev => ({ ...DEFAULT_TESTIMONIALS_CONFIG, ...s.homeContent.testimonialsConfig }))
+      }
+    })
+
+    const unsubSettings = fbFirestore.onSettingsChanged?.(s => {
+      if (s?.homeContent?.testimonialsConfig) {
+        setConfig(prev => ({ ...DEFAULT_TESTIMONIALS_CONFIG, ...s.homeContent.testimonialsConfig }))
+      }
+    })
+
+    return () => {
+      unsub && unsub()
+      unsubSettings && unsubSettings()
+    }
   }, [])
 
   // Handle responsive perView calculation
@@ -84,6 +113,9 @@ export default function Testimonials() {
     )
   }
 
+  const hasLeftNote = Boolean((config.leftNoteLine1 ?? '').trim() || (config.leftNoteLine2 ?? '').trim())
+  const hasRightScript = Boolean((config.rightScriptLine1 ?? '').trim() || (config.rightScriptLine2 ?? '').trim() || (config.rightScriptLine3 ?? '').trim())
+
   // ── Mobile (perView === 1): Simple single-card display ───────────────────
   if (perView === 1) {
     const currentItem = items[currentOffset]
@@ -93,13 +125,19 @@ export default function Testimonials() {
 
           {/* Section Header */}
           <div className="testimonials-header-box">
-            <div className="testimonials-top-tag">
-              <span className="tag-line" />
-              <span className="tag-text">STUDENT REVIEWS</span>
-              <span className="tag-line" />
-            </div>
-            <h2 className="testimonials-main-title">Hear What They Say</h2>
-            <p className="testimonials-subtitle">Honest feedback from successful Nermai students.</p>
+            {Boolean((config.eyebrow ?? '').trim()) && (
+              <div className="testimonials-top-tag">
+                <span className="tag-line" />
+                <span className="tag-text">{config.eyebrow}</span>
+                <span className="tag-line" />
+              </div>
+            )}
+            {Boolean((config.title ?? '').trim()) && (
+              <h2 className="testimonials-main-title">{config.title}</h2>
+            )}
+            {Boolean((config.subtitle ?? '').trim()) && (
+              <p className="testimonials-subtitle">{config.subtitle}</p>
+            )}
           </div>
 
           {/* Single Card */}
@@ -139,9 +177,11 @@ export default function Testimonials() {
             )}
           </div>
 
-          <div className="testimonials-bottom-tagline" style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-            THOUSANDS OF DREAMS. A STRONGER INDIA.
-          </div>
+          {Boolean((config.bottomTagline ?? '').trim()) && (
+            <div className="testimonials-bottom-tagline" style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+              {config.bottomTagline}
+            </div>
+          )}
 
         </div>
       </section>
@@ -155,30 +195,40 @@ export default function Testimonials() {
 
         {/* Section Header */}
         <div className="testimonials-header-box">
-          <div className="testimonials-top-tag">
-            <span className="tag-line" />
-            <span className="tag-text">STUDENT REVIEWS</span>
-            <span className="tag-line" />
-          </div>
-          <h2 className="testimonials-main-title">Hear What They Say</h2>
-          <p className="testimonials-subtitle">Honest feedback from successful Nermai students.</p>
+          {Boolean((config.eyebrow ?? '').trim()) && (
+            <div className="testimonials-top-tag">
+              <span className="tag-line" />
+              <span className="tag-text">{config.eyebrow}</span>
+              <span className="tag-line" />
+            </div>
+          )}
+          {Boolean((config.title ?? '').trim()) && (
+            <h2 className="testimonials-main-title">{config.title}</h2>
+          )}
+          {Boolean((config.subtitle ?? '').trim()) && (
+            <p className="testimonials-subtitle">{config.subtitle}</p>
+          )}
         </div>
 
         {/* Content Row with Left Accent, Center Cards Track, Right Accent */}
         <div className="testimonials-content-grid">
 
           {/* Far Left Decorative Element */}
-          <div className="testimonials-accent-left" aria-hidden="true">
-            <div className="giant-quote-mark">"</div>
-            <div className="left-handwriting">
-              <span>Same Dedication.</span>
-              <span className="sub">A Brighter Tomorrow.</span>
+          {hasLeftNote ? (
+            <div className="testimonials-accent-left" aria-hidden="true">
+              <div className="giant-quote-mark">"</div>
+              <div className="left-handwriting">
+                {Boolean((config.leftNoteLine1 ?? '').trim()) && <span>{config.leftNoteLine1}</span>}
+                {Boolean((config.leftNoteLine2 ?? '').trim()) && <span className="sub">{config.leftNoteLine2}</span>}
+              </div>
+              <svg className="left-dome-svg" viewBox="0 0 100 60" fill="none" stroke="#C85A17" strokeWidth="1">
+                <path d="M20 55 V35 L50 15 L80 35 V55 H20 Z M50 15 V5 M35 35 H65 M40 55 V42 H60 V55" opacity="0.3" />
+                <circle cx="50" cy="25" r="5" stroke="#C85A17" opacity="0.3" />
+              </svg>
             </div>
-            <svg className="left-dome-svg" viewBox="0 0 100 60" fill="none" stroke="#C85A17" strokeWidth="1">
-              <path d="M20 55 V35 L50 15 L80 35 V55 H20 Z M50 15 V5 M35 35 H65 M40 55 V42 H60 V55" opacity="0.3" />
-              <circle cx="50" cy="25" r="5" stroke="#C85A17" opacity="0.3" />
-            </svg>
-          </div>
+          ) : (
+            <div className="testimonials-accent-left-spacer" aria-hidden="true" />
+          )}
 
           {/* Center Carousel Slider */}
           <div className="testimonials-carousel-box">
@@ -221,13 +271,17 @@ export default function Testimonials() {
           </div>
 
           {/* Far Right Tilted Script Accent */}
-          <div className="testimonials-accent-right" aria-hidden="true">
-            <div className="right-script-box">
-              <span>Real Aspirants</span>
-              <span>Real Stories</span>
-              <span className="accent-underline">Real Success</span>
+          {hasRightScript ? (
+            <div className="testimonials-accent-right" aria-hidden="true">
+              <div className="right-script-box">
+                {Boolean((config.rightScriptLine1 ?? '').trim()) && <span>{config.rightScriptLine1}</span>}
+                {Boolean((config.rightScriptLine2 ?? '').trim()) && <span>{config.rightScriptLine2}</span>}
+                {Boolean((config.rightScriptLine3 ?? '').trim()) && <span className="accent-underline">{config.rightScriptLine3}</span>}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="testimonials-accent-right-spacer" aria-hidden="true" />
+          )}
 
         </div>
 
@@ -243,9 +297,11 @@ export default function Testimonials() {
               />
             ))}
           </div>
-          <div className="testimonials-bottom-tagline">
-            THOUSANDS OF DREAMS. A STRONGER INDIA.
-          </div>
+          {Boolean((config.bottomTagline ?? '').trim()) && (
+            <div className="testimonials-bottom-tagline">
+              {config.bottomTagline}
+            </div>
+          )}
         </div>
 
       </div>

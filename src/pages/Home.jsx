@@ -6,16 +6,12 @@ import StatsBar from '../components/StatsBar'
 import Courses from '../components/Courses'
 import WhyNermai from '../components/WhyNermai'
 import WhatYouGet from '../components/WhatYouGet'
-import Results from '../components/Results'
 import Gallery from '../components/Gallery'
-import Testimonials from '../components/Testimonials'
-import ToppersWall from '../components/ToppersWall'
+import SuccessStoriesSection from '../components/SuccessStoriesSection'
 import OfficeLocations from '../components/OfficeLocations'
 import Footer from '../components/Footer'
 import EventsCalendar from '../components/EventsCalendar'
-import JourneySection from '../components/JourneySection'
 import ResourcesDesk from '../components/ResourcesDesk'
-import { LMS_URL } from '../constants'
 import { fbFirestore } from '../firebase/firestore'
 
 const DEFAULT_ABOUT = {
@@ -168,6 +164,9 @@ export default function Home() {
           </section>
         )}
 
+        {/* ── UNIFIED SUCCESS STORIES & TESTIMONIALS ── */}
+        {visibility.results !== false && visibility.toppers !== false && <SuccessStoriesSection />}
+
         {/* ── WHAT YOU GET (Features) ── */}
         {visibility.features !== false && <WhatYouGet />}
 
@@ -177,54 +176,8 @@ export default function Home() {
         {/* ── WHY NERMAI ── */}
         <WhyNermai />
 
-        {/* ── YOUR JOURNEY ── */}
-        {visibility.steps !== false && <JourneySection steps={journeySteps} />}
-
-        {/* ── RESULTS ── */}
-        {visibility.results !== false && <Results />}
-
-        {/* ── TOPPERS WALL ── */}
-        <ToppersWall />
-
         {/* ── GALLERY ── */}
         {visibility.gallery !== false && <Gallery />}
-
-        {/* ── TESTIMONIALS ── */}
-        {visibility.testimonials !== false && <Testimonials />}
-
-        {/* ── FINAL CTA ── */}
-        <section className="cta-final-section" id="enroll">
-          <div className="cta-final-bg-grid" aria-hidden="true" />
-          <div className="container-narrow">
-            <div className="cta-final-inner reveal">
-              <div className="cta-final-stamp-wrap" aria-hidden="true">
-                <div className="cta-final-stamp">
-                  <img src="/nermai-logo.png" alt="Nermai Logo" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-                </div>
-              </div>
-              <span className="eyebrow cta-eyebrow">BEGIN YOUR JOURNEY</span>
-              <h2 className="cta-final-heading">
-                Your Success Journey<br />
-                <em>Starts Today.</em>
-              </h2>
-              <p className="cta-final-sub">
-                Don't just aim for the exam.<br />
-                Start your preparation systematically.
-              </p>
-              <div className="cta-final-actions">
-                <a href={LMS_URL} className="btn btn-primary btn-lg cta-enroll-btn" id="home-enroll-btn" target="_blank" rel="noopener noreferrer">
-                  Enroll Now <i className="fa-solid fa-arrow-right" />
-                </a>
-                <a href="/contact" className="btn btn-ghost btn-lg">
-                  Talk to Us
-                </a>
-              </div>
-              <div className="cta-exam-row">
-                UPSC · TNPSC · TN POLICE · BANKING · PUDUCHERRY EXAM · SSC
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
       <OfficeLocations />

@@ -23,17 +23,18 @@
 .ol-container {
   position: relative;
   z-index: 1;
-  max-width: 1240px;
+  max-width: 1400px;
+  width: 95%;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 1rem;
 }
 
 /* ── Section Header ── */
 .ol-header {
   text-align: center;
   position: relative;
-  margin-bottom: 2.5rem;
-  max-width: 780px;
+  margin-bottom: 2.75rem;
+  max-width: 880px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -73,7 +74,7 @@
   color: #5A524D;
   line-height: 1.6;
   margin: 0 auto;
-  max-width: 680px;
+  max-width: 720px;
 }
 
 /* ── Handwritten Cursive Accents ── */
@@ -133,13 +134,38 @@
   gap: 0.75rem;
   margin-bottom: 2rem;
   flex-wrap: wrap;
+  position: relative;
+}
+
+.ol-nav-arrow-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 1.5px solid #E5DEC9;
+  color: #7B1B2E;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.ol-nav-arrow-btn:hover {
+  background: #7B1B2E;
+  color: #FFFFFF;
+  border-color: #7B1B2E;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(123, 27, 46, 0.2);
 }
 
 .ol-tab-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.65rem 1.25rem;
+  padding: 0.65rem 1.35rem;
   background-color: #FFFFFF;
   border: 1.5px solid #E5DEC9;
   border-radius: 50px;
@@ -149,6 +175,8 @@
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  position: relative;
+  overflow: hidden;
 }
 
 .ol-tab-btn:hover {
@@ -179,31 +207,48 @@
 .ol-main-card {
   background: #FFFFFF;
   border: 1.5px solid #EFE7DA;
-  border-radius: 24px;
-  box-shadow: 0 16px 48px rgba(74, 14, 28, 0.05), 0 4px 12px rgba(0,0,0,0.02);
-  padding: 1.5rem;
+  border-radius: 26px;
+  box-shadow: 0 20px 54px rgba(74, 14, 28, 0.06), 0 4px 16px rgba(0,0,0,0.03);
+  padding: 2rem;
   display: grid;
-  grid-template-columns: 1.05fr 1fr;
-  gap: 2rem;
+  grid-template-columns: 1.12fr 1fr;
+  gap: 2.25rem;
   align-items: stretch;
   position: relative;
+  width: 100%;
+}
+
+.ol-card-fade {
+  animation: olCardFadeIn 0.35s ease-out forwards;
+}
+
+@keyframes olCardFadeIn {
+  from {
+    opacity: 0.6;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Left Map Container ── */
 .ol-map-container {
   position: relative;
   width: 100%;
-  min-height: 480px;
-  border-radius: 18px;
+  min-height: 520px;
+  border-radius: 20px;
   overflow: hidden;
   border: 1px solid #EAE3D5;
   background-color: #EFECE6;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.04);
 }
 
 .ol-map-iframe {
   width: 100%;
   height: 100%;
-  min-height: 480px;
+  min-height: 520px;
   border: 0;
   display: block;
 }
@@ -257,13 +302,31 @@
   margin: 0;
 }
 
-.ol-address-row {
+.ol-address-row,
+.ol-address-block {
   display: flex;
   align-items: flex-start;
   gap: 0.85rem;
   font-size: 0.975rem;
   color: #4A4440;
-  line-height: 1.6;
+  line-height: 1.55;
+}
+
+.ol-addresses-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin: 0.25rem 0;
+}
+
+.ol-address-line-primary {
+  font-weight: 600;
+  color: #2D2422;
+}
+
+.ol-address-line-sub {
+  color: #5C5550;
+  font-size: 0.94rem;
 }
 
 .ol-address-pin-icon {
@@ -488,7 +551,12 @@
     gap: 1.5rem;
   }
   .ol-map-container {
-    min-height: 380px;
+    min-height: 360px;
+    height: 360px;
+  }
+  .ol-map-iframe {
+    min-height: 360px;
+    height: 100%;
   }
   .ol-details-container {
     padding: 0;
@@ -521,7 +589,13 @@
     grid-template-columns: 1fr;
   }
   .ol-map-container {
-    min-height: 300px;
+    min-height: 220px;
+    height: 220px;
+    border-radius: 16px;
+  }
+  .ol-map-iframe {
+    min-height: 220px;
+    height: 100%;
   }
   .ol-features-bar {
     grid-template-columns: 1fr;
@@ -529,5 +603,17 @@
   }
   .ol-motto-wrap {
     grid-column: span 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .ol-map-container {
+    min-height: 200px;
+    height: 200px;
+    border-radius: 14px;
+  }
+  .ol-map-iframe {
+    min-height: 200px;
+    height: 100%;
   }
 }
