@@ -266,7 +266,7 @@ export const driveStorage = {
     const driveId = extractGoogleDriveId(trimmed)
     if (driveId) return getGoogleDriveCDNUrl(driveId, size)
     if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('//')) return trimmed
-    return trimmed
+    return null
   },
 
   handleImageError(event, fallbackUrl = '') {

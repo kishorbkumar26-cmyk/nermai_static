@@ -90,45 +90,185 @@ const DEFAULT_COURSES = [
   }
 ]
 
-// Category Emblem SVGs for fallback rendering
-function renderCategoryEmblem(categoryId) {
-  const cat = (categoryId || '').toLowerCase()
+// Render crisp vector emblem seals for each exam category
+function renderCategoryEmblem(courseOrCat) {
+  const cat = (typeof courseOrCat === 'string' ? courseOrCat : (courseOrCat?.categoryId || courseOrCat?.title || '')).toLowerCase()
   if (cat.includes('upsc')) {
     return (
-      <svg viewBox="0 0 60 60" fill="none" width="52" height="52">
-        <circle cx="30" cy="30" r="26" fill="#FFF8F0" stroke="#B87333" strokeWidth="2" />
-        <path d="M30 12 L35 22 H25 Z M20 28 C20 24 40 24 40 28 V38 H20 Z M30 40 V48 H20 V50 H40 V48 H30 Z" fill="#B87333" />
-        <circle cx="30" cy="33" r="3" fill="#D4AF37" />
+      <svg viewBox="0 0 70 70" fill="none" width="56" height="56">
+        <circle cx="35" cy="35" r="32" fill="#FFFFFF" stroke="#7B1B2E" strokeWidth="2.5" />
+        <circle cx="35" cy="35" r="28" fill="#FFF8F0" />
+        <path d="M35 15 L38 22 H32 Z M28 25 C28 21 42 21 42 25 V36 H28 Z M35 38 V43 H26 V45 H44 V43 H35 Z" fill="#7B1B2E" />
+        <circle cx="35" cy="29" r="2.5" fill="#D4AF37" />
+        <text x="35" y="58" fontSize="8" fontWeight="800" textAnchor="middle" fill="#7B1B2E" letterSpacing="0.6">UPSC</text>
       </svg>
     )
   }
   if (cat.includes('tnpsc')) {
     return (
-      <svg viewBox="0 0 60 60" fill="none" width="52" height="52">
-        <circle cx="30" cy="30" r="26" fill="#F4FAF6" stroke="#1B6B48" strokeWidth="2" />
-        <path d="M30 10 L44 44 H16 Z M30 18 L38 38 H22 Z" fill="#1B6B48" opacity="0.8" />
-        <circle cx="30" cy="28" r="4" fill="#D4AF37" />
+      <svg viewBox="0 0 70 70" fill="none" width="56" height="56">
+        <circle cx="35" cy="35" r="32" fill="#FFFFFF" stroke="#1B6B48" strokeWidth="2.5" />
+        <circle cx="35" cy="35" r="28" fill="#F4FAF6" />
+        <path d="M35 14 L42 23 H28 Z M30 23 H40 V38 H30 Z M26 38 H44 V42 H26 Z" fill="#1B6B48" />
+        <circle cx="35" cy="27" r="2.5" fill="#D4AF37" />
+        <text x="35" y="58" fontSize="7.5" fontWeight="800" textAnchor="middle" fill="#1B6B48" letterSpacing="0.5">TNPSC</text>
       </svg>
     )
   }
   if (cat.includes('banking') || cat.includes('bank')) {
     return (
-      <svg viewBox="0 0 60 60" fill="none" width="52" height="52">
-        <circle cx="30" cy="30" r="26" fill="#F0F4FA" stroke="#1D4ED8" strokeWidth="2" />
-        <path d="M15 22 L30 12 L45 22 H15 Z M18 25 H22 V42 H18 Z M28 25 H32 V42 H28 Z M38 25 H42 V42 H38 Z M14 44 H46 V48 H14 Z" fill="#1D4ED8" />
+      <svg viewBox="0 0 70 70" fill="none" width="56" height="56">
+        <circle cx="35" cy="35" r="32" fill="#FFFFFF" stroke="#1D4ED8" strokeWidth="2.5" />
+        <circle cx="35" cy="35" r="28" fill="#F0F4FA" />
+        <path d="M22 25 L35 17 L48 25 H22 Z M25 27 H28 V39 H25 Z M33 27 H37 V39 H33 Z M42 27 H45 V39 H42 Z M21 41 H49 V44 H21 Z" fill="#1D4ED8" />
+        <text x="35" y="58" fontSize="8" fontWeight="800" textAnchor="middle" fill="#1D4ED8" letterSpacing="0.5">BANK</text>
       </svg>
     )
   }
   if (cat.includes('ssc')) {
     return (
-      <svg viewBox="0 0 60 60" fill="none" width="52" height="52">
-        <circle cx="30" cy="30" r="26" fill="#FAF5EF" stroke="#C85A17" strokeWidth="2" />
-        <path d="M30 14 L42 22 V38 L30 46 L18 38 V22 Z" stroke="#C85A17" strokeWidth="2.5" fill="none" />
-        <path d="M26 30 L30 34 L36 26" stroke="#C85A17" strokeWidth="3" strokeLinecap="round" />
+      <svg viewBox="0 0 70 70" fill="none" width="56" height="56">
+        <circle cx="35" cy="35" r="32" fill="#FFFFFF" stroke="#C85A17" strokeWidth="2.5" />
+        <circle cx="35" cy="35" r="28" fill="#FAF5EF" />
+        <path d="M35 17 L46 23 V34 L35 41 L24 34 V23 Z" stroke="#C85A17" strokeWidth="2" fill="#FFF3E8" />
+        <path d="M31 28 L34 31 L39 25" stroke="#C85A17" strokeWidth="2.5" strokeLinecap="round" />
+        <text x="35" y="58" fontSize="8" fontWeight="800" textAnchor="middle" fill="#C85A17" letterSpacing="0.5">SSC</text>
       </svg>
     )
   }
-  return <GraduationCap size={44} style={{ color: '#7B1B2E' }} />
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
+      <GraduationCap size={36} style={{ color: '#7B1B2E' }} />
+    </div>
+  )
+}
+
+// Render designed default banner artwork for each course category
+function renderCategoryBanner(course) {
+  const cat = (course?.categoryId || course?.title || '').toLowerCase()
+  
+  if (cat.includes('tnpsc')) {
+    return (
+      <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: '#F8FAF7', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingLeft: '22px' }}>
+        <div style={{ fontSize: '1.3rem', fontWeight: 800, fontFamily: 'Georgia, serif', color: '#1B2E24', letterSpacing: '-0.01em', lineHeight: 1.1 }}>
+          TNPSC Exams
+        </div>
+        <div style={{ fontSize: '0.66rem', color: '#4A6B58', fontWeight: 600, marginTop: '4px', fontFamily: 'system-ui, sans-serif' }}>
+          Tamil Nadu Public Service Commission
+        </div>
+        {/* Subtle decorative curve */}
+        <svg viewBox="0 0 200 60" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '40px', pointerEvents: 'none' }} preserveAspectRatio="none">
+          <path d="M0 35 Q100 5 200 35 L200 60 L0 60 Z" fill="#1B6B48" opacity="0.12" />
+          <path d="M0 45 Q100 20 200 45 L200 60 L0 60 Z" fill="#1B6B48" opacity="0.18" />
+        </svg>
+      </div>
+    )
+  }
+
+  if (cat.includes('upsc')) {
+    return (
+      <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, #FFF6EE 0%, #F5E8D8 100%)', display: 'flex', alignItems: 'center' }}>
+        <div style={{ paddingLeft: '18px', zIndex: 2 }}>
+          <div style={{ fontSize: '1.45rem', fontWeight: 900, fontFamily: 'Arial, sans-serif', letterSpacing: '-0.02em', color: '#1A1817', lineHeight: 1.05 }}>UPSC</div>
+          <div style={{ fontSize: '0.62rem', fontWeight: 800, letterSpacing: '0.05em', color: '#B32B1E', textTransform: 'uppercase', marginTop: '3px' }}>CIVIL SERVICE EXAMINATION</div>
+        </div>
+        <svg viewBox="0 0 160 150" style={{ position: 'absolute', right: 0, top: 0, height: '100%', width: 'auto', opacity: 0.85 }} fill="none">
+          <path d="M120 20 C120 20 100 40 100 80 L160 80 C160 40 140 20 120 20 Z" fill="#D49A58" opacity="0.35" />
+          <rect x="80" y="80" width="80" height="70" fill="#C2843E" opacity="0.25" />
+          <line x1="95" y1="80" x2="95" y2="150" stroke="#8C4B18" strokeWidth="2" opacity="0.35" />
+          <line x1="115" y1="80" x2="115" y2="150" stroke="#8C4B18" strokeWidth="2" opacity="0.35" />
+          <line x1="135" y1="80" x2="135" y2="150" stroke="#8C4B18" strokeWidth="2" opacity="0.35" />
+        </svg>
+      </div>
+    )
+  }
+
+  if (cat.includes('banking') || cat.includes('bank')) {
+    return (
+      <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: '#F4F7FC', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingLeft: '22px' }}>
+        <div style={{ fontSize: '1.3rem', fontWeight: 800, fontFamily: 'Georgia, serif', color: '#102A56', letterSpacing: '-0.01em', lineHeight: 1.1 }}>
+          Banking Exams
+        </div>
+        <div style={{ fontSize: '0.66rem', color: '#3B5998', fontWeight: 600, marginTop: '4px', fontFamily: 'system-ui, sans-serif' }}>
+          IBPS &bull; SBI &bull; RBI &bull; Insurance
+        </div>
+        <svg viewBox="0 0 200 60" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '40px', pointerEvents: 'none' }} preserveAspectRatio="none">
+          <path d="M0 35 Q100 5 200 35 L200 60 L0 60 Z" fill="#1D4ED8" opacity="0.1" />
+          <path d="M0 45 Q100 20 200 45 L200 60 L0 60 Z" fill="#1D4ED8" opacity="0.18" />
+        </svg>
+      </div>
+    )
+  }
+
+  if (cat.includes('ssc')) {
+    return (
+      <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: '#FAF6F0', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingLeft: '22px' }}>
+        <div style={{ fontSize: '1.3rem', fontWeight: 800, fontFamily: 'Georgia, serif', color: '#3A1E08', letterSpacing: '-0.01em', lineHeight: 1.1 }}>
+          SSC Exams
+        </div>
+        <div style={{ fontSize: '0.66rem', color: '#8C4B18', fontWeight: 600, marginTop: '4px', fontFamily: 'system-ui, sans-serif' }}>
+          Staff Selection Commission
+        </div>
+        <svg viewBox="0 0 200 60" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '40px', pointerEvents: 'none' }} preserveAspectRatio="none">
+          <path d="M0 35 Q100 5 200 35 L200 60 L0 60 Z" fill="#C85A17" opacity="0.1" />
+          <path d="M0 45 Q100 20 200 45 L200 60 L0 60 Z" fill="#C85A17" opacity="0.18" />
+        </svg>
+      </div>
+    )
+  }
+
+  return (
+    <div className={`replicated-banner-fallback cat-${(course.categoryId || 'default').toLowerCase()}`}>
+      <span className="banner-fallback-title">{course.title || course.categoryId ? (course.title || course.categoryId).toUpperCase() : 'COURSES'}</span>
+    </div>
+  )
+}
+
+function CourseCardBanner({ course, coverImg, isPopular }) {
+  const [hasError, setHasError] = useState(false)
+  const title = course?.title || 'Course'
+
+  return (
+    <div className="replicated-card-banner">
+      {coverImg && !hasError ? (
+        <img 
+          src={coverImg} 
+          alt={title} 
+          className="replicated-banner-img" 
+          loading="lazy" 
+          onError={() => setHasError(true)} 
+        />
+      ) : (
+        renderCategoryBanner(course)
+      )}
+
+      {isPopular && (
+        <div className="replicated-popular-badge">
+          ★ Most Popular
+        </div>
+      )}
+    </div>
+  )
+}
+
+function CourseCardEmblem({ course, logoImg }) {
+  const [hasError, setHasError] = useState(false)
+  const title = course?.title || 'Emblem'
+
+  return (
+    <div className="replicated-emblem-circle">
+      {logoImg && !hasError ? (
+        <img 
+          src={logoImg} 
+          alt={title} 
+          className="replicated-emblem-img" 
+          onError={() => setHasError(true)} 
+        />
+      ) : (
+        renderCategoryEmblem(course)
+      )}
+    </div>
+  )
 }
 
 export default function Courses({ hideHeader = false, layout = 'grid' }) {
@@ -375,32 +515,10 @@ export default function Courses({ hideHeader = false, layout = 'grid' }) {
                         onClick={() => setActiveIdx(i)}
                       >
                         {/* Top Cover Banner */}
-                        {/* Top Cover Banner */}
-                        <div className="replicated-card-banner">
-                          {coverImg ? (
-                            <img src={coverImg} alt={courseTitle} className="replicated-banner-img" loading="lazy" />
-                          ) : (
-                            <div className={`replicated-banner-fallback cat-${(course.categoryId || 'default').toLowerCase()}`}>
-                              <span className="banner-fallback-title">{course.categoryId ? course.categoryId.toUpperCase() : 'COURSES'}</span>
-                            </div>
-                          )}
-
-                          {/* Popular Pill Badge */}
-                          {isPopular && (
-                            <div className="replicated-popular-badge">
-                              ★ Most Popular
-                            </div>
-                          )}
-                        </div>
+                        <CourseCardBanner course={course} coverImg={coverImg} isPopular={isPopular} />
 
                         {/* Circular Logo Emblem overlapping boundary */}
-                        <div className="replicated-emblem-circle">
-                          {logoImg ? (
-                            <img src={logoImg} alt={courseTitle} className="replicated-emblem-img" />
-                          ) : (
-                            renderCategoryEmblem(course.categoryId || course.title)
-                          )}
-                        </div>
+                        <CourseCardEmblem course={course} logoImg={logoImg} />
 
                         {/* Card Body */}
                         <div className="replicated-card-body">
