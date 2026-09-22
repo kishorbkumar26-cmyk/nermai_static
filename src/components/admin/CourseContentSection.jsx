@@ -702,11 +702,23 @@ export default function CourseContentSection({ toast }) {
 
             {/* 2. Side Cursive Writing Editor */}
             <div style={{ borderTop: '1px dashed #E5D5C5', paddingTop: '1.25rem' }}>
-              <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#2C221E', marginBottom: '0.75rem' }}>
-                2. Decorative Side Cursive Writing (Left &amp; Right)
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem', background: '#F8F4EE', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid #EAE0D3' }}>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#2C221E' }}>
+                    2. Decorative Side Cursive Writing (Left &amp; Right)
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: '#736B63' }}>
+                    Master toggle to show or hide all floating side handwriting on the homepage.
+                  </div>
+                </div>
+                <Toggle 
+                  label="Enable Side Cursive Text" 
+                  checked={coursesConfig.sideScripts?.visible !== false} 
+                  onChange={v => updateCoursesSideScript('visible', v)} 
+                />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '1.25rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '1.25rem', opacity: coursesConfig.sideScripts?.visible !== false ? 1 : 0.5, pointerEvents: coursesConfig.sideScripts?.visible !== false ? 'auto' : 'none' }}>
                 {/* Left Cursive Accent Box */}
                 <div style={{ background: '#FFF8F2', padding: '1.1rem', borderRadius: '8px', border: '1px solid #F0D5C0' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', borderBottom: '1px solid #F5DECE', paddingBottom: '0.5rem' }}>

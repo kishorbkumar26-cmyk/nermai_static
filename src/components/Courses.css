@@ -52,15 +52,28 @@
   margin: 0;
 }
 
-/* Main Content Grid with Left & Right Accents */
+/* Main Content Grid with Dynamic Left & Right Accents */
 .replicated-courses-content-row {
   display: grid;
-  grid-template-columns: 150px 1fr 150px;
+  grid-template-columns: 1fr;
   gap: 1.25rem;
   align-items: flex-start;
   max-width: 1480px;
   margin: 0 auto;
   position: relative;
+  width: 100%;
+}
+
+.replicated-courses-content-row.has-left-accent.has-right-accent {
+  grid-template-columns: 150px 1fr 150px;
+}
+
+.replicated-courses-content-row.has-left-accent:not(.has-right-accent) {
+  grid-template-columns: 150px 1fr;
+}
+
+.replicated-courses-content-row.has-right-accent:not(.has-left-accent) {
+  grid-template-columns: 1fr 150px;
 }
 
 .replicated-courses-content-row.no-side-accents {

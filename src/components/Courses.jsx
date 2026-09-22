@@ -247,6 +247,17 @@ export default function Courses({ hideHeader = false, layout = 'grid' }) {
     touchStartX.current = null
   }
 
+  const isSideScriptsVisible = coursesConfig.sideScripts?.visible !== false
+  const showLeft = !hideHeader && isSideScriptsVisible && coursesConfig.sideScripts?.showLeft !== false
+  const showRight = !hideHeader && isSideScriptsVisible && coursesConfig.sideScripts?.showRight !== false
+
+  const rowClasses = [
+    'replicated-courses-content-row',
+    showLeft ? 'has-left-accent' : '',
+    showRight ? 'has-right-accent' : '',
+    (!showLeft && !showRight) ? 'no-side-accents' : ''
+  ].filter(Boolean).join(' ')
+
   return (
     <section className="replicated-courses-section" id="courses">
       <div className="container" style={{ maxWidth: '1480px' }}>
@@ -265,10 +276,10 @@ export default function Courses({ hideHeader = false, layout = 'grid' }) {
         )}
 
         {/* Content Row with Left Accent, Filter Tabs + Grid, Right Accent */}
-        <div className={`replicated-courses-content-row ${hideHeader ? 'no-side-accents' : ''}`}>
+        <div className={rowClasses}>
           
           {/* Far Left Decorative Element */}
-          {!hideHeader && (coursesConfig.sideScripts?.showLeft !== false) && (
+          {showLeft && (
             <div className="courses-accent-left" aria-hidden="true">
               <div className="left-handwriting">
                 <span>{coursesConfig.sideScripts?.leftLine1 || 'Learn'}</span>
@@ -452,7 +463,7 @@ export default function Courses({ hideHeader = false, layout = 'grid' }) {
           </div>
 
           {/* Far Right Tilted Script Accent */}
-          {!hideHeader && (coursesConfig.sideScripts?.showRight !== false) && (
+          {showRight && (
             <div className="courses-accent-right" aria-hidden="true">
               <div className="right-script-box">
                 <span>{coursesConfig.sideScripts?.rightLine1 || 'Different Aspirations'}</span>
