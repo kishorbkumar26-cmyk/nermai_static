@@ -8,11 +8,17 @@ export default defineConfig({
     // Split large chunks so browsers cache vendor libs separately from app code
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Firebase SDKs — rarely change, cached long-term by browser
-          'firebase-core': ['firebase/app', 'firebase/firestore', 'firebase/storage'],
-          // React core — almost never changes
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+        manualChunks(id) {
+          if (id.includes('node_modules/firebase')) {
+            return 'firebase-core';
+          }
+          if (
+            id.includes('node_modules/react') ||
+            id.includes('node_modules/react-dom') ||
+            id.includes('node_modules/react-router-dom')
+          ) {
+            return 'react-vendor';
+          }
         }
       }
     },
