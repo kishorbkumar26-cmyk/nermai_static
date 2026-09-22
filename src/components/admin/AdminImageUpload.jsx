@@ -323,17 +323,15 @@ export default function AdminImageUpload({
               <div style={{ color: '#92400e', fontSize: '0.65rem', textAlign: 'center', padding: '0.35rem', background: '#fef3c7', borderRadius: '4px', width: '100%' }}>
                 <i className="fa-solid fa-triangle-exclamation" style={{ fontSize: '0.9rem', display: 'block', marginBottom: '3px', color: '#d97706' }} />
                 <div style={{ fontWeight: 700, marginBottom: '3px' }}>Preview unavailable</div>
-                <div style={{ marginBottom: '4px', fontSize: '0.6rem', color: '#78350f' }}>Drive CDN rate limited</div>
-                {driveId && (
-                  <a
-                    href={`https://drive.google.com/file/d/${driveId}/view`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ color: '#1d4ed8', fontSize: '0.6rem', textDecoration: 'underline', fontWeight: 600 }}
-                  >
-                    Open in Drive ↗
-                  </a>
-                )}
+                <div style={{ marginBottom: '4px', fontSize: '0.6rem', color: '#78350f' }}>{driveId ? 'Drive CDN rate limited' : 'Image URL not reachable'}</div>
+                <a
+                  href={driveId ? `https://drive.google.com/file/d/${driveId}/view` : value}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: '#1d4ed8', fontSize: '0.6rem', textDecoration: 'underline', fontWeight: 600 }}
+                >
+                  {driveId ? 'Open in Drive ↗' : 'Open Link ↗'}
+                </a>
               </div>
             )}
           </div>

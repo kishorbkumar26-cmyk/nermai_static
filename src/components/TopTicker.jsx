@@ -31,8 +31,9 @@ export default function TopTicker({ ticker }) {
           
           {/* Left Deep Maroon Tab Badge */}
           <div className="ticker-badge-tab">
-            <Megaphone size={14} style={{ color: '#F5D061' }} />
-            <span>Latest Updates</span>
+            <Megaphone size={14} style={{ color: '#F5D061', flexShrink: 0 }} />
+            <span className="ticker-badge-text-full">Latest Updates</span>
+            <span className="ticker-badge-text-short">Updates</span>
           </div>
 
           {/* Center Scrolling Track */}
@@ -40,6 +41,8 @@ export default function TopTicker({ ticker }) {
             className="ticker-content-track"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
+            onTouchStart={() => setIsPaused(true)}
+            onTouchEnd={() => setIsPaused(false)}
           >
             <div 
               className={`ticker-scroll-wrapper ${isPaused ? 'paused' : ''}`}
@@ -52,7 +55,7 @@ export default function TopTicker({ ticker }) {
               {displayItems.map((item, idx) => (
                 <React.Fragment key={idx}>
                   <span className="ticker-item-span">
-                    <Bell size={13} className="ticker-item-bell" />
+                    <Bell size={13} className="ticker-item-bell" style={{ flexShrink: 0 }} />
                     {item.link ? (
                       <a href={item.link} className="top-ticker-link">
                         {item.text}
@@ -61,7 +64,7 @@ export default function TopTicker({ ticker }) {
                       <span>{item.text}</span>
                     )}
                   </span>
-                  <span style={{ color: 'rgba(123, 27, 46, 0.25)', fontSize: '0.8rem', margin: '0 4px' }}>|</span>
+                  <span style={{ color: 'rgba(123, 27, 46, 0.25)', fontSize: '0.8rem', margin: '0 4px', flexShrink: 0 }}>|</span>
                 </React.Fragment>
               ))}
             </div>
@@ -70,7 +73,7 @@ export default function TopTicker({ ticker }) {
           {/* Right Navigation Controls */}
           <div className="ticker-controls-group">
             <button 
-              className="ticker-ctrl-btn" 
+              className="ticker-ctrl-btn ticker-ctrl-nav" 
               onClick={handlePrev} 
               title="Previous Update"
               aria-label="Previous Update"
@@ -78,7 +81,7 @@ export default function TopTicker({ ticker }) {
               <ChevronLeft size={14} />
             </button>
             <button 
-              className="ticker-ctrl-btn" 
+              className="ticker-ctrl-btn ticker-ctrl-pause" 
               onClick={() => setIsPaused(!isPaused)} 
               title={isPaused ? "Resume Ticker" : "Pause Ticker"}
               aria-label={isPaused ? "Resume Ticker" : "Pause Ticker"}
@@ -86,7 +89,7 @@ export default function TopTicker({ ticker }) {
               {isPaused ? <Play size={12} /> : <Pause size={12} />}
             </button>
             <button 
-              className="ticker-ctrl-btn" 
+              className="ticker-ctrl-btn ticker-ctrl-nav" 
               onClick={handleNext} 
               title="Next Update"
               aria-label="Next Update"

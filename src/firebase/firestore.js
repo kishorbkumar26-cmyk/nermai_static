@@ -86,8 +86,96 @@ export const DEFAULT_WHY_NERMAI = {
   ]
 }
 
+export const DEFAULT_WHY_NERMAI_SHOWCASE = {
+  eyebrow: 'OUR FEATURES',
+  title: 'What Makes Nermai Different',
+  subtitle: 'Every aspect of our academy is designed around one purpose — your success.',
+  steps: [
+    {
+      id: 'step_1',
+      num: '01',
+      circleStyle: 'circle-maroon',
+      icon: 'Heart',
+      title: 'Non Profit Initiative',
+      desc: 'Run entirely by volunteers. Our sole mission is to empower rural and economically weaker youth — not to profit from their aspirations.'
+    },
+    {
+      id: 'step_2',
+      num: '02',
+      circleStyle: 'circle-cream',
+      icon: 'BookOpen',
+      title: 'Comprehensive Syllabus Coverage',
+      desc: 'Every topic from Prelims to Mains is covered systematically. No gaps, no shortcuts — structured preparation from day one.'
+    },
+    {
+      id: 'step_3',
+      num: '03',
+      circleStyle: 'circle-maroon',
+      icon: 'ClipboardCheck',
+      title: 'Regular Test Practice',
+      desc: 'Frequent mock tests and topic-wise tests that closely mirror the actual exam pattern to build speed and accuracy.'
+    },
+    {
+      id: 'step_4',
+      num: '04',
+      circleStyle: 'circle-cream',
+      icon: 'UserCheck',
+      title: 'Personal Guidance & Counseling',
+      desc: 'One-on-one mentoring sessions to assess your strengths, address weaknesses, and keep you on the right track.'
+    },
+    {
+      id: 'step_5',
+      num: '05',
+      circleStyle: 'circle-maroon',
+      icon: 'Laptop',
+      title: 'Offline & Online',
+      desc: 'Attend classes at our Puducherry centre or learn from anywhere via our online platform — flexible learning your way.'
+    },
+    {
+      id: 'step_6',
+      num: '06',
+      circleStyle: 'circle-cream',
+      icon: 'Trophy',
+      title: 'Result Driven Learning',
+      desc: '187+ successful candidates across UPSC, TNPSC, Police and Puducherry Recruitments prove that our approach works.'
+    }
+  ],
+  bottomQuote: "Education is not a business for us, it's a responsibility.",
+  bottomAuthor: 'NERMAI',
+  stat1Num: '187+',
+  stat1Label: 'Successful Candidates',
+  stat2Num: '14+',
+  stat2Label: 'Years of Impact',
+  stat3Num: 'Stronger',
+  stat3Label: 'Rural Youth, Brighter India',
+  cursiveLine1: 'Same Dedication.',
+  cursiveLine2: 'A Brighter Tomorrow.',
+  ctaText: 'JOIN NERMAI TODAY',
+  ctaLink: '#contact'
+}
+
+export const DEFAULT_SUCCESS_STORIES_CONFIG = {
+  eyebrow: 'NERMAI SUCCESS STORIES',
+  titlePrefix: 'From Aspirants to',
+  titleHighlight: 'Achievers',
+  subtitle: 'Real journeys. Real people. Real results. Be inspired by our students who turned their dreams into reality with Nermai.',
+  scriptTopLeft: 'Learn\nPrepare\nSucceed',
+  scriptTopRight: 'Different\nAspirations\nOne\nDestination',
+
+  toppersSubheading: 'OUR TOPPERS',
+  toppersDesc: 'Meet our achievers who made it happen with dedication, guidance and the Nermai way.',
+  toppersViewAllText: 'View All Toppers',
+  toppersViewAllLink: '/results',
+
+  testimonialsHeading: 'TESTIMONIALS',
+  testimonialsSubtitle: 'Honest feedback from our students.',
+  testimonialsScript: 'Real Stories Real Impact'
+}
+
 const DEFAULT_SETTINGS = {
   whyNermai: DEFAULT_WHY_NERMAI,
+  whyNermaiShowcase: DEFAULT_WHY_NERMAI_SHOWCASE,
+  successStories: DEFAULT_SUCCESS_STORIES_CONFIG,
   passcode: 'nermai2024',
   pageVisibility: {
     courses: true,

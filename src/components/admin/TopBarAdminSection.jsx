@@ -276,7 +276,7 @@ export default function TopBarAdminSection({ toast }) {
               />
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <span style={{
-                  fontFamily: 'Georgia, serif',
+                  fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif',
                   fontSize: '1.25rem',
                   fontWeight: 800,
                   color: '#7B1B2E',

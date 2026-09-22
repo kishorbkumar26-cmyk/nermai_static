@@ -262,11 +262,11 @@ export const driveStorage = {
     if (!url || typeof url !== 'string') return null
     const trimmed = url.trim()
     if (!trimmed) return null
-    if (trimmed.startsWith('data:') || trimmed.startsWith('blob:') || trimmed.startsWith('assets/')) return trimmed
+    if (trimmed.startsWith('data:') || trimmed.startsWith('blob:') || trimmed.startsWith('assets/') || trimmed.startsWith('/assets/') || trimmed.startsWith('/') || trimmed.startsWith('./')) return trimmed
     const driveId = extractGoogleDriveId(trimmed)
     if (driveId) return getGoogleDriveCDNUrl(driveId, size)
-    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed
-    return null
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('//')) return trimmed
+    return trimmed
   },
 
   handleImageError(event, fallbackUrl = '') {

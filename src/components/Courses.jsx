@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { fbFirestore } from '../firebase/firestore'
 import { driveStorage } from '../services/driveStorage'
@@ -134,6 +134,20 @@ function renderCategoryEmblem(categoryId) {
 export default function Courses({ hideHeader = false, layout = 'grid' }) {
   const [categories, setCategories] = useState([])
   const [courses, setCourses] = useState([])
+  const [coursesConfig, setCoursesConfig] = useState({
+    tagText: 'OUR COURSES',
+    sectionHeading: 'Choose Your Path to a Brighter Future',
+    subHeading: 'Structured courses, expert guidance and proven results for every aspirant.',
+    sideScripts: {
+      leftLine1: 'Learn',
+      leftLine2: 'Prepare',
+      leftLine3: 'Succeed',
+      rightLine1: 'Different Aspirations',
+      rightLine2: 'One Destination',
+      showLeft: true,
+      showRight: true,
+    }
+  })
   const [activeCategory, setActiveCategory] = useState('all')
   const [activeIdx, setActiveIdx] = useState(0)
   const [perView, setPerView] = useState(4)
@@ -148,6 +162,16 @@ export default function Courses({ hideHeader = false, layout = 'grid' }) {
           setCourses(s.homeContent.courses)
         } else {
           setCourses(DEFAULT_COURSES)
+        }
+        if (s.homeContent.coursesConfig) {
+          setCoursesConfig(prev => ({
+            ...prev,
+            ...s.homeContent.coursesConfig,
+            sideScripts: {
+              ...prev.sideScripts,
+              ...(s.homeContent.coursesConfig.sideScripts || {})
+            }
+          }))
         }
       } else {
         setCourses(DEFAULT_COURSES)
@@ -206,6 +230,23 @@ export default function Courses({ hideHeader = false, layout = 'grid' }) {
   const handlePrev = () => setActiveIdx(prev => (prev === 0 ? maxOffset : prev - 1))
   const handleNext = () => setActiveIdx(prev => (prev >= maxOffset ? 0 : prev + 1))
 
+  const touchStartX = useRef(null)
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX
+  }
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return
+    const diffX = touchStartX.current - e.changedTouches[0].clientX
+    if (Math.abs(diffX) > 40) {
+      if (diffX > 0) {
+        handleNext()
+      } else {
+        handlePrev()
+      }
+    }
+    touchStartX.current = null
+  }
+
   return (
     <section className="replicated-courses-section" id="courses">
       <div className="container" style={{ maxWidth: '1480px' }}>
@@ -215,11 +256,11 @@ export default function Courses({ hideHeader = false, layout = 'grid' }) {
           <div className="replicated-courses-header">
             <div className="replicated-courses-top-tag">
               <span className="tag-line" />
-              <span className="tag-text">OUR COURSES</span>
+              <span className="tag-text">{coursesConfig.tagText || 'OUR COURSES'}</span>
               <span className="tag-line" />
             </div>
-            <h2 className="replicated-courses-main-title">Choose Your Path to a Brighter Future</h2>
-            <p className="replicated-courses-subtitle">Structured courses, expert guidance and proven results for every aspirant.</p>
+            <h2 className="replicated-courses-main-title">{coursesConfig.sectionHeading || 'Choose Your Path to a Brighter Future'}</h2>
+            <p className="replicated-courses-subtitle">{coursesConfig.subHeading || 'Structured courses, expert guidance and proven results for every aspirant.'}</p>
           </div>
         )}
 
@@ -227,12 +268,12 @@ export default function Courses({ hideHeader = false, layout = 'grid' }) {
         <div className={`replicated-courses-content-row ${hideHeader ? 'no-side-accents' : ''}`}>
           
           {/* Far Left Decorative Element */}
-          {!hideHeader && (
+          {!hideHeader && (coursesConfig.sideScripts?.showLeft !== false) && (
             <div className="courses-accent-left" aria-hidden="true">
               <div className="left-handwriting">
-                <span>Learn</span>
-                <span>Prepare</span>
-                <span className="sub">Succeed</span>
+                <span>{coursesConfig.sideScripts?.leftLine1 || 'Learn'}</span>
+                <span>{coursesConfig.sideScripts?.leftLine2 || 'Prepare'}</span>
+                <span className="sub">{coursesConfig.sideScripts?.leftLine3 || 'Succeed'}</span>
               </div>
               <svg className="left-lines-svg" viewBox="0 0 50 20" stroke="#C85A17" strokeWidth="1.5">
                 <path d="M5 10 Q25 18 45 10 M10 15 Q25 20 40 15" fill="none" opacity="0.6" />
@@ -282,7 +323,11 @@ export default function Courses({ hideHeader = false, layout = 'grid' }) {
               )}
 
               {/* Viewport & Track */}
-              <div className="replicated-cards-viewport">
+              <div 
+                className="replicated-cards-viewport"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+              >
                 <div 
                   className="replicated-cards-track"
                   style={{
@@ -407,11 +452,11 @@ export default function Courses({ hideHeader = false, layout = 'grid' }) {
           </div>
 
           {/* Far Right Tilted Script Accent */}
-          {!hideHeader && (
+          {!hideHeader && (coursesConfig.sideScripts?.showRight !== false) && (
             <div className="courses-accent-right" aria-hidden="true">
               <div className="right-script-box">
-                <span>Different Aspirations</span>
-                <span className="accent-underline">One Destination</span>
+                <span>{coursesConfig.sideScripts?.rightLine1 || 'Different Aspirations'}</span>
+                <span className="accent-underline">{coursesConfig.sideScripts?.rightLine2 || 'One Destination'}</span>
               </div>
             </div>
           )}

@@ -41,12 +41,21 @@ export default function ResourcesDesk({ isWidget = false }) {
     return ['ALL', ...Array.from(cats).filter(Boolean).sort()]
   }, [resources])
 
+  // Sort: Featured first, then newest date first
   const filtered = useMemo(() => {
     let list = resources
     if (activeTab !== 'ALL') {
       list = list.filter(r => r.category === activeTab)
     }
-    return [...list].sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0) || new Date(b.date || 0) - new Date(a.date || 0))
+    return [...list].sort((a, b) => {
+      const featA = a.isFeatured ? 1 : 0
+      const featB = b.isFeatured ? 1 : 0
+      if (featB !== featA) return featB - featA
+
+      const timeA = new Date(a.date || a.createdAt || 0).getTime()
+      const timeB = new Date(b.date || b.createdAt || 0).getTime()
+      return timeB - timeA
+    })
   }, [resources, activeTab])
 
   if (!loading && resources.length === 0) return null
@@ -59,49 +68,70 @@ export default function ResourcesDesk({ isWidget = false }) {
       style={{
         background: isWidget ? 'var(--white)' : 'var(--cream)',
         color: 'var(--ink)',
-        padding: isWidget ? '2rem' : '5rem 1.5rem',
-        borderRadius: isWidget ? '16px' : '0',
+        padding: isWidget ? '2rem 2.25rem' : '5rem 1.5rem',
+        borderRadius: isWidget ? '20px' : '0',
         border: isWidget ? '1px solid var(--gray-200)' : 'none',
         boxShadow: isWidget ? '0 10px 30px rgba(26, 16, 8, 0.04)' : 'none',
-        fontFamily: 'var(--font-body)'
+        fontFamily: 'var(--font-body)',
+        width: '100%',
+        boxSizing: 'border-box'
       }}
     >
       <div className={!isWidget ? "container-narrow" : ""}>
         
         {/* Header */}
-        <div style={{ marginBottom: '2rem' }}>
-          <span style={{ 
-            fontSize: '0.75rem', 
-            fontWeight: 700, 
-            letterSpacing: '0.12em', 
-            color: 'var(--maroon)', 
-            textTransform: 'uppercase', 
-            display: 'block', 
-            marginBottom: '0.3rem' 
-          }}>
-            FREE LEARNING RESOURCES
-          </span>
-          <h2 style={{ 
-            fontFamily: 'var(--font-display)', 
-            fontSize: isWidget ? '1.5rem' : '2.25rem', 
-            fontWeight: 700, 
-            color: 'var(--ink)', 
-            margin: '0 0 0.75rem',
-            lineHeight: 1.2
-          }}>
-            Study Notes & Question Banks
-          </h2>
-          <div style={{ 
-            width: '50px', 
-            height: '3px', 
-            background: 'linear-gradient(90deg, var(--maroon) 0%, var(--saffron) 100%)',
-            borderRadius: '2px' 
-          }} />
+        <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '0.85rem' }}>
+          <div>
+            <span style={{ 
+              fontSize: '0.75rem', 
+              fontWeight: 700, 
+              letterSpacing: '0.12em', 
+              color: 'var(--maroon)', 
+              textTransform: 'uppercase', 
+              display: 'block', 
+              marginBottom: '0.3rem' 
+            }}>
+              FREE LEARNING RESOURCES
+            </span>
+            <h2 style={{ 
+              fontFamily: 'var(--font-display)', 
+              fontSize: isWidget ? '1.5rem' : '2.25rem', 
+              fontWeight: 700, 
+              color: 'var(--ink)', 
+              margin: '0 0 0.75rem',
+              lineHeight: 1.2
+            }}>
+              Study Notes & Question Banks
+            </h2>
+            <div style={{ 
+              width: '50px', 
+              height: '3px', 
+              background: 'linear-gradient(90deg, var(--maroon) 0%, var(--saffron) 100%)',
+              borderRadius: '2px' 
+            }} />
+          </div>
+
+          {filtered.length > 5 && (
+            <span style={{ 
+              fontSize: '0.8rem', 
+              color: 'var(--gray-600)', 
+              fontWeight: 600,
+              background: 'var(--gray-100)',
+              padding: '0.35rem 0.75rem',
+              borderRadius: '20px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem'
+            }}>
+              <i className="fa-solid fa-arrow-down" style={{ fontSize: '0.75rem', color: 'var(--maroon)' }} />
+              Scroll to view all ({filtered.length})
+            </span>
+          )}
         </div>
 
-        {/* Tabs */}
+        {/* Category Tabs */}
         {categories.length > 1 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.75rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.35rem' }}>
             {categories.map(cat => {
               const isActive = activeTab === cat
               return (
@@ -113,7 +143,7 @@ export default function ResourcesDesk({ isWidget = false }) {
                     color: isActive ? 'var(--white)' : 'var(--gray-700)',
                     border: isActive ? '1px solid var(--maroon)' : '1px solid var(--gray-200)',
                     fontWeight: isActive ? 600 : 500,
-                    fontSize: '0.85rem',
+                    fontSize: '0.84rem',
                     letterSpacing: '0.02em',
                     cursor: 'pointer',
                     padding: '0.4rem 1rem',
@@ -129,24 +159,37 @@ export default function ResourcesDesk({ isWidget = false }) {
           </div>
         )}
 
-        {/* List */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        {/* Scrollable List — Shows latest 5 and featured, with smooth scroll for remaining */}
+        <div 
+          className="resource-desk-scroll-container"
+          style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '0.85rem',
+            maxHeight: '520px',
+            overflowY: 'auto',
+            paddingRight: '0.35rem',
+            scrollBehavior: 'smooth'
+          }}
+        >
           {filtered.map(res => (
             <div 
               key={res.id} 
-              className="resource-card-item reveal"
+              className="resource-card-item"
               style={{
                 background: 'var(--surface)',
-                border: '1px solid var(--gray-200)',
-                borderRadius: '12px',
-                padding: '1.25rem 1.5rem',
+                border: res.isFeatured ? '1.5px solid rgba(230, 92, 0, 0.4)' : '1px solid var(--gray-200)',
+                borderRadius: '14px',
+                padding: '1.15rem 1.35rem',
                 position: 'relative',
                 transition: 'all 0.25s ease',
                 display: 'block',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)'
+                boxShadow: res.isFeatured ? '0 4px 14px rgba(230, 92, 0, 0.06)' : '0 2px 8px rgba(0, 0, 0, 0.02)',
+                boxSizing: 'border-box',
+                width: '100%'
               }}
             >
-              <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', gap: '0.85rem', alignItems: 'flex-start' }}>
                 {/* Accent Line */}
                 <div style={{ 
                   width: '4px', 
@@ -156,53 +199,58 @@ export default function ResourcesDesk({ isWidget = false }) {
                   flexShrink: 0 
                 }} />
                 
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.3rem' }}>
-                    <h3 style={{ 
-                      fontSize: res.isFeatured ? '1.2rem' : '1.05rem', 
-                      fontWeight: 700, 
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  {/* Top Row: Title + Featured Badge */}
+                  <div className="resource-card-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.35rem' }}>
+                    <h3 className="resource-card-title" style={{ 
+                      fontSize: res.isFeatured ? '1.15rem' : '1.02rem', 
+                      fontWeight: 750, 
                       margin: 0, 
                       color: 'var(--ink)', 
                       letterSpacing: '-0.01em',
-                      lineHeight: 1.3
+                      lineHeight: 1.3,
+                      wordBreak: 'break-word'
                     }}>
                       {res.title}
                     </h3>
                     {res.isFeatured && (
                       <span style={{ 
-                        background: 'rgba(230, 92, 0, 0.1)', 
+                        background: 'rgba(230, 92, 0, 0.12)', 
                         color: 'var(--saffron-dark)', 
-                        fontSize: '0.7rem', 
-                        fontWeight: 700, 
-                        padding: '0.15rem 0.5rem', 
+                        fontSize: '0.68rem', 
+                        fontWeight: 800, 
+                        padding: '0.15rem 0.55rem', 
                         borderRadius: '4px',
                         textTransform: 'uppercase',
-                        letterSpacing: '0.05em'
+                        letterSpacing: '0.05em',
+                        flexShrink: 0
                       }}>
                         Featured
                       </span>
                     )}
                   </div>
 
+                  {/* Description */}
                   {res.description && (
-                    <p style={{ fontSize: '0.9rem', color: 'var(--gray-600)', marginBottom: '1rem', lineHeight: 1.5 }}>
+                    <p style={{ fontSize: '0.86rem', color: 'var(--gray-600)', marginBottom: '0.75rem', lineHeight: 1.45 }}>
                       {res.description}
                     </p>
                   )}
                   
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginTop: '0.5rem' }}>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
+                  {/* Bottom Row: Metadata & View Action Button */}
+                  <div className="resource-card-bottom-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginTop: '0.45rem' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.65rem', alignItems: 'center' }}>
                       {(() => {
                         const meta = getFormatMeta(res.format)
                         return (
                           <span style={{ 
                             background: meta.bg,
                             color: meta.color,
-                            fontSize: '0.75rem', 
-                            fontWeight: 700, 
-                            padding: '0.2rem 0.6rem', 
+                            fontSize: '0.74rem', 
+                            fontWeight: 750, 
+                            padding: '0.18rem 0.55rem', 
                             borderRadius: '6px', 
-                            letterSpacing: '0.05em',
+                            letterSpacing: '0.04em',
                             fontFamily: 'var(--font-mono)',
                             display: 'inline-flex',
                             alignItems: 'center',
@@ -213,15 +261,17 @@ export default function ResourcesDesk({ isWidget = false }) {
                           </span>
                         )
                       })()}
-                      {res.sizeBytes && (
-                        <span style={{ color: 'var(--gray-500)', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-                          <i className="fa-solid fa-file" style={{ fontSize: '0.75rem', color: 'var(--gray-400)' }} />
-                          {(res.sizeBytes / 1024 / 1024).toFixed(1)} MB
+
+                      {Boolean(res.sizeBytes && Number(res.sizeBytes) > 0) && (
+                        <span style={{ color: 'var(--gray-500)', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                          <i className="fa-solid fa-file" style={{ fontSize: '0.72rem', color: 'var(--gray-400)' }} />
+                          {(Number(res.sizeBytes) / 1024 / 1024).toFixed(1)} MB
                         </span>
                       )}
+
                       {res.date && (
-                        <span style={{ color: 'var(--gray-500)', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-                          <i className="fa-regular fa-calendar" style={{ fontSize: '0.75rem', color: 'var(--gray-400)' }} />
+                        <span style={{ color: 'var(--gray-500)', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                          <i className="fa-regular fa-calendar" style={{ fontSize: '0.72rem', color: 'var(--gray-400)' }} />
                           {new Date(res.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                         </span>
                       )}
@@ -236,8 +286,8 @@ export default function ResourcesDesk({ isWidget = false }) {
                         background: 'var(--maroon)',
                         color: 'var(--white)',
                         textDecoration: 'none',
-                        fontWeight: 600,
-                        fontSize: '0.85rem',
+                        fontWeight: 700,
+                        fontSize: '0.84rem',
                         letterSpacing: '0.02em',
                         padding: '0.45rem 1.1rem',
                         borderRadius: '8px',
@@ -245,11 +295,12 @@ export default function ResourcesDesk({ isWidget = false }) {
                         alignItems: 'center',
                         gap: '0.4rem',
                         transition: 'all 0.2s ease',
-                        boxShadow: '0 2px 6px rgba(123, 27, 46, 0.15)'
+                        boxShadow: '0 2px 6px rgba(123, 27, 46, 0.2)',
+                        flexShrink: 0
                       }}
                     >
                       {['DOC','DOCX','PPT','PPTX'].includes((res.format||'').toUpperCase()) ? 'OPEN' : 'VIEW'}
-                      <i className="fa-solid fa-arrow-right" style={{ fontSize: '0.75rem' }} />
+                      <i className="fa-solid fa-arrow-right" style={{ fontSize: '0.72rem' }} />
                     </a>
                   </div>
                 </div>
@@ -264,7 +315,44 @@ export default function ResourcesDesk({ isWidget = false }) {
         </div>
 
       </div>
+
+      <style>{`
+        .resource-desk-scroll-container {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(123, 27, 46, 0.35) rgba(0, 0, 0, 0.04);
+        }
+        .resource-desk-scroll-container::-webkit-scrollbar {
+          width: 6px;
+        }
+        .resource-desk-scroll-container::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.04);
+          border-radius: 10px;
+        }
+        .resource-desk-scroll-container::-webkit-scrollbar-thumb {
+          background: rgba(123, 27, 46, 0.35);
+          border-radius: 10px;
+        }
+        .resource-desk-scroll-container::-webkit-scrollbar-thumb:hover {
+          background: rgba(123, 27, 46, 0.65);
+        }
+
+        @media (max-width: 768px) {
+          .resource-desk-widget {
+            padding: 1.25rem 0.85rem !important;
+            border-radius: 16px !important;
+          }
+          .resource-card-item {
+            padding: 0.95rem 0.85rem !important;
+          }
+          .resource-card-title {
+            font-size: 0.98rem !important;
+          }
+          .resource-view-btn {
+            padding: 0.4rem 0.95rem !important;
+            font-size: 0.8rem !important;
+          }
+        }
+      `}</style>
     </Wrapper>
   )
 }
-

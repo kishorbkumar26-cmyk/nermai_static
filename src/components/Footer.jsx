@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { fbFirestore } from '../firebase/firestore'
+import { driveStorage } from '../services/driveStorage'
 import { LMS_URL, CONTACT, COURSES } from '../constants'
 
 export default function Footer() {
@@ -64,6 +65,9 @@ export default function Footer() {
 
   const f = footerData ? { ...defaultFooter, ...footerData, contactCard: footerData.contactCard || defaultFooter.contactCard } : defaultFooter;
 
+  const showUseful = f.showUsefulLinks !== false && (f.usefulLinks || []).length > 0
+  const showNotifs = f.showNotifications !== false && (f.notifications || []).length > 0
+  const showCourses = f.showCoursesLinks !== false && (f.coursesLinks || []).length > 0
 
   return (
     <footer className="site-footer" id="contact">
@@ -88,11 +92,10 @@ export default function Footer() {
       <div className="footer-main">
         <div className="container">
 
-
           <div className="footer-grid">
 
-            {/* About */}
-            <div className="footer-col">
+            {/* About / Brand */}
+            <div className="footer-col footer-brand-col">
               <div className="footer-col-brand">
                 <img src="/nermai-logo.png" alt="Nermai IAS Academy Logo" style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover' }} />
                 <span className="footer-brand-name">NERMAI IAS ACADEMY</span>
@@ -103,7 +106,7 @@ export default function Footer() {
                 {(f.socialLinks || []).map((social, i) => (
                   <a key={i} href={social.link || '#'} className="footer-social-btn" aria-label={social.name} rel="noopener noreferrer" target="_blank">
                     {social.iconUrl ? (
-                      <img src={social.iconUrl} alt={social.name} style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
+                      <img src={driveStorage.formatImageUrl(social.iconUrl) || social.iconUrl} alt={social.name} style={{ width: '20px', height: '20px', objectFit: 'contain' }} />
                     ) : (
                       <i className={social.iconClass || "fa-solid fa-link"} />
                     )}
@@ -113,7 +116,7 @@ export default function Footer() {
             </div>
 
             {/* Contact Info */}
-            <div className="footer-col">
+            <div className="footer-col footer-contact-col">
               <div className="footer-col-title">Contact Information</div>
               <div className="footer-contact-list">
                 <div className="footer-contact-item">
@@ -136,34 +139,41 @@ export default function Footer() {
             </div>
 
             {/* Useful Links */}
-            <div className="footer-col">
-              <div className="footer-col-title">Useful Links</div>
-              <ul className="footer-links">
-                {(f.usefulLinks || []).map((lnk, i) => (
-                  <li key={i}>
-                    {lnk.link.startsWith('/') || lnk.link.startsWith('#') ? (
-                      <Link to={lnk.link} className="footer-link">{lnk.label}</Link>
-                    ) : (
-                      <a href={lnk.link} target="_blank" rel="noopener noreferrer" className="footer-link">{lnk.label}</a>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {showUseful && (
+              <div className="footer-col footer-useful-col">
+                <div className="footer-col-title">Useful Links</div>
+                <ul className="footer-links">
+                  {(f.usefulLinks || []).map((lnk, i) => (
+                    <li key={i}>
+                      {lnk.link.startsWith('/') || lnk.link.startsWith('#') ? (
+                        <Link to={lnk.link} className="footer-link">{lnk.label}</Link>
+                      ) : (
+                        <a href={lnk.link} target="_blank" rel="noopener noreferrer" className="footer-link">{lnk.label}</a>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {/* Notifications */}
-            <div className="footer-col">
-              <div className="footer-col-title">Notifications</div>
-              <ul className="footer-links">
-                {(f.notifications || []).map((lnk, i) => (
-                  <li key={i}>
-                    <a href={lnk.link} className="footer-link" target="_blank" rel="noopener noreferrer">{lnk.label}</a>
-                  </li>
-                ))}
-              </ul>
+            {showNotifs && (
+              <div className="footer-col footer-notifs-col">
+                <div className="footer-col-title">Notifications</div>
+                <ul className="footer-links">
+                  {(f.notifications || []).map((lnk, i) => (
+                    <li key={i}>
+                      <a href={lnk.link} className="footer-link" target="_blank" rel="noopener noreferrer">{lnk.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-              <div style={{ marginTop: '2rem' }}>
-                <div className="footer-col-title" style={{ marginBottom: '0.75rem' }}>Courses</div>
+            {/* Courses Links */}
+            {showCourses && (
+              <div className="footer-col footer-courses-col">
+                <div className="footer-col-title">Courses</div>
                 <ul className="footer-links">
                   {(f.coursesLinks || []).map((lnk, i) => (
                     <li key={i}>
@@ -176,7 +186,7 @@ export default function Footer() {
                   ))}
                 </ul>
               </div>
-            </div>
+            )}
             {/* Contact QR Code Column */}
             {f.contactCard && (f.contactCard.heading || f.contactCard.qrImage) && (
               <div className="footer-col footer-qr-col">

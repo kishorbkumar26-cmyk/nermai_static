@@ -15,15 +15,44 @@ export function extractGoogleDriveId(urlOrId) {
     if (str.includes('%')) str = decodeURIComponent(str)
   } catch {}
 
-  // Strip query parameters or sizing suffixes for raw check
-  const stripped = str.replace(/[?#].*$/, '').replace(/=[sw]\d+.*$/, '')
-
-  // 1. Direct ID check (Google Drive IDs are 25-60 chars alphanumeric with _ or -)
-  if (/^[a-zA-Z0-9_-]{25,60}$/.test(stripped)) {
-    return stripped
+  // If it's a data URL, blob URL, or local asset path, definitely not Drive
+  if (str.startsWith('data:') || str.startsWith('blob:') || str.startsWith('assets/') || str.startsWith('/assets/')) {
+    return ''
   }
 
-  // 2. Pattern matching across all known Google Drive & Google CDN URLs
+  const isHttpUrl = /^https?:\/\//i.test(str) || str.startsWith('//')
+  
+  if (isHttpUrl) {
+    // For full HTTP/HTTPS URLs, it MUST be a Google domain
+    let isGoogleDomain = false
+    try {
+      const hostname = new URL(str.startsWith('//') ? `https:${str}` : str).hostname
+      isGoogleDomain = /(?:^|\.)(?:google\.com|googleusercontent\.com)$/i.test(hostname)
+    } catch {
+      isGoogleDomain = /google\.com|googleusercontent\.com/i.test(str)
+    }
+    if (!isGoogleDomain) {
+      return ''
+    }
+  } else {
+    // Not a full URL. If it has slashes, query params or colons, it might be a partial URL (e.g. drive.google.com/...)
+    if (str.includes('/') || str.includes('?') || str.includes(':')) {
+      const isGoogleLike = /google\.com|googleusercontent\.com/i.test(str)
+      if (!isGoogleLike) {
+        return ''
+      }
+    } else {
+      // Raw string without slashes or colons.
+      // Direct raw ID check: Google Drive IDs are strictly 25-60 chars alphanumeric with _ or -
+      const stripped = str.replace(/[?#].*$/, '').replace(/=[sw]\d+.*$/, '')
+      if (/^[a-zA-Z0-9_-]{25,60}$/.test(stripped)) {
+        return stripped
+      }
+      return ''
+    }
+  }
+
+  // Pattern matching across all known Google Drive & Google CDN URLs
   const patterns = [
     /\/file\/d\/([a-zA-Z0-9_-]{25,60})/,
     /\/folders\/([a-zA-Z0-9_-]{25,60})/,
@@ -38,12 +67,6 @@ export function extractGoogleDriveId(urlOrId) {
   for (const pattern of patterns) {
     const match = str.match(pattern)
     if (match && match[1]) return match[1]
-  }
-
-  // Fallback: search anywhere in string for a sequence of 28-45 valid ID characters
-  const broadMatch = str.match(/[a-zA-Z0-9_-]{28,45}/)
-  if (broadMatch && broadMatch[0] && !broadMatch[0].startsWith('http')) {
-    return broadMatch[0]
   }
 
   return ''

@@ -1,55 +1,52 @@
-import React, { useState } from 'react'
-import { Heart, BookOpen, ClipboardCheck, UserCheck, Laptop, Trophy, Users, GraduationCap, TrendingUp, ArrowRight } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { 
+  Heart, BookOpen, ClipboardCheck, UserCheck, Laptop, Trophy, 
+  Users, GraduationCap, TrendingUp, ArrowRight, ShieldCheck, 
+  Target, Award, Sparkles, Star, CheckCircle, Flame, Compass, Zap
+} from 'lucide-react'
+import { fbFirestore, DEFAULT_WHY_NERMAI_SHOWCASE } from '../firebase/firestore'
 import { LMS_URL } from '../constants'
 import './WhyNermaiShowcase.css'
 
-const STEPS = [
-  {
-    num: '01',
-    circleStyle: 'circle-maroon',
-    icon: Heart,
-    title: 'Non Profit Initiative',
-    desc: 'Run entirely by volunteers. Our sole mission is to empower rural and economically weaker youth — not to profit from their aspirations.'
-  },
-  {
-    num: '02',
-    circleStyle: 'circle-cream',
-    icon: BookOpen,
-    title: 'Comprehensive Syllabus Coverage',
-    desc: 'Every topic from Prelims to Mains is covered systematically. No gaps, no shortcuts — structured preparation from day one.'
-  },
-  {
-    num: '03',
-    circleStyle: 'circle-maroon',
-    icon: ClipboardCheck,
-    title: 'Regular Test Practice',
-    desc: 'Frequent mock tests and topic-wise tests that closely mirror the actual exam pattern to build speed and accuracy.'
-  },
-  {
-    num: '04',
-    circleStyle: 'circle-cream',
-    icon: UserCheck,
-    title: 'Personal Guidance & Counseling',
-    desc: 'One-on-one mentoring sessions to assess your strengths, address weaknesses, and keep you on the right track.'
-  },
-  {
-    num: '05',
-    circleStyle: 'circle-maroon',
-    icon: Laptop,
-    title: 'Offline & Online',
-    desc: 'Attend classes at our Puducherry centre or learn from anywhere via our online platform — flexible learning your way.'
-  },
-  {
-    num: '06',
-    circleStyle: 'circle-cream',
-    icon: Trophy,
-    title: 'Result Driven Learning',
-    desc: '187+ successful candidates across UPSC, TNPSC, Police and Puducherry Recruitments prove that our approach works.'
-  }
-]
+const ICON_MAP = {
+  Heart,
+  BookOpen,
+  ClipboardCheck,
+  UserCheck,
+  Laptop,
+  Trophy,
+  Users,
+  GraduationCap,
+  TrendingUp,
+  ShieldCheck,
+  Target,
+  Award,
+  Sparkles,
+  Star,
+  CheckCircle,
+  Flame,
+  Compass,
+  Zap
+}
 
 export default function WhyNermaiShowcase() {
+  const [data, setData] = useState(DEFAULT_WHY_NERMAI_SHOWCASE)
   const [flippedCards, setFlippedCards] = useState({})
+
+  useEffect(() => {
+    const unsub = fbFirestore.onSettingsChanged((settings) => {
+      if (settings?.whyNermaiShowcase) {
+        setData({
+          ...DEFAULT_WHY_NERMAI_SHOWCASE,
+          ...settings.whyNermaiShowcase,
+          steps: Array.isArray(settings.whyNermaiShowcase.steps) && settings.whyNermaiShowcase.steps.length > 0
+            ? settings.whyNermaiShowcase.steps
+            : DEFAULT_WHY_NERMAI_SHOWCASE.steps
+        })
+      }
+    })
+    return () => unsub()
+  }, [])
 
   const handleCardClick = (num) => {
     // Only toggle flip on mobile screens <= 768px
@@ -60,6 +57,8 @@ export default function WhyNermaiShowcase() {
       }))
     }
   }
+
+  const steps = data.steps || DEFAULT_WHY_NERMAI_SHOWCASE.steps
 
   return (
     <section className="why-showcase-section" id="features">
@@ -97,13 +96,13 @@ export default function WhyNermaiShowcase() {
         {/* Header */}
         <div className="why-showcase-header">
           <div className="why-showcase-eyebrow">
-            OUR FEATURES
+            {data.eyebrow || 'OUR FEATURES'}
           </div>
           <h2 className="why-showcase-title">
-            What Makes Nermai Different
+            {data.title || 'What Makes Nermai Different'}
           </h2>
           <p className="why-showcase-subtitle">
-            Every aspect of our academy is designed around one purpose — your success.
+            {data.subtitle || 'Every aspect of our academy is designed around one purpose — your success.'}
           </p>
         </div>
 
@@ -132,21 +131,22 @@ export default function WhyNermaiShowcase() {
 
           {/* 6 Step Columns */}
           <div className="why-steps-grid">
-            {STEPS.map((step) => {
-              const IconComp = step.icon
-              const isFlipped = !!flippedCards[step.num]
+            {steps.map((step, idx) => {
+              const IconComp = ICON_MAP[step.icon] || Trophy
+              const isFlipped = !!flippedCards[step.num || idx]
+              const circleClass = step.circleStyle || (idx % 2 === 0 ? 'circle-maroon' : 'circle-cream')
 
               return (
                 <div 
-                  key={step.num} 
+                  key={step.id || step.num || idx} 
                   className={`why-step-col reveal visible ${isFlipped ? 'is-flipped' : ''}`}
-                  onClick={() => handleCardClick(step.num)}
+                  onClick={() => handleCardClick(step.num || idx)}
                 >
                   <div className="why-card-flip-inner">
                     {/* Front Face: Logo and Topic Alone (Mobile default, Desktop full) */}
                     <div className="why-card-front">
-                      <div className="why-step-number">{step.num}</div>
-                      <div className={`why-step-circle ${step.circleStyle}`}>
+                      <div className="why-step-number">{step.num || `0${idx + 1}`}</div>
+                      <div className={`why-step-circle ${circleClass}`}>
                         <IconComp size={28} />
                       </div>
                       <h3 className="why-step-title">{step.title}</h3>
@@ -163,7 +163,7 @@ export default function WhyNermaiShowcase() {
                     {/* Back Face: Content of the Card (Mobile only) */}
                     <div className="why-card-back why-mobile-back">
                       <div className="why-back-top-row">
-                        <span className="why-back-num">{step.num}</span>
+                        <span className="why-back-num">{step.num || `0${idx + 1}`}</span>
                         <h4 className="why-back-topic">{step.title}</h4>
                       </div>
                       <div className="why-title-underline" style={{ margin: '0.25rem 0 0.55rem 0', width: '28px' }} />
@@ -185,74 +185,93 @@ export default function WhyNermaiShowcase() {
         <div className="why-bottom-bar reveal visible">
           
           {/* Quote Block */}
-          <div className="why-quote-block">
-            <div className="why-quote-text">
-              “Education is not a business for us, it's a responsibility.”
-            </div>
-            <div className="why-quote-author">
-              NERMAI
-            </div>
-          </div>
-
-          <div className="why-bar-divider" />
+          {data.bottomQuote && (
+            <>
+              <div className="why-quote-block">
+                <div className="why-quote-text">
+                  “{data.bottomQuote}”
+                </div>
+                {data.bottomAuthor && (
+                  <div className="why-quote-author">
+                    {data.bottomAuthor}
+                  </div>
+                )}
+              </div>
+              <div className="why-bar-divider" />
+            </>
+          )}
 
           {/* Metric 1 */}
-          <div className="why-metric-item">
-            <div className="why-metric-icon">
-              <Users size={22} />
-            </div>
-            <div className="why-metric-content">
-              <div className="why-metric-num">187+</div>
-              <div className="why-metric-label">Successful Candidates</div>
-            </div>
-          </div>
-
-          <div className="why-bar-divider" />
+          {(data.stat1Num || data.stat1Label) && (
+            <>
+              <div className="why-metric-item">
+                <div className="why-metric-icon">
+                  <Users size={22} />
+                </div>
+                <div className="why-metric-content">
+                  <div className="why-metric-num">{data.stat1Num || '187+'}</div>
+                  <div className="why-metric-label">{data.stat1Label || 'Successful Candidates'}</div>
+                </div>
+              </div>
+              <div className="why-bar-divider" />
+            </>
+          )}
 
           {/* Metric 2 */}
-          <div className="why-metric-item">
-            <div className="why-metric-icon">
-              <GraduationCap size={22} />
-            </div>
-            <div className="why-metric-content">
-              <div className="why-metric-num">14+</div>
-              <div className="why-metric-label">Years of Impact</div>
-            </div>
-          </div>
-
-          <div className="why-bar-divider" />
+          {(data.stat2Num || data.stat2Label) && (
+            <>
+              <div className="why-metric-item">
+                <div className="why-metric-icon">
+                  <GraduationCap size={22} />
+                </div>
+                <div className="why-metric-content">
+                  <div className="why-metric-num">{data.stat2Num || '14+'}</div>
+                  <div className="why-metric-label">{data.stat2Label || 'Years of Impact'}</div>
+                </div>
+              </div>
+              <div className="why-bar-divider" />
+            </>
+          )}
 
           {/* Metric 3 */}
-          <div className="why-metric-item">
-            <div className="why-metric-icon">
-              <TrendingUp size={22} />
-            </div>
-            <div className="why-metric-content">
-              <div className="why-metric-num">Stronger</div>
-              <div className="why-metric-label">Rural Youth, Brighter India</div>
-            </div>
-          </div>
-
-          <div className="why-bar-divider" />
+          {(data.stat3Num || data.stat3Label) && (
+            <>
+              <div className="why-metric-item">
+                <div className="why-metric-icon">
+                  <TrendingUp size={22} />
+                </div>
+                <div className="why-metric-content">
+                  <div className="why-metric-num">{data.stat3Num || 'Stronger'}</div>
+                  <div className="why-metric-label">{data.stat3Label || 'Rural Youth, Brighter India'}</div>
+                </div>
+              </div>
+              <div className="why-bar-divider" />
+            </>
+          )}
 
           {/* Handwritten Cursive Note */}
-          <div className="why-cursive-block">
-            <div className="why-cursive-note">
-              Same Dedication.<br />A Brighter Tomorrow.
+          {(data.cursiveLine1 || data.cursiveLine2) && (
+            <div className="why-cursive-block">
+              <div className="why-cursive-note">
+                {data.cursiveLine1 && <>{data.cursiveLine1}<br /></>}
+                {data.cursiveLine2 && <>{data.cursiveLine2}</>}
+              </div>
+              <svg className="why-cursive-underline" viewBox="0 0 160 16">
+                <path d="M 5,10 Q 80,15 155,5" fill="none" stroke="#7B1B2E" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
             </div>
-            <svg className="why-cursive-underline" viewBox="0 0 160 16">
-              <path d="M 5,10 Q 80,15 155,5" fill="none" stroke="#7B1B2E" strokeWidth="2.5" strokeLinecap="round" />
-            </svg>
-          </div>
+          )}
 
         </div>
 
         {/* Action CTA Button */}
-        <div className="why-cta-row reveal visible">
-          <a href={LMS_URL} className="why-join-btn">
-            JOIN NERMAI TODAY <ArrowRight size={18} />
-          </a>
-        </div>
+        {data.ctaText && (
+          <div className="why-cta-row reveal visible">
+            <a href={data.ctaLink || LMS_URL} className="why-join-btn">
+              {data.ctaText} <ArrowRight size={18} />
+            </a>
+          </div>
+        )}
 
       </div>
     </section>

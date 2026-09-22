@@ -120,6 +120,18 @@ export default function Header() {
     navigate(`/courses?q=${encodeURIComponent(searchQuery.trim())}`)
   }
 
+  const handleFreeContentClick = (e) => {
+    closeMobileNav()
+    if (location.pathname === '/') {
+      e.preventDefault()
+      const el = document.getElementById('free-resources')
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' })
+        window.history.pushState(null, '', '#free-resources')
+      }
+    }
+  }
+
   const primaryPhone = topBarData.contacts?.find(c => c && c.visible !== false && c.value)?.value || CONTACT.phones[0]
   const waLink = `https://wa.me/${primaryPhone.replace(/\D/g, '') || WHATSAPP_NUMBER}`
 
@@ -243,7 +255,7 @@ export default function Header() {
               {/* Home */}
               <Link 
                 to="/" 
-                className={`nav-link-btn ${location.pathname === '/' ? 'active nav-active-pill' : ''}`}
+                className={`nav-link-btn ${location.pathname === '/' && !location.hash ? 'active nav-active-pill' : ''}`}
               >
                 <HomeIcon size={16} style={{ marginRight: '2px' }} /> Home
               </Link>
@@ -262,6 +274,15 @@ export default function Header() {
                 className={`nav-link-btn ${location.pathname.startsWith('/courses') ? 'active nav-active-pill' : ''}`}
               >
                 Courses
+              </Link>
+
+              {/* Free Content (Moves to Free Resource part above location on Home) */}
+              <Link 
+                to="/#free-resources" 
+                onClick={handleFreeContentClick}
+                className={`nav-link-btn ${location.hash === '#free-resources' ? 'active nav-active-pill' : ''}`}
+              >
+                Free Content
               </Link>
 
               {/* Results */}
@@ -387,6 +408,7 @@ export default function Header() {
           <Link to="/" className="mobile-nav-link" onClick={closeMobileNav}>Home</Link>
           <Link to="/why-nermai" className="mobile-nav-link" onClick={closeMobileNav}>Why Nermai</Link>
           <Link to="/courses" className="mobile-nav-link" onClick={closeMobileNav}>Courses</Link>
+          <Link to="/#free-resources" className="mobile-nav-link" onClick={handleFreeContentClick}>Free Content</Link>
           <Link to="/results" className="mobile-nav-link" onClick={closeMobileNav}>Results</Link>
           <Link to="/contact#faq" className="mobile-nav-link" onClick={closeMobileNav}>FAQ</Link>
           <Link to="/contact" className="mobile-nav-link" onClick={closeMobileNav}>Contact Us</Link>

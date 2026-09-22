@@ -50,6 +50,15 @@ function Field({ label, value, onChange, type = 'text', placeholder = '', rows =
   )
 }
 
+function Toggle({ label, checked, onChange }) {
+  return (
+    <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}>
+      <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)} style={{ cursor: 'pointer', width: '16px', height: '16px' }} />
+      {label}
+    </label>
+  )
+}
+
 const richTextModules = {
   toolbar: [
     [{ 'header': [1, 2, 3, false] }],
@@ -77,11 +86,28 @@ function RichField({ label, value, onChange }) {
 }
 
 export default function CourseContentSection({ toast }) {
-  const [mainTab, setMainTab] = useState('hero') // 'hero' | 'detailPages'
+  const [mainTab, setMainTab] = useState('hero') // 'hero' | 'detailPages' | 'sideAccents'
 
   // ── Hero Banner State ──
   const [heroConfig, setHeroConfig] = useState(DEFAULT_COURSES_HERO)
   const [savingHero, setSavingHero] = useState(false)
+
+  // ── Side Cursive Scripts & Section Titles State ──
+  const [coursesConfig, setCoursesConfig] = useState({
+    tagText: 'OUR COURSES',
+    sectionHeading: 'Choose Your Path to a Brighter Future',
+    subHeading: 'Structured courses, expert guidance and proven results for every aspirant.',
+    sideScripts: {
+      leftLine1: 'Learn',
+      leftLine2: 'Prepare',
+      leftLine3: 'Succeed',
+      rightLine1: 'Different Aspirations',
+      rightLine2: 'One Destination',
+      showLeft: true,
+      showRight: true,
+    }
+  })
+  const [savingCoursesConfig, setSavingCoursesConfig] = useState(false)
 
   // ── Detail Pages State ──
   const [selectedSlug, setSelectedSlug] = useState('upsc')
@@ -97,6 +123,16 @@ export default function CourseContentSection({ toast }) {
     fbFirestore.getSettings().then(s => {
       if (s?.coursesHero) {
         setHeroConfig(prev => ({ ...DEFAULT_COURSES_HERO, ...s.coursesHero }))
+      }
+      if (s?.homeContent?.coursesConfig) {
+        setCoursesConfig(prev => ({
+          ...prev,
+          ...s.homeContent.coursesConfig,
+          sideScripts: {
+            ...prev.sideScripts,
+            ...(s.homeContent.coursesConfig.sideScripts || {})
+          }
+        }))
       }
       const courses = s?.homeContent?.courses || DEFAULT_COURSES
       setCourseList(courses)
@@ -132,6 +168,33 @@ export default function CourseContentSection({ toast }) {
 
   const updateHero = (key, val) => setHeroConfig(c => ({ ...c, [key]: val }))
   const updateDetail = (key, val) => setContent(c => ({ ...c, [key]: val }))
+  const updateCoursesConfig = (key, val) => setCoursesConfig(c => ({ ...c, [key]: val }))
+  const updateCoursesSideScript = (key, val) => {
+    setCoursesConfig(c => ({
+      ...c,
+      sideScripts: {
+        ...(c.sideScripts || {}),
+        [key]: val
+      }
+    }))
+  }
+
+  const handleSaveCoursesConfig = async () => {
+    setSavingCoursesConfig(true)
+    try {
+      const current = await fbFirestore.getSettings()
+      const updatedHome = {
+        ...(current?.homeContent || {}),
+        coursesConfig: coursesConfig
+      }
+      await fbFirestore.updateSettings({ homeContent: updatedHome })
+      toast.success('Courses Section Headers & Side Cursive Writing saved successfully!')
+    } catch (e) {
+      toast.error(e.message)
+    } finally {
+      setSavingCoursesConfig(false)
+    }
+  }
 
   const handleSaveHero = async () => {
     setSavingHero(true)
@@ -166,7 +229,7 @@ export default function CourseContentSection({ toast }) {
         <i className="fa-solid fa-graduation-cap" /> Courses &amp; Programs Management
       </h2>
       <p style={{ fontSize: '0.85rem', color: 'var(--gray-500)', marginBottom: '1.5rem' }}>
-        Customize every single word of the <strong>Courses Page Hero Banner</strong>, floating cursive notes, credential pills, stacked leather books artwork, or manage individual <strong>Course Detail Pages</strong>.
+        Customize every single word of the <strong>Courses Page Hero Banner</strong>, side cursive writings &amp; section headings, or manage individual <strong>Course Detail Pages</strong>.
       </p>
 
       {/* Main Sub-Tab Switcher */}
@@ -183,7 +246,22 @@ export default function CourseContentSection({ toast }) {
             display: 'flex', alignItems: 'center', gap: '0.5rem'
           }}
         >
-          <i className="fa-solid fa-palette" /> 1. Courses Page Hero Banner (Every Word)
+          <i className="fa-solid fa-palette" /> 1. Courses Page Hero Banner
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMainTab('sideAccents')}
+          style={{
+            padding: '0.55rem 1.35rem',
+            border: mainTab === 'sideAccents' ? '2px solid var(--maroon)' : '2px solid var(--gray-200)',
+            background: mainTab === 'sideAccents' ? 'var(--maroon)' : 'var(--white)',
+            color: mainTab === 'sideAccents' ? 'var(--white)' : 'var(--gray-600)',
+            fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: '0.5rem'
+          }}
+        >
+          <i className="fa-solid fa-pen-nib" /> 2. Side Cursive Writing &amp; Section Titles
         </button>
 
         <button
@@ -198,7 +276,7 @@ export default function CourseContentSection({ toast }) {
             display: 'flex', alignItems: 'center', gap: '0.5rem'
           }}
         >
-          <i className="fa-solid fa-book-open" /> 2. Course Detail Pages ({courseList.length})
+          <i className="fa-solid fa-book-open" /> 3. Course Detail Pages ({courseList.length})
         </button>
       </div>
 
@@ -594,7 +672,101 @@ export default function CourseContentSection({ toast }) {
         </div>
       )}
 
-      {/* ────────────────── SUB-TAB 2: COURSE DETAIL PAGES ────────────────── */}
+      {/* ────────────────── SUB-TAB 2: SIDE CURSIVE WRITING & SECTION TITLES ────────────────── */}
+      {mainTab === 'sideAccents' && (
+        <div>
+          <div className="ap-card" style={{ marginBottom: '1.5rem', padding: '1.5rem', background: '#FFFDF9', border: '1.5px solid #F3E8DF', borderRadius: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.25rem', borderBottom: '1px solid #EAD8C7', paddingBottom: '0.75rem' }}>
+              <i className="fa-solid fa-pen-nib" style={{ color: '#C85A17', fontSize: '1.1rem' }} />
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '1rem', color: '#7B1B2E' }}>
+                  Courses Section Titles &amp; Side Cursive Handwriting
+                </div>
+                <div style={{ fontSize: '0.8rem', color: '#8C7E74' }}>
+                  Customize the main section title, subtitle, and the left &amp; right decorative handwriting notes shown around the course cards on the homepage.
+                </div>
+              </div>
+            </div>
+
+            {/* 1. Main Section Titles */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#2C221E', marginBottom: '0.75rem' }}>
+                1. Main Section Titles
+              </div>
+              <div className="ap-form-row">
+                <Field label="Top Tag Line (e.g. OUR COURSES)" value={coursesConfig.tagText ?? 'OUR COURSES'} onChange={v => updateCoursesConfig('tagText', v)} placeholder="OUR COURSES" />
+                <Field label="Main Heading" value={coursesConfig.sectionHeading ?? 'Choose Your Path to a Brighter Future'} onChange={v => updateCoursesConfig('sectionHeading', v)} placeholder="Choose Your Path to a Brighter Future" />
+              </div>
+              <Field label="Sub Heading / Description" value={coursesConfig.subHeading ?? 'Structured courses, expert guidance and proven results for every aspirant.'} onChange={v => updateCoursesConfig('subHeading', v)} placeholder="Structured courses, expert guidance and proven results for every aspirant." />
+            </div>
+
+            {/* 2. Side Cursive Writing Editor */}
+            <div style={{ borderTop: '1px dashed #E5D5C5', paddingTop: '1.25rem' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#2C221E', marginBottom: '0.75rem' }}>
+                2. Decorative Side Cursive Writing (Left &amp; Right)
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '1.25rem' }}>
+                {/* Left Cursive Accent Box */}
+                <div style={{ background: '#FFF8F2', padding: '1.1rem', borderRadius: '8px', border: '1px solid #F0D5C0' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', borderBottom: '1px solid #F5DECE', paddingBottom: '0.5rem' }}>
+                    <span style={{ fontWeight: 700, fontSize: '0.88rem', color: '#9C4B13' }}>
+                      ✍️ Left Cursive Script (3 Lines)
+                    </span>
+                    <Toggle 
+                      label="Visible" 
+                      checked={coursesConfig.sideScripts?.showLeft !== false} 
+                      onChange={v => updateCoursesSideScript('showLeft', v)} 
+                    />
+                  </div>
+                  <Field label="Line 1" value={coursesConfig.sideScripts?.leftLine1 ?? 'Learn'} onChange={v => updateCoursesSideScript('leftLine1', v)} placeholder="Learn" />
+                  <Field label="Line 2" value={coursesConfig.sideScripts?.leftLine2 ?? 'Prepare'} onChange={v => updateCoursesSideScript('leftLine2', v)} placeholder="Prepare" />
+                  <Field label="Line 3 (Highlighted)" value={coursesConfig.sideScripts?.leftLine3 ?? 'Succeed'} onChange={v => updateCoursesSideScript('leftLine3', v)} placeholder="Succeed" />
+                  
+                  <div style={{ marginTop: '0.75rem', padding: '0.6rem', background: '#ffffff', borderRadius: '6px', border: '1px dashed #E0C0A8', fontFamily: 'Georgia, serif', fontStyle: 'italic', color: '#9C4B13', fontSize: '0.88rem', textAlign: 'center' }}>
+                    Preview: {coursesConfig.sideScripts?.leftLine1 ?? 'Learn'} &bull; {coursesConfig.sideScripts?.leftLine2 ?? 'Prepare'} &bull; <strong>{coursesConfig.sideScripts?.leftLine3 ?? 'Succeed'}</strong>
+                  </div>
+                </div>
+
+                {/* Right Cursive Accent Box */}
+                <div style={{ background: '#FDF2F4', padding: '1.1rem', borderRadius: '8px', border: '1px solid #F3CFD7' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', borderBottom: '1px solid #F8D8DF', paddingBottom: '0.5rem' }}>
+                    <span style={{ fontWeight: 700, fontSize: '0.88rem', color: '#8A263B' }}>
+                      ✍️ Right Cursive Script (Tilted)
+                    </span>
+                    <Toggle 
+                      label="Visible" 
+                      checked={coursesConfig.sideScripts?.showRight !== false} 
+                      onChange={v => updateCoursesSideScript('showRight', v)} 
+                    />
+                  </div>
+                  <Field label="Top Line" value={coursesConfig.sideScripts?.rightLine1 ?? 'Different Aspirations'} onChange={v => updateCoursesSideScript('rightLine1', v)} placeholder="Different Aspirations" />
+                  <Field label="Bottom Line (Underlined)" value={coursesConfig.sideScripts?.rightLine2 ?? 'One Destination'} onChange={v => updateCoursesSideScript('rightLine2', v)} placeholder="One Destination" />
+                  
+                  <div style={{ marginTop: '0.75rem', padding: '0.6rem', background: '#ffffff', borderRadius: '6px', border: '1px dashed #E5B2BD', fontFamily: 'Georgia, serif', fontStyle: 'italic', color: '#8A263B', fontSize: '0.88rem', textAlign: 'center' }}>
+                    Preview: {coursesConfig.sideScripts?.rightLine1 ?? 'Different Aspirations'} / <span style={{ borderBottom: '2px solid #8A263B' }}>{coursesConfig.sideScripts?.rightLine2 ?? 'One Destination'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Save Button for Side Accents & Section Titles */}
+          <div style={{ position: 'sticky', bottom: '1rem', zIndex: 10, marginTop: '1.5rem' }}>
+            <button
+              type="button"
+              className="ap-btn ap-btn-primary"
+              onClick={handleSaveCoursesConfig}
+              disabled={savingCoursesConfig}
+              style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
+            >
+              {savingCoursesConfig ? <><i className="fa-solid fa-spinner fa-spin" /> Saving Side Cursive &amp; Titles...</> : <><i className="fa-solid fa-floppy-disk" /> Save Side Cursive Writing &amp; Section Titles</>}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ────────────────── SUB-TAB 3: COURSE DETAIL PAGES ────────────────── */}
       {mainTab === 'detailPages' && (
         <div>
           {/* Course selector */}

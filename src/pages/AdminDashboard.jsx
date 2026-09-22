@@ -38,7 +38,7 @@ const SECTIONS = [
   { id: 'hero',         label: 'Hero Slides',    icon: 'fa-solid fa-film',                 group: 'Media' },
   { id: 'gallery',      label: 'Gallery',        icon: 'fa-solid fa-camera',               group: 'Media' },
   { id: 'notices',      label: 'Notices',        icon: 'fa-solid fa-bell',                 group: 'Updates' },
-  { id: 'testimonials', label: 'Reviews',        icon: 'fa-solid fa-quote-right',           group: 'Updates' },
+  { id: 'testimonials', label: 'Testimonials',   icon: 'fa-solid fa-quote-right',           group: 'Updates' },
   { id: 'siteinfo',     label: 'Site Info',      icon: 'fa-solid fa-circle-info',           group: 'Settings' },
   { id: 'siteVisibility',label:'Site Visibility', icon: 'fa-solid fa-eye',                 group: 'Settings' },
   { id: 'drive',        label: 'Drive Config',   icon: 'fa-brands fa-google-drive',         group: 'Settings' },
@@ -146,7 +146,7 @@ function SiteVisibilitySection({ toast }) {
     { key: 'notices', label: 'Notices (/notices)' },
     { key: 'gallery', label: 'Photo Gallery (/gallery)' },
     { key: 'toppers', label: 'Toppers (/toppers)' },
-    { key: 'testimonials', label: 'Reviews (/reviews)' }
+    { key: 'testimonials', label: 'Testimonials (/testimonials)' }
   ]
 
   if (loading) return <div style={{ padding: '2rem', color: 'var(--gray-400)' }}><i className="fa-solid fa-spinner fa-spin" /> Loading...</div>

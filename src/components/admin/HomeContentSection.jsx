@@ -720,15 +720,101 @@ function CoursesEditor({ courses = [], config = {}, categories = [], onChangeCou
     onChangeCourses(nextCourses)
   }
 
+  const updateSideScript = (key, val) => {
+    const prevSide = config?.sideScripts || {
+      leftLine1: 'Learn',
+      leftLine2: 'Prepare',
+      leftLine3: 'Succeed',
+      rightLine1: 'Different Aspirations',
+      rightLine2: 'One Destination',
+      showLeft: true,
+      showRight: true,
+    }
+    onChangeConfig({
+      ...config,
+      sideScripts: {
+        ...prevSide,
+        [key]: val
+      }
+    })
+  }
+
   return (
     <div>
-      <div className="ap-card" style={{ marginBottom: '2rem', padding: '1.5rem', background: 'var(--gray-50)' }}>
-        <div style={{ fontWeight: 700, marginBottom: '1rem', color: 'var(--color-primary)' }}>Courses Section Header</div>
-        <div className="ap-form-row">
-          <Field label="Section Heading" value={config.sectionHeading} onChange={v => updateConfig('sectionHeading', v)} placeholder="Courses at NERMAI" />
-          <Field label="Highlighted Word" value={config.highlightedWord} onChange={v => updateConfig('highlightedWord', v)} placeholder="NERMAI" />
+      <div className="ap-card" style={{ marginBottom: '2rem', padding: '1.5rem', background: '#FFFDF9', border: '1.5px solid #F3E8DF', borderRadius: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.25rem', borderBottom: '1px solid #EAD8C7', paddingBottom: '0.75rem' }}>
+          <i className="fa-solid fa-pen-nib" style={{ color: '#C85A17', fontSize: '1.1rem' }} />
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '1rem', color: '#7B1B2E' }}>
+              Courses Section Titles &amp; Side Cursive Writing
+            </div>
+            <div style={{ fontSize: '0.8rem', color: '#8C7E74' }}>
+              Customize the section title, subtitle, and the left/right decorative cursive handwriting shown on the homepage.
+            </div>
+          </div>
         </div>
-        <Field label="Sub Heading" value={config.subHeading} onChange={v => updateConfig('subHeading', v)} placeholder="Expert guidance for every stage of preparation" />
+
+        {/* Section Header Text Fields */}
+        <div style={{ marginBottom: '1.5rem' }}>
+          <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#2C221E', marginBottom: '0.75rem' }}>
+            1. Main Section Titles
+          </div>
+          <div className="ap-form-row">
+            <Field label="Top Tag Line (e.g. OUR COURSES)" value={config.tagText ?? 'OUR COURSES'} onChange={v => updateConfig('tagText', v)} placeholder="OUR COURSES" />
+            <Field label="Main Heading" value={config.sectionHeading ?? 'Choose Your Path to a Brighter Future'} onChange={v => updateConfig('sectionHeading', v)} placeholder="Choose Your Path to a Brighter Future" />
+          </div>
+          <Field label="Sub Heading / Description" value={config.subHeading ?? 'Structured courses, expert guidance and proven results for every aspirant.'} onChange={v => updateConfig('subHeading', v)} placeholder="Structured courses, expert guidance and proven results for every aspirant." />
+        </div>
+
+        {/* Side Cursive Writing Editor */}
+        <div style={{ borderTop: '1px dashed #E5D5C5', paddingTop: '1.25rem' }}>
+          <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#2C221E', marginBottom: '0.75rem' }}>
+            2. Decorative Side Cursive Writing (Left &amp; Right)
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '1.25rem' }}>
+            {/* Left Cursive Accent Box */}
+            <div style={{ background: '#FFF8F2', padding: '1.1rem', borderRadius: '8px', border: '1px solid #F0D5C0' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', borderBottom: '1px solid #F5DECE', paddingBottom: '0.5rem' }}>
+                <span style={{ fontWeight: 700, fontSize: '0.88rem', color: '#9C4B13' }}>
+                  ✍️ Left Cursive Script (3 Lines)
+                </span>
+                <Toggle 
+                  label="Visible" 
+                  checked={config.sideScripts?.showLeft !== false} 
+                  onChange={v => updateSideScript('showLeft', v)} 
+                />
+              </div>
+              <Field label="Line 1" value={config.sideScripts?.leftLine1 ?? 'Learn'} onChange={v => updateSideScript('leftLine1', v)} placeholder="Learn" />
+              <Field label="Line 2" value={config.sideScripts?.leftLine2 ?? 'Prepare'} onChange={v => updateSideScript('leftLine2', v)} placeholder="Prepare" />
+              <Field label="Line 3 (Highlighted)" value={config.sideScripts?.leftLine3 ?? 'Succeed'} onChange={v => updateSideScript('leftLine3', v)} placeholder="Succeed" />
+              
+              <div style={{ marginTop: '0.75rem', padding: '0.6rem', background: '#ffffff', borderRadius: '6px', border: '1px dashed #E0C0A8', fontFamily: 'Georgia, serif', fontStyle: 'italic', color: '#9C4B13', fontSize: '0.88rem', textAlign: 'center' }}>
+                Preview: {config.sideScripts?.leftLine1 ?? 'Learn'} &bull; {config.sideScripts?.leftLine2 ?? 'Prepare'} &bull; <strong>{config.sideScripts?.leftLine3 ?? 'Succeed'}</strong>
+              </div>
+            </div>
+
+            {/* Right Cursive Accent Box */}
+            <div style={{ background: '#FDF2F4', padding: '1.1rem', borderRadius: '8px', border: '1px solid #F3CFD7' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', borderBottom: '1px solid #F8D8DF', paddingBottom: '0.5rem' }}>
+                <span style={{ fontWeight: 700, fontSize: '0.88rem', color: '#8A263B' }}>
+                  ✍️ Right Cursive Script (Tilted)
+                </span>
+                <Toggle 
+                  label="Visible" 
+                  checked={config.sideScripts?.showRight !== false} 
+                  onChange={v => updateSideScript('showRight', v)} 
+                />
+              </div>
+              <Field label="Top Line" value={config.sideScripts?.rightLine1 ?? 'Different Aspirations'} onChange={v => updateSideScript('rightLine1', v)} placeholder="Different Aspirations" />
+              <Field label="Bottom Line (Underlined)" value={config.sideScripts?.rightLine2 ?? 'One Destination'} onChange={v => updateSideScript('rightLine2', v)} placeholder="One Destination" />
+              
+              <div style={{ marginTop: '0.75rem', padding: '0.6rem', background: '#ffffff', borderRadius: '6px', border: '1px dashed #E5B2BD', fontFamily: 'Georgia, serif', fontStyle: 'italic', color: '#8A263B', fontSize: '0.88rem', textAlign: 'center' }}>
+                Preview: {config.sideScripts?.rightLine1 ?? 'Different Aspirations'} / <span style={{ borderBottom: '2px solid #8A263B' }}>{config.sideScripts?.rightLine2 ?? 'One Destination'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <p style={{ fontSize: '0.82rem', color: 'var(--gray-400)', marginBottom: '1.25rem' }}>

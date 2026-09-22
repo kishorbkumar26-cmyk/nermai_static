@@ -103,14 +103,14 @@ export default function SuccessStoriesSection({ customConfig }) {
   useEffect(() => {
     // 1. Settings from Firestore
     fbFirestore.getSettings().then(s => {
-      const saved = s?.homeContent?.successStories || s?.homeContent?.toppersWall || s?.toppersWall
+      const saved = s?.homeContent?.successStories || s?.successStories || s?.homeContent?.toppersWall || s?.toppersWall
       if (saved) {
         setConfig(prev => ({ ...DEFAULT_SUCCESS_STORIES_CONFIG, ...saved }))
       }
     }).catch(err => console.warn('Could not load successStories settings', err))
 
     const unsubSettings = fbFirestore.onSettingsChanged?.(s => {
-      const saved = s?.homeContent?.successStories || s?.homeContent?.toppersWall || s?.toppersWall
+      const saved = s?.homeContent?.successStories || s?.successStories || s?.homeContent?.toppersWall || s?.toppersWall
       if (saved) {
         setConfig(prev => ({ ...DEFAULT_SUCCESS_STORIES_CONFIG, ...saved }))
       }
@@ -253,9 +253,9 @@ export default function SuccessStoriesSection({ customConfig }) {
           {/* Top-Left Floating Cursive Script Accent */}
           <div className="ss-script-top-left" aria-hidden="true">
             <div className="ss-script-text">
-              <span>Learn</span>
-              <span>Prepare</span>
-              <span>Succeed</span>
+              {(config.scriptTopLeft || 'Learn\nPrepare\nSucceed').split('\n').filter(Boolean).map((line, lIdx) => (
+                <span key={lIdx}>{line}</span>
+              ))}
               <svg className="ss-script-curve" viewBox="0 0 70 12" fill="none">
                 <path d="M2 9C22 2 48 2 68 9" stroke="#F5D061" strokeWidth="2.2" strokeLinecap="round"/>
               </svg>
@@ -265,10 +265,9 @@ export default function SuccessStoriesSection({ customConfig }) {
           {/* Top-Right Floating Cursive Script Accent */}
           <div className="ss-script-top-right" aria-hidden="true">
             <div className="ss-script-text">
-              <span>Different</span>
-              <span>Aspirations</span>
-              <span>One</span>
-              <span>Destination</span>
+              {(config.scriptTopRight || 'Different\nAspirations\nOne\nDestination').split('\n').filter(Boolean).map((line, lIdx) => (
+                <span key={lIdx}>{line}</span>
+              ))}
             </div>
           </div>
 

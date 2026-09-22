@@ -50,28 +50,115 @@ export default function FooterContentSection({ toast }) {
     setFooter(updated)
   }
 
-  // Generic List Manager for links
-  const renderLinksManager = (title, listKey) => {
+  // Generic List Manager for links with overall section visibility toggle
+  const renderLinksManager = (title, listKey, visibilityKey) => {
     const list = footer?.[listKey] || []
-    
+    const isVisible = footer?.[visibilityKey] !== false
+
+    const toggleVisibility = (e) => {
+      const checked = e.target.checked
+      const updated = { ...footer, [visibilityKey]: checked }
+      setFooter(updated)
+      save(updated)
+    }
+
     const addLink = () => {
       save({ ...footer, [listKey]: [...list, { label: 'New Link', link: '#' }] })
     }
-    
+
     const updateLink = (idx, field, value) => {
       const newList = [...list]
       newList[idx][field] = value
       setFooter({ ...footer, [listKey]: newList })
     }
-    
+
     const removeLink = (idx) => {
       const newList = list.filter((_, i) => i !== idx)
       save({ ...footer, [listKey]: newList })
     }
 
     return (
-      <div className="ap-card" style={{ marginBottom: '1.5rem' }}>
-        <h3 className="ap-subtitle">{title}</h3>
+      <div className="ap-card" style={{
+        marginBottom: '1.5rem',
+        border: isVisible ? '1px solid var(--gray-200)' : '1.5px dashed #fca5a5',
+        background: isVisible ? '#ffffff' : '#fffbfa',
+        transition: 'all 0.2s ease'
+      }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '1rem',
+          flexWrap: 'wrap',
+          gap: '0.75rem',
+          borderBottom: '1px solid #f1f5f9',
+          paddingBottom: '0.75rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <h3 className="ap-subtitle" style={{ margin: 0 }}>{title}</h3>
+            <span style={{
+              fontSize: '0.72rem',
+              padding: '2px 8px',
+              borderRadius: '12px',
+              background: isVisible ? '#f1f5f9' : '#fee2e2',
+              color: isVisible ? '#475569' : '#991b1b',
+              fontWeight: 700
+            }}>
+              {list.length} {list.length === 1 ? 'Link' : 'Links'}
+            </span>
+          </div>
+
+          {/* Overall Section Visibility Switch */}
+          <label style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.55rem',
+            cursor: 'pointer',
+            padding: '5px 12px',
+            borderRadius: '20px',
+            background: isVisible ? '#dcfce7' : '#fee2e2',
+            border: isVisible ? '1px solid #86efac' : '1px solid #fca5a5',
+            transition: 'all 0.2s ease',
+            userSelect: 'none'
+          }}>
+            <input
+              type="checkbox"
+              checked={isVisible}
+              onChange={toggleVisibility}
+              style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#16a34a' }}
+            />
+            <span style={{
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              color: isVisible ? '#15803d' : '#b91c1c',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px'
+            }}>
+              <i className={isVisible ? "fa-solid fa-eye" : "fa-solid fa-eye-slash"} />
+              {isVisible ? 'Visible on Footer' : 'Hidden from Footer'}
+            </span>
+          </label>
+        </div>
+
+        {!isVisible && (
+          <div style={{
+            padding: '0.65rem 0.9rem',
+            background: '#fff1f2',
+            border: '1px solid #fecdd3',
+            borderRadius: '6px',
+            color: '#9f1239',
+            fontSize: '0.75rem',
+            marginBottom: '1rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}>
+            <i className="fa-solid fa-triangle-exclamation" style={{ color: '#e11d48' }} />
+            <span>This entire <strong>{title}</strong> section is currently hidden from the website footer. Toggle "Visible on Footer" above to show it.</span>
+          </div>
+        )}
+
         {list.map((item, i) => (
           <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '0.5rem', marginBottom: '0.5rem' }}>
             <input 
@@ -88,7 +175,7 @@ export default function FooterContentSection({ toast }) {
               onChange={e => updateLink(i, 'link', e.target.value)} 
               placeholder="URL (e.g. /courses or https://...)" 
             />
-            <button className="ap-btn ap-btn-danger" onClick={() => removeLink(i)}>
+            <button className="ap-btn ap-btn-danger" onClick={() => removeLink(i)} title="Remove Link">
               <i className="fa-solid fa-trash" />
             </button>
           </div>
@@ -231,9 +318,9 @@ export default function FooterContentSection({ toast }) {
 
       <div style={{ marginTop: '2rem' }}>
         {renderSocialLinksManager()}
-        {renderLinksManager('Useful Links', 'usefulLinks')}
-        {renderLinksManager('Notifications', 'notifications')}
-        {renderLinksManager('Courses Links', 'coursesLinks')}
+        {renderLinksManager('Useful Links', 'usefulLinks', 'showUsefulLinks')}
+        {renderLinksManager('Notifications', 'notifications', 'showNotifications')}
+        {renderLinksManager('Courses Links', 'coursesLinks', 'showCoursesLinks')}
       </div>
 
       <div className="ap-card" style={{ marginTop: '2rem' }}>

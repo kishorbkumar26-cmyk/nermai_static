@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import Header from '../components/Header'
 import Hero from '../components/hero/Hero'
 import TopTicker from '../components/TopTicker'
@@ -76,6 +77,8 @@ export default function Home() {
     results: true, gallery: true, testimonials: true
   })
 
+  const location = useLocation()
+
   useEffect(() => {
     fbFirestore.getSettings().then(s => {
       if (s.homeContent?.ticker) setTicker(s.homeContent.ticker)
@@ -89,6 +92,18 @@ export default function Home() {
     const cleanup = initReveal()
     return () => { cleanup() }
   }, [about])
+
+  useEffect(() => {
+    if (location.hash === '#free-resources' || window.location.hash === '#free-resources') {
+      const timer = setTimeout(() => {
+        const el = document.getElementById('free-resources')
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' })
+        }
+      }, 250)
+      return () => clearTimeout(timer)
+    }
+  }, [location])
 
   return (
     <>
@@ -164,20 +179,27 @@ export default function Home() {
           </section>
         )}
 
-        {/* ── UNIFIED SUCCESS STORIES & TESTIMONIALS ── */}
-        {visibility.results !== false && visibility.toppers !== false && <SuccessStoriesSection />}
-
-        {/* ── WHAT YOU GET (Features) ── */}
-        {visibility.features !== false && <WhatYouGet />}
-
         {/* ── COURSES ── */}
         {visibility.courses !== false && <Courses />}
+
+        {/* ── UNIFIED SUCCESS STORIES & TESTIMONIALS (TOPPERS LIST) ── */}
+        {visibility.results !== false && visibility.toppers !== false && <SuccessStoriesSection />}
+
+        {/* ── WHAT YOU GET (Features / Nermai Class Platform) ── */}
+        {visibility.features !== false && <WhatYouGet />}
 
         {/* ── WHY NERMAI ── */}
         <WhyNermai />
 
         {/* ── GALLERY ── */}
         {visibility.gallery !== false && <Gallery />}
+
+        {/* ── FREE LEARNING RESOURCES (Study Notes & Question Banks) ── */}
+        <section id="free-resources" className="section free-resources-section" style={{ background: 'var(--cream)', scrollMarginTop: '110px' }}>
+          <div className="container free-resources-container" style={{ maxWidth: '1440px', margin: '0 auto' }}>
+            <ResourcesDesk isWidget={true} />
+          </div>
+        </section>
       </main>
 
       <OfficeLocations />
