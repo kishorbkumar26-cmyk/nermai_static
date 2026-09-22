@@ -1011,42 +1011,158 @@ function CoursesEditor({ courses = [], config = {}, categories = [], onChangeCou
 }
 
 /* ── About Editor ────────────────────────────────────────────────────────── */
-function AboutEditor({ about, onChange }) {
+function AboutEditor({ about = {}, stats = [], onChange }) {
   const update = (key, val) => onChange({ ...about, [key]: val })
+  
+  const badges = (about.badges && Array.isArray(about.badges) && about.badges.length > 0)
+    ? about.badges
+    : [
+        { num: '187+', label: 'Results' },
+        { num: '14+', label: 'Years' },
+        { num: '2400+', label: 'Students' }
+      ]
+
+  const isSync = about.syncWithStats === true
+
   const updateBadge = (i, key, val) => {
-    const badges = (about.badges || []).map((b, idx) => idx === i ? { ...b, [key]: val } : b)
-    onChange({ ...about, badges })
+    const next = badges.map((b, idx) => idx === i ? { ...b, [key]: val } : b)
+    onChange({ ...about, badges: next })
   }
+
+  const addBadge = () => {
+    onChange({ ...about, badges: [...badges, { num: '', label: '' }] })
+  }
+
+  const removeBadge = (i) => {
+    onChange({ ...about, badges: badges.filter((_, idx) => idx !== i) })
+  }
+
+  const handleCopyFromStats = () => {
+    if (stats && stats.length > 0) {
+      const visibleStats = stats.filter(s => s.visible !== false)
+      const copied = (visibleStats.length > 0 ? visibleStats : stats).slice(0, 3).map(s => ({
+        num: s.num || '',
+        label: s.label || ''
+      }))
+      onChange({ ...about, badges: copied, syncWithStats: false })
+    }
+  }
+
   return (
     <div>
       <p style={{ fontSize: '0.82rem', color: 'var(--gray-400)', marginBottom: '1.25rem' }}>
-        Edit the About / Introduction section on the homepage with image, text and badge numbers.
+        Edit the About / Introduction section on the homepage with image, text, and small gold stat badges.
       </p>
-      <div className="ap-card" style={{ marginBottom: '0.75rem', padding: '1rem' }}>
-        <div style={{ fontWeight: 700, marginBottom: '0.75rem', fontSize: '0.85rem' }}>📝 Text Content</div>
+
+      {/* 1. Text Content */}
+      <div className="ap-card" style={{ marginBottom: '1rem', padding: '1.25rem' }}>
+        <div style={{ fontWeight: 700, marginBottom: '0.75rem', fontSize: '0.9rem', color: '#7B1B2E' }}>📝 Text Content</div>
         <div className="ap-form-row">
           <Field label="Eyebrow Label" value={about.eyebrow || ''} onChange={v => update('eyebrow', v)} placeholder="About Nermai" />
-          <Field label="Section Title"  value={about.title   || ''} onChange={v => update('title', v)} placeholder="Introduction to Nermai IAS" />
+          <Field label="Section Title" value={about.title || ''} onChange={v => update('title', v)} placeholder="Introduction to Nermai IAS" />
         </div>
         <Field label="Paragraph 1" value={about.para1 || ''} onChange={v => update('para1', v)} type="textarea" />
         <Field label="Paragraph 2" value={about.para2 || ''} onChange={v => update('para2', v)} type="textarea" />
       </div>
-      <div className="ap-card" style={{ marginBottom: '0.75rem', padding: '1rem' }}>
-        <div style={{ fontWeight: 700, marginBottom: '0.75rem', fontSize: '0.85rem' }}>🖼️ Image</div>
+
+      {/* 2. Image */}
+      <div className="ap-card" style={{ marginBottom: '1rem', padding: '1.25rem' }}>
+        <div style={{ fontWeight: 700, marginBottom: '0.75rem', fontSize: '0.9rem', color: '#7B1B2E' }}>🖼️ Image &amp; Overlay Label</div>
         <Field label="Image URL" value={about.imageUrl || ''} onChange={v => update('imageUrl', v)} placeholder="https://..." />
-        <Field label="Image Label (shown as overlay)" value={about.imageLabel || ''} onChange={v => update('imageLabel', v)} placeholder="187+ RESULTS · 2022–25" />
+        <Field label="Image Label (shown as overlay banner)" value={about.imageLabel || ''} onChange={v => update('imageLabel', v)} placeholder="187+ RESULTS · 2022–25" />
         {about.imageUrl && (
-          <img src={about.imageUrl} alt="preview" style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', marginTop: '0.75rem', border: '1px solid var(--gray-200)' }} onError={e => e.target.style.display='none'} />
+          <img src={about.imageUrl} alt="preview" style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', marginTop: '0.75rem', borderRadius: '6px', border: '1px solid var(--gray-200)' }} onError={e => e.target.style.display='none'} />
         )}
       </div>
-      <div className="ap-card" style={{ padding: '1rem' }}>
-        <div style={{ fontWeight: 700, marginBottom: '0.75rem', fontSize: '0.85rem' }}>🏅 Badge Numbers (e.g. 187+ Results)</div>
-        {(about.badges || []).map((badge, i) => (
-          <div key={i} className="ap-form-row" style={{ marginBottom: '0.5rem' }}>
-            <Field label={`Badge ${i+1} Number`} value={badge.num}   onChange={v => updateBadge(i, 'num', v)} placeholder="187+" />
-            <Field label={`Badge ${i+1} Label`}  value={badge.label} onChange={v => updateBadge(i, 'label', v)} placeholder="Results" />
+
+      {/* 3. Small Gold Stat Badges */}
+      <div className="ap-card" style={{ padding: '1.25rem', background: '#FFFDF9', border: '1.5px solid #F3E8DF', borderRadius: '10px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem', borderBottom: '1px solid #EAD8C7', paddingBottom: '0.75rem' }}>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#B35900' }}>
+              🏅 Small Gold Stat Badges (Count / Numbers)
+            </div>
+            <div style={{ fontSize: '0.8rem', color: '#8C7E74' }}>
+              Displayed as 3 white cards with gold numbers below Upcoming Events on the homepage.
+            </div>
           </div>
-        ))}
+
+          <Toggle 
+            label="⚡ Auto-Sync with Main Stats Bar" 
+            checked={isSync} 
+            onChange={v => update('syncWithStats', v)} 
+          />
+        </div>
+
+        {isSync ? (
+          <div style={{ background: '#FFF8F2', padding: '1rem', borderRadius: '8px', border: '1px solid #F0D5C0', marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#9C4B13', fontWeight: 700, fontSize: '0.88rem', marginBottom: '0.5rem' }}>
+              <i className="fa-solid fa-arrows-rotate" /> Synchronized Mode Active
+            </div>
+            <p style={{ margin: 0, fontSize: '0.82rem', color: '#736B63', lineHeight: 1.5 }}>
+              These 3 gold badge counts are automatically synchronizing with the top <strong>Stats Banner</strong> values (e.g. {stats.slice(0, 3).map(s => s.num).filter(Boolean).join(', ') || '5000+, 15+, 28+'}). Any update made in the <strong>Stats Banner</strong> tab will instantly reflect here.
+            </p>
+          </div>
+        ) : (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+              <span style={{ fontSize: '0.82rem', color: '#736B63', fontWeight: 600 }}>Custom Gold Badges Mode:</span>
+              <button 
+                type="button" 
+                onClick={handleCopyFromStats}
+                className="btn"
+                style={{ background: '#FFF0E5', color: '#C85A17', border: '1px solid #F0D5C0', fontSize: '0.78rem', padding: '0.35rem 0.75rem', borderRadius: '6px', cursor: 'pointer', fontWeight: 700 }}
+              >
+                <i className="fa-solid fa-copy" style={{ marginRight: '6px' }} /> Copy values from Stats Bar
+              </button>
+            </div>
+
+            {badges.map((badge, i) => (
+              <div key={i} className="ap-card" style={{ marginBottom: '0.75rem', padding: '0.85rem 1rem', background: '#FFFFFF', position: 'relative' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <strong style={{ fontSize: '0.8rem', color: '#B35900', textTransform: 'uppercase' }}>Gold Badge {i + 1}</strong>
+                  {badges.length > 1 && (
+                    <button 
+                      type="button" 
+                      onClick={() => removeBadge(i)}
+                      style={{ background: '#fee2e2', color: '#dc2626', border: '1px solid #f87171', padding: '0.2rem 0.5rem', fontSize: '0.72rem', borderRadius: '4px', cursor: 'pointer' }}
+                    >
+                      <i className="fa-solid fa-trash" /> Delete
+                    </button>
+                  )}
+                </div>
+                <div className="ap-form-row">
+                  <Field label="Stat Number / Value" value={badge.num} onChange={v => updateBadge(i, 'num', v)} placeholder="187+" />
+                  <Field label="Stat Label" value={badge.label} onChange={v => updateBadge(i, 'label', v)} placeholder="RESULTS" />
+                </div>
+              </div>
+            ))}
+
+            <button 
+              type="button" 
+              onClick={addBadge}
+              className="btn" 
+              style={{ marginTop: '0.5rem', width: '100%', justifyContent: 'center', background: '#F8F4EE', color: '#7B1B2E', border: '1px dashed #D5C0A8', padding: '0.6rem', fontWeight: 700, fontSize: '0.85rem' }}
+            >
+              <i className="fa-solid fa-plus" style={{ marginRight: '8px' }} /> Add Another Badge
+            </button>
+          </div>
+        )}
+
+        {/* Live Visual Preview of Badges */}
+        <div style={{ marginTop: '1.25rem', borderTop: '1px dashed #E5D5C5', paddingTop: '1rem' }}>
+          <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#736B63', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
+            Live Badge Preview on Homepage
+          </div>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            {(isSync && stats.length > 0 ? stats.slice(0, 3) : badges).map((b, idx) => (
+              <div key={idx} style={{ flex: 1, minWidth: '100px', textAlign: 'center', padding: '0.85rem 0.5rem', background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+                <span style={{ display: 'block', fontSize: '1.4rem', fontWeight: 800, color: '#E65C00', lineHeight: 1.1 }}>{b.num || '0'}</span>
+                <span style={{ display: 'block', fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#6B7280', marginTop: '0.25rem' }}>{b.label || 'LABEL'}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -1678,7 +1794,7 @@ export default function HomeContentSection({ toast }) {
       {activeTab === 'courseCategories' && <CourseCategoriesEditor categories={content.courseCategories} onChange={v => setContent(c => ({ ...c, courseCategories: v }))} />}
       {activeTab === 'courses'  && <CoursesEditor  courses={content.courses} config={content.coursesConfig} categories={content.courseCategories} onChangeCourses={v => setContent(c => ({ ...c, courses: v }))} onChangeConfig={v => setContent(c => ({ ...c, coursesConfig: v }))} onChangeCategories={v => setContent(c => ({ ...c, courseCategories: v }))} />}
       {activeTab === 'events'   && <EventsEditor   events={content.events}       onChange={v => setContent(c => ({ ...c, events: v }))} />}
-      {activeTab === 'about'    && <AboutEditor    about={content.about}         onChange={v => setContent(c => ({ ...c, about: v }))} />}
+      {activeTab === 'about'    && <AboutEditor    about={content.about} stats={content.stats} onChange={v => setContent(c => ({ ...c, about: v }))} />}
       {activeTab === 'journeySteps' && <JourneyStepsEditor steps={content.journeySteps} onChange={v => setContent(c => ({ ...c, journeySteps: v }))} />}
 
       {/* Save button */}

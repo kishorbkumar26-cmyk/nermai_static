@@ -70,6 +70,7 @@ function initReveal() {
 
 export default function Home() {
   const [about, setAbout] = useState(DEFAULT_ABOUT)
+  const [stats, setStats] = useState([])
   const [ticker, setTicker] = useState(DEFAULT_TICKER)
   const [journeySteps, setJourneySteps] = useState(undefined)
   const [visibility, setVisibility] = useState({
@@ -80,13 +81,42 @@ export default function Home() {
   const location = useLocation()
 
   useEffect(() => {
-    fbFirestore.getSettings().then(s => {
+    const unsub = fbFirestore.onSettingsChanged(s => {
+      if (!s) return
       if (s.homeContent?.ticker) setTicker(s.homeContent.ticker)
       if (s.homeContent?.about) setAbout(ab => ({ ...DEFAULT_ABOUT, ...s.homeContent.about }))
+      if (s.homeContent?.stats && Array.isArray(s.homeContent.stats)) setStats(s.homeContent.stats)
       if (s.homeContent?.visibility) setVisibility(v => ({ ...v, ...s.homeContent.visibility }))
       if (s.homeContent?.journeySteps) setJourneySteps(s.homeContent.journeySteps)
     })
+    return () => { if (typeof unsub === 'function') unsub() }
   }, [])
+
+  // Calculate active gold badges (Synchronized with StatsBar or Admin customized)
+  const goldBadges = useMemo(() => {
+    if (about.syncWithStats && stats && stats.length > 0) {
+      const visibleStats = stats.filter(s => s.visible !== false)
+      if (visibleStats.length > 0) {
+        return visibleStats.slice(0, 3).map(s => ({
+          num: s.num,
+          label: s.label
+        }))
+      }
+    }
+    if (about.badges && Array.isArray(about.badges) && about.badges.length > 0) {
+      return about.badges
+    }
+    if (stats && stats.length > 0) {
+      const visibleStats = stats.filter(s => s.visible !== false)
+      if (visibleStats.length > 0) {
+        return visibleStats.slice(0, 3).map(s => ({
+          num: s.num,
+          label: s.label
+        }))
+      }
+    }
+    return DEFAULT_ABOUT.badges
+  }, [about.syncWithStats, about.badges, stats])
 
   useEffect(() => {
     const cleanup = initReveal()
@@ -164,7 +194,7 @@ export default function Home() {
 
                   {/* Yellow Stat Badges moved below Upcoming Events */}
                   <div className="about-badges-row" style={{ marginTop: 0 }}>
-                    {(about.badges || []).map((b, i) => (
+                    {goldBadges.map((b, i) => (
                       <div key={i} className="about-badge-v2">
                         <span className="about-badge-num">{b.num}</span>
                         <span className="about-badge-label">{b.label}</span>
