@@ -67,7 +67,10 @@ function VisibilityEditor({ visibility = {}, onChange }) {
 }
 
 /* ── Stats Editor ─────────────────────────────────────────────────────────── */
-function StatsEditor({ stats = [], onChange }) {
+function StatsEditor({ stats = [], visibility = {}, onChange, onChangeVisibility }) {
+  const isStatsVisible = visibility.stats !== false
+  const updateVisibility = (val) => onChangeVisibility && onChangeVisibility({ ...visibility, stats: val })
+
   const update = (i, key, val) => {
     const next = stats.map((s, idx) => idx === i ? { ...s, [key]: val } : s)
     onChange(next)
@@ -77,6 +80,40 @@ function StatsEditor({ stats = [], onChange }) {
 
   return (
     <div>
+      {/* Top Overall Visibility Card */}
+      <div
+        className="ap-card"
+        style={{
+          marginBottom: '1.5rem',
+          padding: '1.25rem 1.5rem',
+          borderLeft: isStatsVisible ? '5px solid #10b981' : '5px solid #ef4444',
+          background: isStatsVisible ? '#f0fdf4' : '#fef2f2',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '1rem'
+        }}
+      >
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <span style={{ fontSize: '1.2rem' }}>{isStatsVisible ? '🟢' : '🔴'}</span>
+            <strong style={{ fontSize: '1rem', color: isStatsVisible ? '#065f46' : '#991b1b' }}>
+              {isStatsVisible ? 'Stats Banner is VISIBLE on Homepage' : 'Stats Banner is HIDDEN on Homepage'}
+            </strong>
+          </div>
+          <p style={{ margin: '0.25rem 0 0 1.8rem', fontSize: '0.8rem', color: isStatsVisible ? '#047857' : '#b91c1c' }}>
+            Controls the main maroon banner with orange numbers right below the hero carousel.
+          </p>
+        </div>
+
+        <Toggle 
+          label={isStatsVisible ? 'Banner: ON' : 'Banner: OFF'} 
+          checked={isStatsVisible} 
+          onChange={updateVisibility} 
+        />
+      </div>
+
       <p style={{ fontSize: '0.82rem', color: 'var(--gray-400)', marginBottom: '1.25rem' }}>
         Edit the impact stats and success terms (e.g. 5000+, 15+, 28+, Highest) displayed in the maroon card on the homepage.
       </p>
@@ -1087,13 +1124,27 @@ function AboutEditor({ about = {}, stats = [], onChange }) {
             </div>
           </div>
 
-          <Toggle 
-            label="⚡ Auto-Sync with Main Stats Bar" 
-            checked={isSync} 
-            onChange={v => update('syncWithStats', v)} 
-          />
+          <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <Toggle 
+              label="👁️ Show Badges on Homepage" 
+              checked={about.showBadges !== false} 
+              onChange={v => update('showBadges', v)} 
+            />
+            <Toggle 
+              label="⚡ Auto-Sync with Main Stats Bar" 
+              checked={isSync} 
+              onChange={v => update('syncWithStats', v)} 
+            />
+          </div>
         </div>
 
+        {about.showBadges === false && (
+          <div style={{ background: '#FEF2F2', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid #FCA5A5', color: '#991B1B', fontSize: '0.82rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <i className="fa-solid fa-eye-slash" /> Small gold stat badges are currently <strong>HIDDEN</strong> on the homepage. Turn on "Show Badges on Homepage" above to display them.
+          </div>
+        )}
+
+        <div style={{ opacity: about.showBadges !== false ? 1 : 0.5, pointerEvents: about.showBadges !== false ? 'auto' : 'none' }}>
         {isSync ? (
           <div style={{ background: '#FFF8F2', padding: '1rem', borderRadius: '8px', border: '1px solid #F0D5C0', marginBottom: '1rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#9C4B13', fontWeight: 700, fontSize: '0.88rem', marginBottom: '0.5rem' }}>
@@ -1148,6 +1199,7 @@ function AboutEditor({ about = {}, stats = [], onChange }) {
             </button>
           </div>
         )}
+        </div>
 
         {/* Live Visual Preview of Badges */}
         <div style={{ marginTop: '1.25rem', borderTop: '1px dashed #E5D5C5', paddingTop: '1rem' }}>
@@ -1781,7 +1833,7 @@ export default function HomeContentSection({ toast }) {
       {activeTab === 'visibility' && <VisibilityEditor visibility={content.visibility} onChange={v => setContent(c => ({ ...c, visibility: v }))} />}
       {activeTab === 'ticker'   && <TickerEditor   ticker={content.ticker}       onChange={v => setContent(c => ({ ...c, ticker: v }))} />}
       {activeTab === 'toppersWall' && <ToppersWallEditor data={content.toppersWall} onChange={v => setContent(c => ({ ...c, toppersWall: v }))} />}
-      {activeTab === 'stats'    && <StatsEditor    stats={content.stats}         onChange={v => setContent(c => ({ ...c, stats: v }))} />}
+      {activeTab === 'stats'    && <StatsEditor    stats={content.stats} visibility={content.visibility} onChange={v => setContent(c => ({ ...c, stats: v }))} onChangeVisibility={v => setContent(c => ({ ...c, visibility: v }))} />}
       {activeTab === 'features' && (
         <FeaturesEditor 
           config={content.featuresConfig} 

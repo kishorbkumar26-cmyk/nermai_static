@@ -193,14 +193,16 @@ export default function Home() {
                   {visibility.events !== false && <EventsCalendar />}
 
                   {/* Yellow Stat Badges moved below Upcoming Events */}
-                  <div className="about-badges-row" style={{ marginTop: 0 }}>
-                    {goldBadges.map((b, i) => (
-                      <div key={i} className="about-badge-v2">
-                        <span className="about-badge-num">{b.num}</span>
-                        <span className="about-badge-label">{b.label}</span>
-                      </div>
-                    ))}
-                  </div>
+                  {about.showBadges !== false && (
+                    <div className="about-badges-row" style={{ marginTop: 0 }}>
+                      {goldBadges.map((b, i) => (
+                        <div key={i} className="about-badge-v2">
+                          <span className="about-badge-num">{b.num}</span>
+                          <span className="about-badge-label">{b.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 
