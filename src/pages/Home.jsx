@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
 import Header from '../components/Header'
 import Hero from '../components/hero/Hero'
