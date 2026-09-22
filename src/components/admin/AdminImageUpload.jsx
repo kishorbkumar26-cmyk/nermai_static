@@ -117,22 +117,23 @@ export default function AdminImageUpload({
   const handlePreviewError = (e) => {
     const imgEl = e.target
     if (driveId) {
-      if (!imgEl.dataset.fallbackStep || imgEl.dataset.fallbackStep === '0') {
+      const step = imgEl.dataset.fallbackStep || '0'
+      if (step === '0') {
         imgEl.dataset.fallbackStep = '1'
-        imgEl.src = `https://lh3.googleusercontent.com/d/${driveId}=w1000`
+        imgEl.src = `https://lh3.googleusercontent.com/u/0/d/${driveId}=w800`
         return
       }
-      if (imgEl.dataset.fallbackStep === '1') {
+      if (step === '1') {
         imgEl.dataset.fallbackStep = '2'
-        imgEl.src = `https://lh3.googleusercontent.com/u/0/d/${driveId}=w1000`
+        imgEl.src = `https://drive.google.com/uc?id=${driveId}&export=view`
         return
       }
-      if (imgEl.dataset.fallbackStep === '2') {
+      if (step === '2') {
         imgEl.dataset.fallbackStep = '3'
-        imgEl.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000`
+        imgEl.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w400`
         return
       }
-      if (imgEl.dataset.fallbackStep === '3') {
+      if (step === '3') {
         imgEl.dataset.fallbackStep = '4'
         imgEl.src = `https://drive.usercontent.google.com/download?id=${driveId}&export=view`
         return
@@ -319,9 +320,20 @@ export default function AdminImageUpload({
                 }}
               />
             ) : (
-              <div style={{ color: '#ef4444', fontSize: '0.7rem', textAlign: 'center', padding: '0.25rem' }}>
-                <i className="fa-solid fa-triangle-exclamation" style={{ fontSize: '1.1rem', display: 'block', marginBottom: '2px' }} />
-                Image Failed
+              <div style={{ color: '#92400e', fontSize: '0.65rem', textAlign: 'center', padding: '0.35rem', background: '#fef3c7', borderRadius: '4px', width: '100%' }}>
+                <i className="fa-solid fa-triangle-exclamation" style={{ fontSize: '0.9rem', display: 'block', marginBottom: '3px', color: '#d97706' }} />
+                <div style={{ fontWeight: 700, marginBottom: '3px' }}>Preview unavailable</div>
+                <div style={{ marginBottom: '4px', fontSize: '0.6rem', color: '#78350f' }}>Drive CDN rate limited</div>
+                {driveId && (
+                  <a
+                    href={`https://drive.google.com/file/d/${driveId}/view`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: '#1d4ed8', fontSize: '0.6rem', textDecoration: 'underline', fontWeight: 600 }}
+                  >
+                    Open in Drive ↗
+                  </a>
+                )}
               </div>
             )}
           </div>

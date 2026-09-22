@@ -1,18 +1,40 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { fbFirestore } from './firebase/firestore'
 import { WHATSAPP_NUMBER } from './constants'
+
+// Home loads immediately (first page visitors see)
 import Home from './pages/Home'
-import WhyNermaiPage from './pages/WhyNermaiPage'
-import CoursesPage from './pages/CoursesPage'
-import CourseDetailPage from './pages/CourseDetailPage'
-import ContactPage from './pages/ContactPage'
-import AdminPage from './pages/AdminPage'
-import AdminDashboard from './pages/AdminDashboard'
-import AdminPortal from './components/AdminPortal'
-import FaqPage from './pages/FaqPage'
-import ResultsPage from './pages/ResultsPage'
+
+// All other pages load on-demand (only when navigated to)
+const WhyNermaiPage    = lazy(() => import('./pages/WhyNermaiPage'))
+const CoursesPage      = lazy(() => import('./pages/CoursesPage'))
+const CourseDetailPage = lazy(() => import('./pages/CourseDetailPage'))
+const ContactPage      = lazy(() => import('./pages/ContactPage'))
+const FaqPage          = lazy(() => import('./pages/FaqPage'))
+const ResultsPage      = lazy(() => import('./pages/ResultsPage'))
+const AdminPage        = lazy(() => import('./pages/AdminPage'))
+const AdminDashboard   = lazy(() => import('./pages/AdminDashboard'))
+const AdminPortal      = lazy(() => import('./components/AdminPortal'))
 import LiveBackground from './components/LiveBackground'
+
+// Minimal page-level loading fallback
+function PageLoader() {
+  return (
+    <div style={{
+      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: '#0d0005', color: '#D4AF37', fontSize: '1rem', gap: '0.75rem'
+    }}>
+      <div style={{
+        width: 28, height: 28, border: '3px solid rgba(212,175,55,0.2)',
+        borderTop: '3px solid #D4AF37', borderRadius: '50%',
+        animation: 'spin 0.8s linear infinite'
+      }} />
+      Loading…
+      <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+    </div>
+  )
+}
 
 function VisibilityGuard({ pageKey, children }) {
   const [loading, setLoading] = useState(true)
@@ -101,32 +123,34 @@ export default function App() {
   return (
     <BrowserRouter>
       <FloatingButtons />
-      <Routes>
-        {/* ── Public pages ── */}
-        <Route path="/"              element={<Home />} />
-        <Route path="/why-nermai"    element={<WhyNermaiPage />} />
-        <Route path="/contact"       element={<ContactPage />} />
-        <Route path="/results"       element={<ResultsPage />} />
-        {/* FAQ integrated into Contact page */}
-        <Route path="/faq"           element={<Navigate to="/contact#faq" replace />} />
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          {/* ── Public pages ── */}
+          <Route path="/"              element={<Home />} />
+          <Route path="/why-nermai"    element={<WhyNermaiPage />} />
+          <Route path="/contact"       element={<ContactPage />} />
+          <Route path="/results"       element={<ResultsPage />} />
+          {/* FAQ integrated into Contact page */}
+          <Route path="/faq"           element={<Navigate to="/contact#faq" replace />} />
 
-        {/* ── Protected pages (controlled via admin Site Visibility) ── */}
-        <Route
-          path="/courses"
-          element={<VisibilityGuard pageKey="courses"><CoursesPage /></VisibilityGuard>}
-        />
-        <Route
-          path="/courses/:slug"
-          element={<VisibilityGuard pageKey="courses"><CourseDetailPage /></VisibilityGuard>}
-        />
+          {/* ── Protected pages (controlled via admin Site Visibility) ── */}
+          <Route
+            path="/courses"
+            element={<VisibilityGuard pageKey="courses"><CoursesPage /></VisibilityGuard>}
+          />
+          <Route
+            path="/courses/:slug"
+            element={<VisibilityGuard pageKey="courses"><CourseDetailPage /></VisibilityGuard>}
+          />
 
-        {/* ── Admin pages ── */}
-        <Route path="/admin"           element={<AdminPage />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          {/* ── Admin pages ── */}
+          <Route path="/admin"           element={<AdminPage />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
-        {/* Fallback */}
-        <Route path="*" element={<Home />} />
-      </Routes>
+          {/* Fallback */}
+          <Route path="*" element={<Home />} />
+        </Routes>
+      </Suspense>
 
 
     </BrowserRouter>

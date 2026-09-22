@@ -125,7 +125,7 @@ export default function JourneySection({ steps }) {
         <div className="journey-grid-container">
           {renderSteps.map((step, idx) => {
             const isLast = idx === renderSteps.length - 1
-            const formattedImg = step.imageUrl ? driveStorage.formatImageUrl(step.imageUrl) : null
+            const formattedImg = step.imageUrl ? driveStorage.formatImageUrl(step.imageUrl, 1000) : null
 
             return (
               <React.Fragment key={step.id || idx}>
@@ -153,7 +153,7 @@ export default function JourneySection({ steps }) {
                       <img 
                         src={formattedImg} 
                         alt={step.title} 
-                        crossOrigin="anonymous"
+                        crossOrigin={formattedImg && formattedImg.includes('lh3.google') ? 'anonymous' : undefined}
                         style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} 
                       />
                     ) : (
@@ -265,7 +265,7 @@ export default function JourneySection({ steps }) {
             <img 
               src={activeModalImage} 
               alt="Step Detail" 
-              crossOrigin="anonymous"
+              crossOrigin={activeModalImage && activeModalImage.includes('lh3.google') ? 'anonymous' : undefined}
               style={{ width: '100%', maxHeight: '75vh', objectFit: 'contain', borderRadius: '12px' }} 
             />
             <button 

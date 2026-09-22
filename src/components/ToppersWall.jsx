@@ -22,9 +22,8 @@ function renderStatIcon(st, defaultIndex) {
   if (st && st.logoUrl && typeof st.logoUrl === 'string' && st.logoUrl.trim().length > 3) {
     return (
       <img 
-        src={driveStorage.formatImageUrl(st.logoUrl.trim())} 
+        src={driveStorage.formatImageUrl(st.logoUrl.trim(), 200)} 
         alt={st.label || 'Stat logo'} 
-        crossOrigin="anonymous"
         style={{ width: '22px', height: '22px', objectFit: 'contain', borderRadius: '4px', display: 'block' }} 
         onError={(e) => { e.target.style.display = 'none' }}
       />
@@ -49,7 +48,7 @@ const BASE_CATEGORIES = [
 function getTopperPhoto(topper) {
   if (topper && topper.photo && typeof topper.photo === 'string' && topper.photo.trim().length > 5) {
     if (topper.photo.includes('unsplash.com')) return null
-    return driveStorage.formatImageUrl(topper.photo.trim())
+    return driveStorage.formatImageUrl(topper.photo.trim(), 1000)
   }
   return null
 }
@@ -416,7 +415,6 @@ export default function ToppersWall({ customConfig }) {
                               src={photoUrl} 
                               alt={topper.name} 
                               className="toppers-card-photo" 
-                              crossOrigin="anonymous"
                               loading="lazy" 
                               onError={(e) => driveStorage.handleImageError(e)}
                             />

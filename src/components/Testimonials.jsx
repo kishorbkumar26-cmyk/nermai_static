@@ -103,7 +103,7 @@ export default function Testimonials({ customConfig }) {
 
   const renderCard = (t, idx, highlighted) => {
     const avatarUrl = t.imageUrl || t.avatar || t.photo
-      ? driveStorage.formatImageUrl(t.imageUrl || t.avatar || t.photo)
+      ? driveStorage.formatImageUrl(t.imageUrl || t.avatar || t.photo, 1000)
       : null
 
     return (
@@ -116,7 +116,7 @@ export default function Testimonials({ customConfig }) {
         <p className="card-quote-text">{t.quote || t.text || t.content}</p>
         <div className="card-author-row">
           {avatarUrl ? (
-            <img src={avatarUrl} alt={t.name} crossOrigin="anonymous" className="card-avatar-img" />
+            <img src={avatarUrl} alt={t.name} className="card-avatar-img" />
           ) : (
             <div className="card-avatar-fallback">
               {(t.name || 'A')[0].toUpperCase()}

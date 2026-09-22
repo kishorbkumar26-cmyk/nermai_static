@@ -322,7 +322,7 @@ export default function Courses({ hideHeader = false, layout = 'grid' }) {
                         {/* Top Cover Banner */}
                         <div className="replicated-card-banner">
                           {coverImg ? (
-                            <img src={coverImg} alt={courseTitle} crossOrigin="anonymous" className="replicated-banner-img" loading="lazy" />
+                            <img src={coverImg} alt={courseTitle} className="replicated-banner-img" loading="lazy" />
                           ) : (
                             <div className={`replicated-banner-fallback cat-${(course.categoryId || 'default').toLowerCase()}`}>
                               <span className="banner-fallback-title">{course.categoryId ? course.categoryId.toUpperCase() : 'COURSES'}</span>
@@ -340,7 +340,7 @@ export default function Courses({ hideHeader = false, layout = 'grid' }) {
                         {/* Circular Logo Emblem overlapping boundary */}
                         <div className="replicated-emblem-circle">
                           {logoImg ? (
-                            <img src={logoImg} alt={courseTitle} crossOrigin="anonymous" className="replicated-emblem-img" />
+                            <img src={logoImg} alt={courseTitle} className="replicated-emblem-img" />
                           ) : (
                             renderCategoryEmblem(course.categoryId || course.title)
                           )}

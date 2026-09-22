@@ -52,7 +52,6 @@ export function extractGoogleDriveId(urlOrId) {
 export function getGoogleDriveCDNUrl(urlOrId, width = 1000) {
   const fileId = extractGoogleDriveId(urlOrId)
   if (!fileId) return urlOrId
-  // High-reliability Google Multi-Node CDN endpoint (bypasses third-party cookie restrictions and CORS blocks)
   const sizeParam = width && width > 0 ? `=w${width}` : '=s0'
   return `https://lh3.googleusercontent.com/d/${fileId}${sizeParam}`
 }
@@ -61,6 +60,47 @@ export function getGoogleDriveDirectUrl(urlOrId) {
   const fileId = extractGoogleDriveId(urlOrId)
   if (!fileId) return urlOrId
   return `https://lh3.googleusercontent.com/d/${fileId}`
+}
+
+export function handleImageError(event, fallbackUrl = '') {
+  const imgEl = event.target
+  if (!imgEl) return
+  const currentSrc = imgEl.src || ''
+  const driveId = extractGoogleDriveId(currentSrc)
+  if (driveId) {
+    const step = imgEl.dataset.fallbackStep || '0'
+    // Step 1: lh3 direct CDN
+    if (step === '0') {
+      imgEl.dataset.fallbackStep = '1'
+      imgEl.src = `https://lh3.googleusercontent.com/d/${driveId}=w1000`
+      return
+    }
+    // Step 2: lh3 with /u/0/ path
+    if (step === '1') {
+      imgEl.dataset.fallbackStep = '2'
+      imgEl.src = `https://lh3.googleusercontent.com/u/0/d/${driveId}=w1000`
+      return
+    }
+    // Step 3: drive usercontent download (bypasses CDN rate limits)
+    if (step === '2') {
+      imgEl.dataset.fallbackStep = '3'
+      imgEl.src = `https://drive.usercontent.google.com/download?id=${driveId}&export=view`
+      return
+    }
+    // Step 4: drive thumbnail API (different quota bucket)
+    if (step === '3') {
+      imgEl.dataset.fallbackStep = '4'
+      imgEl.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000`
+      return
+    }
+  }
+  if (fallbackUrl) {
+    imgEl.src = fallbackUrl
+  } else {
+    imgEl.style.display = 'none'
+    const fallbackSibling = imgEl.parentElement?.querySelector('.toppers-card-photo-fallback, .rp-avatar-fallback')
+    if (fallbackSibling) fallbackSibling.style.display = 'flex'
+  }
 }
 
 function dataURLtoBlob(dataurl) {

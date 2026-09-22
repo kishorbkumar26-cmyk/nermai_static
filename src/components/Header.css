@@ -135,17 +135,19 @@
 }
 
 .brand-logo-img {
-  width: 58px;
-  height: 58px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   object-fit: cover;
-  box-shadow: 0 4px 14px rgba(123, 27, 46, 0.25);
+  box-shadow: 0 4px 18px rgba(123, 27, 46, 0.35);
+  border: 2.5px solid rgba(212, 175, 55, 0.6);
   flex-shrink: 0;
-  transition: transform 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .brand-group:hover .brand-logo-img {
-  transform: scale(1.05);
+  transform: scale(1.07);
+  box-shadow: 0 6px 22px rgba(123, 27, 46, 0.5);
 }
 
 .brand-titles {
@@ -571,8 +573,8 @@
   }
 
   .brand-logo-img, .brand-emblem {
-    width: 38px;
-    height: 38px;
+    width: 48px;
+    height: 48px;
   }
 
   .brand-name {

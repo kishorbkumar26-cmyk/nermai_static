@@ -347,7 +347,7 @@ export default function SuccessStoriesSection({ customConfig }) {
               {visibleTopperCards.length > 0 ? (
                 <div className="ss-toppers-grid">
                   {visibleTopperCards.map((t, idx) => {
-                    const photoUrl = t.photo ? driveStorage.formatImageUrl(t.photo) : null
+                    const photoUrl = t.photo ? driveStorage.formatImageUrl(t.photo, 1000) : null
                     let rankNum = (t.rank || '1').toString().replace(/[^0-9]/g, '')
                     if (!rankNum) rankNum = t.rank || '1'
 
@@ -364,7 +364,6 @@ export default function SuccessStoriesSection({ customConfig }) {
                               src={photoUrl}
                               alt={t.name}
                               className="ss-topper-photo"
-                              crossOrigin="anonymous"
                               onError={(e) => { e.currentTarget.style.display = 'none' }}
                             />
                           ) : (
@@ -582,10 +581,10 @@ export default function SuccessStoriesSection({ customConfig }) {
             <div className="rp-modal-header">
               {selectedStory.photo && (
                 <img
-                  src={driveStorage.formatImageUrl(selectedStory.photo)}
+                  src={driveStorage.formatImageUrl(selectedStory.photo, 1000)}
                   alt={selectedStory.name}
                   className="rp-modal-photo"
-                  crossOrigin="anonymous"
+                  crossOrigin={driveStorage.formatImageUrl(selectedStory.photo)?.includes('lh3.google') ? 'anonymous' : undefined}
                   onError={e => { e.currentTarget.style.display = 'none' }}
                 />
               )}

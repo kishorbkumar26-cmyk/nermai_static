@@ -258,13 +258,13 @@ export const driveStorage = {
     _preloadImages(urls.filter(Boolean))
   },
 
-  formatImageUrl(url) {
+  formatImageUrl(url, size = 1000) {
     if (!url || typeof url !== 'string') return null
     const trimmed = url.trim()
     if (!trimmed) return null
     if (trimmed.startsWith('data:') || trimmed.startsWith('blob:') || trimmed.startsWith('assets/')) return trimmed
     const driveId = extractGoogleDriveId(trimmed)
-    if (driveId) return getGoogleDriveCDNUrl(driveId)
+    if (driveId) return getGoogleDriveCDNUrl(driveId, size)
     if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed
     return null
   },
@@ -275,24 +275,29 @@ export const driveStorage = {
     const currentSrc = imgEl.src || ''
     const driveId = extractGoogleDriveId(currentSrc)
     if (driveId) {
-      if (!imgEl.dataset.fallbackStep || imgEl.dataset.fallbackStep === '0') {
+      const step = imgEl.dataset.fallbackStep || '0'
+      // Step 1: lh3 direct CDN
+      if (step === '0') {
         imgEl.dataset.fallbackStep = '1'
         imgEl.src = `https://lh3.googleusercontent.com/d/${driveId}=w1000`
         return
       }
-      if (imgEl.dataset.fallbackStep === '1') {
+      // Step 2: lh3 with /u/0/ path
+      if (step === '1') {
         imgEl.dataset.fallbackStep = '2'
         imgEl.src = `https://lh3.googleusercontent.com/u/0/d/${driveId}=w1000`
         return
       }
-      if (imgEl.dataset.fallbackStep === '2') {
+      // Step 3: drive usercontent download (different rate limit bucket)
+      if (step === '2') {
         imgEl.dataset.fallbackStep = '3'
-        imgEl.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000`
+        imgEl.src = `https://drive.usercontent.google.com/download?id=${driveId}&export=view`
         return
       }
-      if (imgEl.dataset.fallbackStep === '3') {
+      // Step 4: thumbnail API
+      if (step === '3') {
         imgEl.dataset.fallbackStep = '4'
-        imgEl.src = `https://drive.usercontent.google.com/download?id=${driveId}&export=view`
+        imgEl.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000`
         return
       }
     }

@@ -64,7 +64,6 @@ export default function Gallery() {
                   <img
                     src={photoUrl}
                     alt={img.caption || 'Nermai Gallery Image'}
-                    crossOrigin="anonymous"
                     style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.5s ease' }}
                     onError={(e) => driveStorage.handleImageError(e, '')}
                     loading="lazy"

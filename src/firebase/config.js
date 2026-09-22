@@ -1,7 +1,11 @@
 // Firebase configuration for NERMAI
 // Copy .env.example → .env and fill your Firebase project values
 import { initializeApp } from 'firebase/app'
-import { getFirestore } from 'firebase/firestore'
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager
+} from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
 
 const firebaseConfig = {
@@ -15,6 +19,13 @@ const firebaseConfig = {
 }
 
 export const app = initializeApp(firebaseConfig)
-export const db = getFirestore(app)
+
+// Firestore with offline persistence — repeat visitors load from IndexedDB (0 server reads)
+export const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({
+    tabManager: persistentMultipleTabManager()
+  })
+})
+
 export const storage = getStorage(app)
 export { firebaseConfig }
