@@ -140,16 +140,23 @@ export const DEFAULT_WHY_NERMAI_SHOWCASE = {
       desc: '187+ successful candidates across UPSC, TNPSC, Police and Puducherry Recruitments prove that our approach works.'
     }
   ],
+  showBottomBar: true,
+  showQuote: true,
   bottomQuote: "Education is not a business for us, it's a responsibility.",
   bottomAuthor: 'NERMAI',
+  showMetric1: true,
   stat1Num: '187+',
   stat1Label: 'Successful Candidates',
+  showMetric2: true,
   stat2Num: '14+',
   stat2Label: 'Years of Impact',
+  showMetric3: true,
   stat3Num: 'Stronger',
   stat3Label: 'Rural Youth, Brighter India',
+  showCursive: true,
   cursiveLine1: 'Same Dedication.',
   cursiveLine2: 'A Brighter Tomorrow.',
+  showCta: true,
   ctaText: 'JOIN NERMAI TODAY',
   ctaLink: '#contact'
 }

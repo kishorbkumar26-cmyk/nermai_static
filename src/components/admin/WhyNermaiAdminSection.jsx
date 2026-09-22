@@ -30,6 +30,45 @@ const ICON_CHOICES = [
   { value: 'Compass', label: 'Compass / Direction' },
   { value: 'Zap', label: 'Zap / Speed & Energy' }
 ]
+function ToggleSwitch({ label, checked, onChange, color = '#7B1B2E', subtitle }) {
+  return (
+    <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer', margin: 0, userSelect: 'none' }}>
+      <span style={{
+        position: 'relative',
+        display: 'inline-block',
+        width: '38px',
+        height: '20px',
+        backgroundColor: checked ? color : '#cbd5e1',
+        borderRadius: '20px',
+        transition: 'background-color 0.2s ease',
+        flexShrink: 0
+      }}>
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(e) => onChange(e.target.checked)}
+          style={{ opacity: 0, width: 0, height: 0, position: 'absolute' }}
+        />
+        <span style={{
+          position: 'absolute',
+          top: '2px',
+          left: checked ? '20px' : '2px',
+          width: '16px',
+          height: '16px',
+          backgroundColor: '#ffffff',
+          borderRadius: '50%',
+          transition: 'left 0.2s ease',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+        }} />
+      </span>
+      {label && (
+        <span style={{ fontSize: '0.82rem', fontWeight: 600, color: checked ? '#1f2937' : '#64748b' }}>
+          {label}
+        </span>
+      )}
+    </label>
+  )
+}
 
 export default function WhyNermaiAdminSection({ toast }) {
   const [activeTab, setActiveTab] = useState('showcase') // 'showcase' | 'card'
@@ -337,7 +376,7 @@ export default function WhyNermaiAdminSection({ toast }) {
                 </span>
               </div>
               <div style={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(212, 175, 55, 0.25)' }}>
-                <WhyNermaiShowcase />
+                <WhyNermaiShowcase data={showcaseData} />
               </div>
             </div>
           )}
@@ -510,175 +549,260 @@ export default function WhyNermaiAdminSection({ toast }) {
 
           {/* 3. Bottom Bar: Quote, Metrics & Cursive Note */}
           <div className="ap-card" style={{ marginBottom: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111827', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <i className="fa-solid fa-quote-left" style={{ color: 'var(--maroon)' }} /> 3. Bottom Bar Quote & 3 Metrics
-            </h3>
-
-            {/* Quote Block */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
-              <div className="ap-form-group">
-                <label style={{ fontWeight: 600 }}>Featured Quote Text</label>
-                <input
-                  type="text"
-                  className="ap-input"
-                  value={showcaseData.bottomQuote || ''}
-                  onChange={(e) => handleShowcaseField('bottomQuote', e.target.value)}
-                  placeholder="Education is not a business for us, it's a responsibility."
-                />
-              </div>
-              <div className="ap-form-group">
-                <label style={{ fontWeight: 600 }}>Quote Author / Label</label>
-                <input
-                  type="text"
-                  className="ap-input"
-                  value={showcaseData.bottomAuthor || ''}
-                  onChange={(e) => handleShowcaseField('bottomAuthor', e.target.value)}
-                  placeholder="NERMAI"
-                />
-              </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid #f3f4f6' }}>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111827', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <i className="fa-solid fa-quote-left" style={{ color: 'var(--maroon)' }} /> 3. Bottom Bar Quote & 3 Metrics
+              </h3>
+              <ToggleSwitch
+                label={showcaseData.showBottomBar !== false ? 'Bottom Bar: Visible' : 'Bottom Bar: Hidden'}
+                checked={showcaseData.showBottomBar !== false}
+                onChange={(val) => handleShowcaseField('showBottomBar', val)}
+              />
             </div>
 
-            {/* 3 Metrics */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
-              {/* Metric 1 */}
-              <div style={{ background: '#fafafa', padding: '1rem', borderRadius: '8px', border: '1px solid #f3f4f6' }}>
-                <span style={{ fontWeight: 700, color: '#7B1B2E', fontSize: '0.85rem', display: 'block', marginBottom: '0.5rem' }}>
-                  <Users size={16} style={{ verticalAlign: 'middle', marginRight: '4px' }} /> Metric 1
-                </span>
-                <div className="ap-form-group" style={{ marginBottom: '0.5rem' }}>
-                  <label style={{ fontSize: '0.78rem' }}>Number / Stat</label>
-                  <input
-                    type="text"
-                    className="ap-input"
-                    value={showcaseData.stat1Num || ''}
-                    onChange={(e) => handleShowcaseField('stat1Num', e.target.value)}
-                    placeholder="187+"
-                  />
-                </div>
-                <div className="ap-form-group" style={{ margin: 0 }}>
-                  <label style={{ fontSize: '0.78rem' }}>Label</label>
-                  <input
-                    type="text"
-                    className="ap-input"
-                    value={showcaseData.stat1Label || ''}
-                    onChange={(e) => handleShowcaseField('stat1Label', e.target.value)}
-                    placeholder="Successful Candidates"
-                  />
-                </div>
+            {showcaseData.showBottomBar === false ? (
+              <div style={{ padding: '1rem', background: '#fef2f2', border: '1px dashed #f87171', borderRadius: '8px', color: '#991b1b', fontSize: '0.85rem' }}>
+                <i className="fa-solid fa-eye-slash" style={{ marginRight: '6px' }} /> Entire Bottom Bar (Quote, 3 Metrics & Accent Note) is currently <strong>HIDDEN</strong> from the homepage. Turn ON the toggle above to display it.
               </div>
+            ) : (
+              <>
+                {/* Quote Block */}
+                <div style={{ border: '1px solid #f3f4f6', borderRadius: '8px', padding: '1rem', background: '#fafafa', marginBottom: '1.25rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                    <span style={{ fontWeight: 700, color: '#7B1B2E', fontSize: '0.85rem' }}>
+                      Featured Quote
+                    </span>
+                    <ToggleSwitch
+                      label={showcaseData.showQuote !== false ? 'Visible' : 'Hidden'}
+                      checked={showcaseData.showQuote !== false}
+                      onChange={(val) => handleShowcaseField('showQuote', val)}
+                    />
+                  </div>
+                  {showcaseData.showQuote !== false && (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+                      <div className="ap-form-group" style={{ margin: 0 }}>
+                        <label style={{ fontWeight: 600, fontSize: '0.78rem' }}>Featured Quote Text</label>
+                        <input
+                          type="text"
+                          className="ap-input"
+                          value={showcaseData.bottomQuote || ''}
+                          onChange={(e) => handleShowcaseField('bottomQuote', e.target.value)}
+                          placeholder="Education is not a business for us, it's a responsibility."
+                        />
+                      </div>
+                      <div className="ap-form-group" style={{ margin: 0 }}>
+                        <label style={{ fontWeight: 600, fontSize: '0.78rem' }}>Quote Author / Label</label>
+                        <input
+                          type="text"
+                          className="ap-input"
+                          value={showcaseData.bottomAuthor || ''}
+                          onChange={(e) => handleShowcaseField('bottomAuthor', e.target.value)}
+                          placeholder="NERMAI"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-              {/* Metric 2 */}
-              <div style={{ background: '#fafafa', padding: '1rem', borderRadius: '8px', border: '1px solid #f3f4f6' }}>
-                <span style={{ fontWeight: 700, color: '#7B1B2E', fontSize: '0.85rem', display: 'block', marginBottom: '0.5rem' }}>
-                  <GraduationCap size={16} style={{ verticalAlign: 'middle', marginRight: '4px' }} /> Metric 2
-                </span>
-                <div className="ap-form-group" style={{ marginBottom: '0.5rem' }}>
-                  <label style={{ fontSize: '0.78rem' }}>Number / Stat</label>
-                  <input
-                    type="text"
-                    className="ap-input"
-                    value={showcaseData.stat2Num || ''}
-                    onChange={(e) => handleShowcaseField('stat2Num', e.target.value)}
-                    placeholder="14+"
-                  />
-                </div>
-                <div className="ap-form-group" style={{ margin: 0 }}>
-                  <label style={{ fontSize: '0.78rem' }}>Label</label>
-                  <input
-                    type="text"
-                    className="ap-input"
-                    value={showcaseData.stat2Label || ''}
-                    onChange={(e) => handleShowcaseField('stat2Label', e.target.value)}
-                    placeholder="Years of Impact"
-                  />
-                </div>
-              </div>
+                {/* 3 Metrics */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
+                  {/* Metric 1 */}
+                  <div style={{ background: '#fafafa', padding: '1rem', borderRadius: '8px', border: '1px solid #f3f4f6' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                      <span style={{ fontWeight: 700, color: '#7B1B2E', fontSize: '0.85rem' }}>
+                        <Users size={16} style={{ verticalAlign: 'middle', marginRight: '4px' }} /> Metric 1
+                      </span>
+                      <ToggleSwitch
+                        label={showcaseData.showMetric1 !== false ? 'Visible' : 'Hidden'}
+                        checked={showcaseData.showMetric1 !== false}
+                        onChange={(val) => handleShowcaseField('showMetric1', val)}
+                      />
+                    </div>
+                    {showcaseData.showMetric1 !== false && (
+                      <>
+                        <div className="ap-form-group" style={{ marginBottom: '0.5rem' }}>
+                          <label style={{ fontSize: '0.78rem' }}>Number / Stat</label>
+                          <input
+                            type="text"
+                            className="ap-input"
+                            value={showcaseData.stat1Num || ''}
+                            onChange={(e) => handleShowcaseField('stat1Num', e.target.value)}
+                            placeholder="187+"
+                          />
+                        </div>
+                        <div className="ap-form-group" style={{ margin: 0 }}>
+                          <label style={{ fontSize: '0.78rem' }}>Label</label>
+                          <input
+                            type="text"
+                            className="ap-input"
+                            value={showcaseData.stat1Label || ''}
+                            onChange={(e) => handleShowcaseField('stat1Label', e.target.value)}
+                            placeholder="Successful Candidates"
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
 
-              {/* Metric 3 */}
-              <div style={{ background: '#fafafa', padding: '1rem', borderRadius: '8px', border: '1px solid #f3f4f6' }}>
-                <span style={{ fontWeight: 700, color: '#7B1B2E', fontSize: '0.85rem', display: 'block', marginBottom: '0.5rem' }}>
-                  <TrendingUp size={16} style={{ verticalAlign: 'middle', marginRight: '4px' }} /> Metric 3
-                </span>
-                <div className="ap-form-group" style={{ marginBottom: '0.5rem' }}>
-                  <label style={{ fontSize: '0.78rem' }}>Title / Stat</label>
-                  <input
-                    type="text"
-                    className="ap-input"
-                    value={showcaseData.stat3Num || ''}
-                    onChange={(e) => handleShowcaseField('stat3Num', e.target.value)}
-                    placeholder="Stronger"
-                  />
-                </div>
-                <div className="ap-form-group" style={{ margin: 0 }}>
-                  <label style={{ fontSize: '0.78rem' }}>Label / Description</label>
-                  <input
-                    type="text"
-                    className="ap-input"
-                    value={showcaseData.stat3Label || ''}
-                    onChange={(e) => handleShowcaseField('stat3Label', e.target.value)}
-                    placeholder="Rural Youth, Brighter India"
-                  />
-                </div>
-              </div>
-            </div>
+                  {/* Metric 2 */}
+                  <div style={{ background: '#fafafa', padding: '1rem', borderRadius: '8px', border: '1px solid #f3f4f6' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                      <span style={{ fontWeight: 700, color: '#7B1B2E', fontSize: '0.85rem' }}>
+                        <GraduationCap size={16} style={{ verticalAlign: 'middle', marginRight: '4px' }} /> Metric 2
+                      </span>
+                      <ToggleSwitch
+                        label={showcaseData.showMetric2 !== false ? 'Visible' : 'Hidden'}
+                        checked={showcaseData.showMetric2 !== false}
+                        onChange={(val) => handleShowcaseField('showMetric2', val)}
+                      />
+                    </div>
+                    {showcaseData.showMetric2 !== false && (
+                      <>
+                        <div className="ap-form-group" style={{ marginBottom: '0.5rem' }}>
+                          <label style={{ fontSize: '0.78rem' }}>Number / Stat</label>
+                          <input
+                            type="text"
+                            className="ap-input"
+                            value={showcaseData.stat2Num || ''}
+                            onChange={(e) => handleShowcaseField('stat2Num', e.target.value)}
+                            placeholder="14+"
+                          />
+                        </div>
+                        <div className="ap-form-group" style={{ margin: 0 }}>
+                          <label style={{ fontSize: '0.78rem' }}>Label</label>
+                          <input
+                            type="text"
+                            className="ap-input"
+                            value={showcaseData.stat2Label || ''}
+                            onChange={(e) => handleShowcaseField('stat2Label', e.target.value)}
+                            placeholder="Years of Impact"
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
 
-            {/* Handwritten Cursive Note */}
-            <div style={{ border: '1px solid #f3f4f6', borderRadius: '8px', padding: '1rem', background: '#fafafa' }}>
-              <span style={{ fontWeight: 700, fontSize: '0.85rem', color: '#7B1B2E', display: 'block', marginBottom: '0.5rem' }}>
-                Right Accent Note (Cursive / Handwritten)
-              </span>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
-                <div className="ap-form-group" style={{ margin: 0 }}>
-                  <label style={{ fontSize: '0.78rem' }}>Line 1</label>
-                  <input
-                    type="text"
-                    className="ap-input"
-                    value={showcaseData.cursiveLine1 || ''}
-                    onChange={(e) => handleShowcaseField('cursiveLine1', e.target.value)}
-                    placeholder="Same Dedication."
-                  />
+                  {/* Metric 3 */}
+                  <div style={{ background: '#fafafa', padding: '1rem', borderRadius: '8px', border: '1px solid #f3f4f6' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                      <span style={{ fontWeight: 700, color: '#7B1B2E', fontSize: '0.85rem' }}>
+                        <TrendingUp size={16} style={{ verticalAlign: 'middle', marginRight: '4px' }} /> Metric 3
+                      </span>
+                      <ToggleSwitch
+                        label={showcaseData.showMetric3 !== false ? 'Visible' : 'Hidden'}
+                        checked={showcaseData.showMetric3 !== false}
+                        onChange={(val) => handleShowcaseField('showMetric3', val)}
+                      />
+                    </div>
+                    {showcaseData.showMetric3 !== false && (
+                      <>
+                        <div className="ap-form-group" style={{ marginBottom: '0.5rem' }}>
+                          <label style={{ fontSize: '0.78rem' }}>Title / Stat</label>
+                          <input
+                            type="text"
+                            className="ap-input"
+                            value={showcaseData.stat3Num || ''}
+                            onChange={(e) => handleShowcaseField('stat3Num', e.target.value)}
+                            placeholder="Stronger"
+                          />
+                        </div>
+                        <div className="ap-form-group" style={{ margin: 0 }}>
+                          <label style={{ fontSize: '0.78rem' }}>Label / Description</label>
+                          <input
+                            type="text"
+                            className="ap-input"
+                            value={showcaseData.stat3Label || ''}
+                            onChange={(e) => handleShowcaseField('stat3Label', e.target.value)}
+                            placeholder="Rural Youth, Brighter India"
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
-                <div className="ap-form-group" style={{ margin: 0 }}>
-                  <label style={{ fontSize: '0.78rem' }}>Line 2</label>
-                  <input
-                    type="text"
-                    className="ap-input"
-                    value={showcaseData.cursiveLine2 || ''}
-                    onChange={(e) => handleShowcaseField('cursiveLine2', e.target.value)}
-                    placeholder="A Brighter Tomorrow."
-                  />
+
+                {/* Handwritten Cursive Note */}
+                <div style={{ border: '1px solid #f3f4f6', borderRadius: '8px', padding: '1rem', background: '#fafafa' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                    <span style={{ fontWeight: 700, fontSize: '0.85rem', color: '#7B1B2E' }}>
+                      Right Accent Note (Cursive / Handwritten)
+                    </span>
+                    <ToggleSwitch
+                      label={showcaseData.showCursive !== false ? 'Visible' : 'Hidden'}
+                      checked={showcaseData.showCursive !== false}
+                      onChange={(val) => handleShowcaseField('showCursive', val)}
+                    />
+                  </div>
+                  {showcaseData.showCursive !== false && (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+                      <div className="ap-form-group" style={{ margin: 0 }}>
+                        <label style={{ fontSize: '0.78rem' }}>Line 1</label>
+                        <input
+                          type="text"
+                          className="ap-input"
+                          value={showcaseData.cursiveLine1 || ''}
+                          onChange={(e) => handleShowcaseField('cursiveLine1', e.target.value)}
+                          placeholder="Same Dedication."
+                        />
+                      </div>
+                      <div className="ap-form-group" style={{ margin: 0 }}>
+                        <label style={{ fontSize: '0.78rem' }}>Line 2</label>
+                        <input
+                          type="text"
+                          className="ap-input"
+                          value={showcaseData.cursiveLine2 || ''}
+                          onChange={(e) => handleShowcaseField('cursiveLine2', e.target.value)}
+                          placeholder="A Brighter Tomorrow."
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            </div>
+              </>
+            )}
           </div>
 
           {/* 4. Action CTA Button */}
           <div className="ap-card" style={{ marginBottom: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111827', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <i className="fa-solid fa-arrow-pointer" style={{ color: 'var(--maroon)' }} /> 4. Action Call-to-Action (CTA) Button
-            </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
-              <div className="ap-form-group">
-                <label style={{ fontWeight: 600 }}>Button Text</label>
-                <input
-                  type="text"
-                  className="ap-input"
-                  value={showcaseData.ctaText || ''}
-                  onChange={(e) => handleShowcaseField('ctaText', e.target.value)}
-                  placeholder="JOIN NERMAI TODAY"
-                />
-              </div>
-              <div className="ap-form-group">
-                <label style={{ fontWeight: 600 }}>Button Link / Destination URL</label>
-                <input
-                  type="text"
-                  className="ap-input"
-                  value={showcaseData.ctaLink || ''}
-                  onChange={(e) => handleShowcaseField('ctaLink', e.target.value)}
-                  placeholder="#contact or /courses or https://..."
-                />
-              </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid #f3f4f6' }}>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#111827', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <i className="fa-solid fa-arrow-pointer" style={{ color: 'var(--maroon)' }} /> 4. Action Call-to-Action (CTA) Button
+              </h3>
+              <ToggleSwitch
+                label={showcaseData.showCta !== false ? 'CTA Button: Visible' : 'CTA Button: Hidden'}
+                checked={showcaseData.showCta !== false}
+                onChange={(val) => handleShowcaseField('showCta', val)}
+              />
             </div>
+
+            {showcaseData.showCta === false ? (
+              <div style={{ padding: '1rem', background: '#fef2f2', border: '1px dashed #f87171', borderRadius: '8px', color: '#991b1b', fontSize: '0.85rem' }}>
+                <i className="fa-solid fa-eye-slash" style={{ marginRight: '6px' }} /> The Call-to-Action button is currently <strong>HIDDEN</strong> from the homepage. Turn ON the toggle above to display it.
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
+                <div className="ap-form-group">
+                  <label style={{ fontWeight: 600 }}>Button Text</label>
+                  <input
+                    type="text"
+                    className="ap-input"
+                    value={showcaseData.ctaText || ''}
+                    onChange={(e) => handleShowcaseField('ctaText', e.target.value)}
+                    placeholder="JOIN NERMAI TODAY"
+                  />
+                </div>
+                <div className="ap-form-group">
+                  <label style={{ fontWeight: 600 }}>Button Link / Destination URL</label>
+                  <input
+                    type="text"
+                    className="ap-input"
+                    value={showcaseData.ctaLink || ''}
+                    onChange={(e) => handleShowcaseField('ctaLink', e.target.value)}
+                    placeholder="#contact or /courses or https://..."
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </>
       )}
@@ -937,9 +1061,16 @@ export default function WhyNermaiAdminSection({ toast }) {
               </div>
 
               <div style={{ border: '1px solid #f3f4f6', borderRadius: '8px', padding: '1rem', background: '#fafafa' }}>
-                <span style={{ fontWeight: 700, fontSize: '0.85rem', color: '#7A1526', display: 'block', marginBottom: '0.5rem' }}>
-                  Bottom Script Note (Italic Cursive)
-                </span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                  <span style={{ fontWeight: 700, fontSize: '0.85rem', color: '#7A1526' }}>
+                    Bottom Script Note (Italic Cursive)
+                  </span>
+                  <ToggleSwitch
+                    label={cardData.showCustomScript ? 'Visible' : 'Hidden'}
+                    checked={!!cardData.showCustomScript}
+                    onChange={(val) => handleCardField('showCustomScript', val)}
+                  />
+                </div>
                 <div className="ap-form-group" style={{ marginBottom: '0.5rem' }}>
                   <label style={{ fontSize: '0.78rem' }}>Line 1</label>
                   <input

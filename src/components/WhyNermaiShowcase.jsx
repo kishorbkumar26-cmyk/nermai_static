@@ -29,11 +29,22 @@ const ICON_MAP = {
   Zap
 }
 
-export default function WhyNermaiShowcase() {
-  const [data, setData] = useState(DEFAULT_WHY_NERMAI_SHOWCASE)
+export default function WhyNermaiShowcase({ data: propData }) {
+  const [data, setData] = useState(propData || DEFAULT_WHY_NERMAI_SHOWCASE)
   const [flippedCards, setFlippedCards] = useState({})
 
   useEffect(() => {
+    if (propData) {
+      setData({
+        ...DEFAULT_WHY_NERMAI_SHOWCASE,
+        ...propData,
+        steps: Array.isArray(propData.steps) && propData.steps.length > 0
+          ? propData.steps
+          : DEFAULT_WHY_NERMAI_SHOWCASE.steps
+      })
+      return
+    }
+
     const unsub = fbFirestore.onSettingsChanged((settings) => {
       if (settings?.whyNermaiShowcase) {
         setData({
@@ -46,7 +57,7 @@ export default function WhyNermaiShowcase() {
       }
     })
     return () => unsub()
-  }, [])
+  }, [propData])
 
   const handleCardClick = (num) => {
     // Only toggle flip on mobile screens <= 768px
@@ -182,90 +193,106 @@ export default function WhyNermaiShowcase() {
         </div>
 
         {/* Bottom Bar: Quote + 3 Metrics + Cursive Note */}
-        <div className="why-bottom-bar reveal visible">
-          
-          {/* Quote Block */}
-          {data.bottomQuote && (
-            <>
-              <div className="why-quote-block">
-                <div className="why-quote-text">
-                  “{data.bottomQuote}”
-                </div>
-                {data.bottomAuthor && (
-                  <div className="why-quote-author">
-                    {data.bottomAuthor}
+        {data.showBottomBar !== false && (
+          <div className="why-bottom-bar reveal visible">
+            
+            {/* Quote Block */}
+            {data.showQuote !== false && data.bottomQuote && (
+              <>
+                <div className="why-quote-block">
+                  <div className="why-quote-text">
+                    “{data.bottomQuote}”
                   </div>
+                  {data.bottomAuthor && (
+                    <div className="why-quote-author">
+                      {data.bottomAuthor}
+                    </div>
+                  )}
+                </div>
+                {(
+                  (data.showMetric1 !== false && (data.stat1Num || data.stat1Label)) ||
+                  (data.showMetric2 !== false && (data.stat2Num || data.stat2Label)) ||
+                  (data.showMetric3 !== false && (data.stat3Num || data.stat3Label)) ||
+                  (data.showCursive !== false && (data.cursiveLine1 || data.cursiveLine2))
+                ) && <div className="why-bar-divider" />}
+              </>
+            )}
+
+            {/* Metric 1 */}
+            {data.showMetric1 !== false && (data.stat1Num || data.stat1Label) && (
+              <>
+                <div className="why-metric-item">
+                  <div className="why-metric-icon">
+                    <Users size={22} />
+                  </div>
+                  <div className="why-metric-content">
+                    <div className="why-metric-num">{data.stat1Num || '187+'}</div>
+                    <div className="why-metric-label">{data.stat1Label || 'Successful Candidates'}</div>
+                  </div>
+                </div>
+                {(
+                  (data.showMetric2 !== false && (data.stat2Num || data.stat2Label)) ||
+                  (data.showMetric3 !== false && (data.stat3Num || data.stat3Label)) ||
+                  (data.showCursive !== false && (data.cursiveLine1 || data.cursiveLine2))
+                ) && <div className="why-bar-divider" />}
+              </>
+            )}
+
+            {/* Metric 2 */}
+            {data.showMetric2 !== false && (data.stat2Num || data.stat2Label) && (
+              <>
+                <div className="why-metric-item">
+                  <div className="why-metric-icon">
+                    <GraduationCap size={22} />
+                  </div>
+                  <div className="why-metric-content">
+                    <div className="why-metric-num">{data.stat2Num || '14+'}</div>
+                    <div className="why-metric-label">{data.stat2Label || 'Years of Impact'}</div>
+                  </div>
+                </div>
+                {(
+                  (data.showMetric3 !== false && (data.stat3Num || data.stat3Label)) ||
+                  (data.showCursive !== false && (data.cursiveLine1 || data.cursiveLine2))
+                ) && <div className="why-bar-divider" />}
+              </>
+            )}
+
+            {/* Metric 3 */}
+            {data.showMetric3 !== false && (data.stat3Num || data.stat3Label) && (
+              <>
+                <div className="why-metric-item">
+                  <div className="why-metric-icon">
+                    <TrendingUp size={22} />
+                  </div>
+                  <div className="why-metric-content">
+                    <div className="why-metric-num">{data.stat3Num || 'Stronger'}</div>
+                    <div className="why-metric-label">{data.stat3Label || 'Rural Youth, Brighter India'}</div>
+                  </div>
+                </div>
+                {data.showCursive !== false && (data.cursiveLine1 || data.cursiveLine2) && (
+                  <div className="why-bar-divider" />
                 )}
-              </div>
-              <div className="why-bar-divider" />
-            </>
-          )}
+              </>
+            )}
 
-          {/* Metric 1 */}
-          {(data.stat1Num || data.stat1Label) && (
-            <>
-              <div className="why-metric-item">
-                <div className="why-metric-icon">
-                  <Users size={22} />
+            {/* Handwritten Cursive Note */}
+            {data.showCursive !== false && (data.cursiveLine1 || data.cursiveLine2) && (
+              <div className="why-cursive-block">
+                <div className="why-cursive-note">
+                  {data.cursiveLine1 && <>{data.cursiveLine1}<br /></>}
+                  {data.cursiveLine2 && <>{data.cursiveLine2}</>}
                 </div>
-                <div className="why-metric-content">
-                  <div className="why-metric-num">{data.stat1Num || '187+'}</div>
-                  <div className="why-metric-label">{data.stat1Label || 'Successful Candidates'}</div>
-                </div>
+                <svg className="why-cursive-underline" viewBox="0 0 160 16">
+                  <path d="M 5,10 Q 80,15 155,5" fill="none" stroke="#7B1B2E" strokeWidth="2.5" strokeLinecap="round" />
+                </svg>
               </div>
-              <div className="why-bar-divider" />
-            </>
-          )}
+            )}
 
-          {/* Metric 2 */}
-          {(data.stat2Num || data.stat2Label) && (
-            <>
-              <div className="why-metric-item">
-                <div className="why-metric-icon">
-                  <GraduationCap size={22} />
-                </div>
-                <div className="why-metric-content">
-                  <div className="why-metric-num">{data.stat2Num || '14+'}</div>
-                  <div className="why-metric-label">{data.stat2Label || 'Years of Impact'}</div>
-                </div>
-              </div>
-              <div className="why-bar-divider" />
-            </>
-          )}
-
-          {/* Metric 3 */}
-          {(data.stat3Num || data.stat3Label) && (
-            <>
-              <div className="why-metric-item">
-                <div className="why-metric-icon">
-                  <TrendingUp size={22} />
-                </div>
-                <div className="why-metric-content">
-                  <div className="why-metric-num">{data.stat3Num || 'Stronger'}</div>
-                  <div className="why-metric-label">{data.stat3Label || 'Rural Youth, Brighter India'}</div>
-                </div>
-              </div>
-              <div className="why-bar-divider" />
-            </>
-          )}
-
-          {/* Handwritten Cursive Note */}
-          {(data.cursiveLine1 || data.cursiveLine2) && (
-            <div className="why-cursive-block">
-              <div className="why-cursive-note">
-                {data.cursiveLine1 && <>{data.cursiveLine1}<br /></>}
-                {data.cursiveLine2 && <>{data.cursiveLine2}</>}
-              </div>
-              <svg className="why-cursive-underline" viewBox="0 0 160 16">
-                <path d="M 5,10 Q 80,15 155,5" fill="none" stroke="#7B1B2E" strokeWidth="2.5" strokeLinecap="round" />
-              </svg>
-            </div>
-          )}
-
-        </div>
+          </div>
+        )}
 
         {/* Action CTA Button */}
-        {data.ctaText && (
+        {data.showCta !== false && data.ctaText && (
           <div className="why-cta-row reveal visible">
             <a href={data.ctaLink || LMS_URL} className="why-join-btn">
               {data.ctaText} <ArrowRight size={18} />
