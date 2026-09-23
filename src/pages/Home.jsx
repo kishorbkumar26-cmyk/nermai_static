@@ -8,6 +8,7 @@ import Courses from '../components/Courses'
 import WhyNermai from '../components/WhyNermai'
 import WhatYouGet from '../components/WhatYouGet'
 import Gallery from '../components/Gallery'
+import GoogleReviews from '../components/GoogleReviews'
 import SuccessStoriesSection from '../components/SuccessStoriesSection'
 import OfficeLocations from '../components/OfficeLocations'
 import Footer from '../components/Footer'
@@ -225,6 +226,9 @@ export default function Home() {
 
         {/* ── GALLERY ── */}
         {visibility.gallery !== false && <Gallery />}
+
+        {/* ── GOOGLE REVIEWS (Elfsight Widget) ── */}
+        {visibility.googleReviews !== false && <GoogleReviews />}
 
         {/* ── FREE LEARNING RESOURCES (Study Notes & Question Banks) ── */}
         <section id="free-resources" className="section free-resources-section" style={{ background: 'var(--cream)', scrollMarginTop: '110px' }}>

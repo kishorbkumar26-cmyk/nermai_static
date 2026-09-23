@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "sync-reviews": "node scripts/sync-google-reviews.cjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",

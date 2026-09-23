@@ -1,0 +1,79 @@
+/* ==========================================================================
+   GOOGLE REVIEWS SECTION
+   ========================================================================== */
+
+.google-reviews-section {
+  background: #FFFDF9;
+  padding: 5rem 1.5rem 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle background pattern */
+.google-reviews-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 15% 50%, rgba(200, 90, 23, 0.04) 0%, transparent 55%),
+    radial-gradient(circle at 85% 20%, rgba(66, 133, 244, 0.04) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+.gr-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.gr-top-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0.75rem;
+}
+
+.gr-top-tag .tag-line {
+  width: 24px;
+  height: 1.5px;
+  background: #C85A17;
+  opacity: 0.7;
+}
+
+.gr-top-tag .tag-text {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: #C85A17;
+  text-transform: uppercase;
+}
+
+.gr-main-title {
+  font-family: Georgia, 'Playfair Display', serif;
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  font-weight: 700;
+  color: #2C221E;
+  margin: 0.3rem 0 0.5rem;
+}
+
+.gr-subtitle {
+  font-size: 0.95rem;
+  color: #6C625A;
+  margin: 0;
+}
+
+/* ── Elfsight Widget Wrapper ─────────────────────────────────────────────── */
+.gr-widget-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .google-reviews-section {
+    padding: 3.5rem 1rem 3rem;
+  }
+}

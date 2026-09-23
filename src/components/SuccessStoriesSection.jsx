@@ -20,6 +20,7 @@ export const DEFAULT_SUCCESS_STORIES_CONFIG = {
   testimonialsHeading: 'TESTIMONIALS',
   testimonialsSubtitle: 'Honest feedback from our students.',
   testimonialsScript: 'Real Stories. Real Impact.',
+  showTestimonials: true,
 
   feature1Icon: 'fa-trophy',
   feature1Title: 'Expert Guidance',
@@ -435,7 +436,7 @@ export default function SuccessStoriesSection({ customConfig }) {
         </div>
 
         {/* ════════ ROW 2: TESTIMONIALS ════════ */}
-        <div className="ss-testimonials-section">
+        {config.showTestimonials !== false && <div className="ss-testimonials-section">
           <div className="ss-section-header-row">
             <div className="ss-section-title-wrap">
               <div className="ss-section-badge-title">
@@ -520,7 +521,7 @@ export default function SuccessStoriesSection({ customConfig }) {
               ))}
             </div>
           )}
-        </div>
+        </div>}
 
         {/* ════════ ROW 3: BOTTOM 4 FEATURES BAR ════════ */}
         <div className="ss-bottom-features-bar">

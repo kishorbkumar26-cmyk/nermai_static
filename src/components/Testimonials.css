@@ -438,6 +438,53 @@
   }
 }
 
+/* ── Google Review Badge ─────────────────────────────────────────────────── */
+.card-google-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(66, 133, 244, 0.07);
+  border: 1px solid rgba(66, 133, 244, 0.2);
+  border-radius: 20px;
+  padding: 3px 10px 3px 7px;
+  margin-bottom: 0.65rem;
+  width: fit-content;
+}
 
+.card-google-badge span {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #4285F4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
 
+/* ── Star Rating Row ─────────────────────────────────────────────────────── */
+.card-star-row {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 0.75rem;
+}
+
+.card-star {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.card-star.filled {
+  color: #F5A623;
+}
+
+.card-star.empty {
+  color: #D4D0CC;
+}
+
+/* Subtle left border accent for Google-sourced cards */
+.testimonial-card-item.google-sourced {
+  border-left: 3px solid rgba(66, 133, 244, 0.35);
+}
+
+.testimonial-card-item.google-sourced.active-highlight {
+  border-left: 3px solid #4285F4;
+}
 

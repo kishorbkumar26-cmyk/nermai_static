@@ -43,7 +43,7 @@ function VisibilityEditor({ visibility = {}, onChange }) {
     { key: 'results', label: 'Results & Marquee' },
     { key: 'toppers', label: 'Toppers Carousel' },
     { key: 'gallery', label: 'Gallery Section' },
-    { key: 'testimonials', label: 'Testimonials' },
+    { key: 'googleReviews', label: 'Google Reviews (Elfsight Widget)' },
     { key: 'faq', label: 'FAQ Section' }
   ]
 
@@ -1520,7 +1520,7 @@ const TABS = [
 ]
 
 const DEFAULTS = {
-  visibility: { stats: true, about: true, features: true, courses: true, steps: true, results: true, gallery: true, testimonials: true, faq: true, events: true, toppers: true },
+  visibility: { stats: true, about: true, features: true, courses: true, steps: true, results: true, gallery: true, googleReviews: true, faq: true, events: true, toppers: true },
   ticker: { visible: true, speed: 35, items: [] },
   toppersWall: {
     eyebrow: 'STUDENT SUCCESS STORIES',
